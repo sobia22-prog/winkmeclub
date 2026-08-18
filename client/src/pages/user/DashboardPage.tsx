@@ -1,0 +1,243 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { brandConfig } from '../../config/brand.config';
+import { Card } from '../../components/common/Card';
+import { Badge } from '../../components/common/Badge';
+import { Button } from '../../components/common/Button';
+import { MultiSelectCity } from '../../components/common/MultiSelectCity';
+import { profileService } from '../../services/profile.service';
+import { Profile } from '../../types';
+import { Sparkles, Calendar, MapPin, Heart, ArrowRight } from 'lucide-react';
+import { DateRequestModal } from '../../components/profile/DateRequestModal';
+
+export const DashboardPage: React.FC = () => {
+  const { user } = useAuth();
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'vip' | 'popular' | 'city'>('all');
+  const [selectedProfileForDate, setSelectedProfileForDate] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch profiles from backend MongoDB Atlas whenever selected cities or category filter changes
+  const loadProfiles = useCallback(async () => {
+    setLoading(true);
+    try {
+      let cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
+      if (activeFilter === 'city' && selectedCities.length === 0) {
+        cityQuery = user?.city || 'Mumbai';
+      }
+
+      const vipQuery = activeFilter === 'vip' ? true : undefined;
+
+      const res = await profileService.getMatches({
+        city: cityQuery,
+        vipOnly: vipQuery,
+      });
+
+      if (res.data.success) {
+        let list = res.data.profiles;
+        if (activeFilter === 'popular') {
+          list = list.filter((p: Profile) => p.age <= 25);
+        }
+        setProfiles(list);
+      }
+    } catch (err) {
+      console.error('Failed to load profiles:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedCities, activeFilter, user?.city]);
+
+  useEffect(() => {
+    loadProfiles();
+  }, [loadProfiles]);
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Hero Banner Card 1 */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-rose-600 to-brand-wine border border-rose-400/30 p-6 md:p-8 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <span className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-full text-[10px] font-extrabold tracking-widest uppercase text-pink-200">
+              OFFICIAL VIP CLUB
+            </span>
+            <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
+              Girls' Love
+            </h1>
+            <p className="text-xs md:text-sm text-pink-100 font-medium max-w-md">
+              A CLUB OF LOVE ENCOUNTERS IN THE SAME CITY. LOVE TONIGHT.
+            </p>
+            <div className="pt-2">
+              <Link to="/matches">
+                <Button variant="gold" size="sm" rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                  Explore Encounters
+                </Button>
+              </Link>
+            </div>
+          </div>
+
+          <img
+            src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=80"
+            alt="Girls Love Banner"
+            className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-2 border-white/40 shadow-xl shrink-0"
+          />
+        </div>
+      </div>
+
+      {/* Hero Banner Card 2 */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500/20 via-brand-surface to-brand-surface border border-rose-500/30 p-5 flex items-center gap-4 shadow-lg">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-wine to-pink-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-brand-wine/30">
+          <Heart className="w-7 h-7 fill-white" />
+        </div>
+        <div className="space-y-1 flex-1">
+          <h3 className="text-sm font-bold text-slate-100">
+            {brandConfig.name} Verified Encounters
+          </h3>
+          <p className="text-xs text-slate-400 leading-snug">
+            All member profiles undergo 100% ID document verification for genuine, high-quality social date proposals.
+          </p>
+        </div>
+      </div>
+
+      {/* Section Header & Filters */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 className="text-base md:text-lg font-extrabold text-slate-100 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400" /> Popularity Recommendation List
+          </h2>
+          <Link to="/matches" className="text-xs text-brand-wine hover:underline font-bold flex items-center gap-1">
+            View All <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {/* Multi-Select City Dropdown & Category Pills Bar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <MultiSelectCity
+            label=""
+            selectedCities={selectedCities}
+            onChange={(cities) => setSelectedCities(cities)}
+          />
+
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              onClick={() => setActiveFilter('all')}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeFilter === 'all'
+                  ? 'bg-brand-wine text-white shadow-md shadow-brand-wine/30'
+                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setActiveFilter('vip')}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeFilter === 'vip'
+                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
+                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              VIP Certified
+            </button>
+            <button
+              onClick={() => setActiveFilter('popular')}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeFilter === 'popular'
+                  ? 'bg-pink-600 text-white shadow-md shadow-pink-600/30'
+                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Very Popular
+            </button>
+            <button
+              onClick={() => setActiveFilter('city')}
+              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                activeFilter === 'city'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Same City
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Profiles Grid Loaded from MongoDB Atlas */}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="h-64 animate-pulse bg-slate-800/50">
+              <div className="h-full w-full" />
+            </Card>
+          ))}
+        </div>
+      ) : profiles.length === 0 ? (
+        <Card className="p-8 text-center text-xs text-slate-400 space-y-2">
+          <p className="font-semibold">No recommended profiles found for selected cities.</p>
+          <p className="text-[11px] text-slate-500">Try selecting additional cities in the dropdown above.</p>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {profiles.map((profile) => (
+            <Card key={profile._id} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group">
+              <div className="relative h-64 overflow-hidden">
+                <img
+                  src={profile.profileImage}
+                  alt={profile.fullName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-transparent to-transparent opacity-90" />
+
+                <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                  {profile.isVIP && <Badge variant="vip" size="sm" />}
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-black/40" title="Online now" />
+                </div>
+
+                <div className="absolute bottom-3 left-3 right-3">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    {profile.fullName}, {profile.age}
+                  </h3>
+                  <p className="text-xs text-slate-300 flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-brand-wine" /> {profile.city} • {profile.gender}
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                <p className="text-xs text-slate-400 line-clamp-2 italic">"{profile.bio}"</p>
+
+                <div className="flex items-center gap-2 pt-2 border-t border-brand-border">
+                  <Link to="/matches" className="flex-1">
+                    <Button variant="secondary" size="sm" className="w-full">
+                      View Detail
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<Calendar className="w-3.5 h-3.5" />}
+                    onClick={() => setSelectedProfileForDate(profile)}
+                  >
+                    Apply for Date
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Date Request Modal */}
+      {selectedProfileForDate && (
+        <DateRequestModal
+          profile={selectedProfileForDate}
+          onClose={() => setSelectedProfileForDate(null)}
+        />
+      )}
+    </div>
+  );
+};

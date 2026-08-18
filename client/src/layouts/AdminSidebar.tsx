@@ -1,0 +1,67 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import {
+  LayoutDashboard,
+  Users,
+  TrendingUp,
+  ArrowDownRight,
+  ArrowUpRight,
+  ShieldCheck,
+  Package,
+  History,
+  Megaphone,
+  Headphones,
+  FileText,
+  LogOut,
+} from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+
+export const AdminSidebar: React.FC = () => {
+  const { logout } = useAuth();
+
+  const adminNavItems = [
+    { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+    { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
+    { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },
+    { label: 'Withdrawal Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
+    { label: 'Verifications', path: '/admin/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
+    { label: 'Products', path: '/admin/products', icon: <Package className="w-4 h-4" /> },
+    { label: 'Transactions', path: '/admin/transactions', icon: <History className="w-4 h-4" /> },
+    { label: 'Announcements', path: '/admin/announcements', icon: <Megaphone className="w-4 h-4" /> },
+    { label: 'Customer Service', path: '/admin/support', icon: <Headphones className="w-4 h-4" /> },
+  ];
+
+  return (
+    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-brand-surface border-r border-brand-border p-4 flex flex-col justify-between shrink-0 hidden md:flex self-start">
+      <div className="space-y-1">
+        {adminNavItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                isActive
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-brand-card'
+              }`
+            }
+          >
+            {item.icon}
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+      </div>
+
+      <div className="pt-4 border-t border-brand-border mt-auto">
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Exit Panel</span>
+        </button>
+      </div>
+    </aside>
+  );
+};
