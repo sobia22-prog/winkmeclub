@@ -22,7 +22,7 @@ export const adminService = {
     api.post(`/admin/trades/${tradeId}/settle`, data),
 
   getVerifications: (params?: { status?: string }) => api.get('/admin/verifications', { params }),
-  reviewVerification: (id: string, data: { action: 'APPROVE' | 'REJECT'; reason?: string }) =>
+  reviewVerification: (id: string, data: { action: 'APPROVE' | 'REJECT' | 'PENDING'; reason?: string }) =>
     api.post(`/admin/verifications/${id}/review`, data),
 
   createProduct: (data: any) => api.post('/admin/products', data),

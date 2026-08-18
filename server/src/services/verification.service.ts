@@ -48,7 +48,7 @@ export class VerificationService {
 
   static async reviewVerification(
     verificationId: string,
-    action: 'APPROVE' | 'REJECT',
+    action: 'APPROVE' | 'REJECT' | 'PENDING',
     adminId: string | mongoose.Types.ObjectId,
     reason: string = ''
   ) {
@@ -75,6 +75,18 @@ export class VerificationService {
         'VIP',
         '/profile'
       );
+    } else if (action === 'PENDING') {
+      verification.status = 'PENDING';
+      verification.rejectionReason = '';
+      verification.processedBy = new mongoose.Types.ObjectId(adminId);
+      verification.processedAt = new Date();
+      await verification.save();
+
+      await User.findByIdAndUpdate(verification.userId, {
+        isVIP: false,
+        verificationStatus: 'PENDING',
+        isVerified: false,
+      });
     } else {
       verification.status = 'REJECTED';
       verification.rejectionReason = reason || 'Document verification failed.';
@@ -82,12 +94,16 @@ export class VerificationService {
       verification.processedAt = new Date();
       await verification.save();
 
-      await User.findByIdAndUpdate(verification.userId, { verificationStatus: 'REJECTED' });
+      await User.findByIdAndUpdate(verification.userId, {
+        isVIP: false,
+        verificationStatus: 'REJECTED',
+        isVerified: false,
+      });
 
       await NotificationService.createNotification(
         verification.userId,
-        'Verification Rejected',
-        `Your verification request was rejected. Reason: ${verification.rejectionReason}`,
+        'Verification Status Updated',
+        `Your verification status was updated to REJECTED. Reason: ${verification.rejectionReason}`,
         'VIP',
         '/verification'
       );
