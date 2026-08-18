@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { profileService } from '../../services/profile.service';
 import { Verification } from '../../types';
@@ -7,7 +8,20 @@ import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
-import { ShieldCheck, Crown, Clock, XCircle, Upload, CheckCircle2, Award, FileText, Camera } from 'lucide-react';
+import {
+  ShieldCheck,
+  Crown,
+  Clock,
+  XCircle,
+  Upload,
+  CheckCircle2,
+  Award,
+  FileText,
+  Camera,
+  ShoppingBag,
+  ArrowRight,
+  Sparkles,
+} from 'lucide-react';
 
 export const VerificationPage: React.FC = () => {
   const { user, refreshSession } = useAuth();
@@ -97,6 +111,8 @@ export const VerificationPage: React.FC = () => {
     }
   };
 
+  const isVIPActive = user?.isVIP || verification?.status === 'APPROVED';
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header Banner */}
@@ -105,9 +121,9 @@ export const VerificationPage: React.FC = () => {
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
             <Crown className="w-3.5 h-3.5 fill-amber-400" /> VIP EXCLUSIVE PRIVILEGES
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">Become a Verified VIP</h1>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-100">VIP Identity Verification</h1>
           <p className="text-xs text-slate-300 max-w-lg">
-            Verify your government identity to unlock the Gold VIP badge, 3x profile engagement, priority date request dispatches, and premium trust status.
+            Verify your government identity to unlock Gold VIP status, 3x profile engagement, and exclusive VIP Product Trading privileges.
           </p>
         </div>
 
@@ -122,22 +138,44 @@ export const VerificationPage: React.FC = () => {
       <input ref={idFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleIdFileSelect} />
       <input ref={selfieFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleSelfieFileSelect} />
 
-      {/* Current Status Box */}
+      {/* Current Status & VIP Benefits Showcase Box */}
       {verification && (
-        <Card className="border-l-4 border-l-amber-500 space-y-3">
+        <Card className="border-l-4 border-l-amber-500 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-amber-400" /> Verification Status
             </h3>
-            {verification.status === 'APPROVED' && <Badge variant="verified">APPROVED & VIP ACTIVE</Badge>}
+            {isVIPActive && <Badge variant="verified">APPROVED & VIP ACTIVE</Badge>}
             {verification.status === 'PENDING' && <Badge variant="pending">UNDER ADMIN REVIEW</Badge>}
             {verification.status === 'REJECTED' && <Badge variant="danger">REJECTED</Badge>}
           </div>
 
-          {verification.status === 'APPROVED' && (
-            <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-300 flex items-center gap-3">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-              <span>Congratulations! Your identity has been verified by security administration. Your Gold VIP badge is active.</span>
+          {isVIPActive && (
+            <div className="space-y-4">
+              <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-300 flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span>Congratulations! Your identity has been verified by administration. Your Gold VIP badge and trading benefits are active.</span>
+              </div>
+
+              {/* VIP Benefits & Product Trading Direct Access Button */}
+              <div className="p-6 bg-gradient-to-r from-amber-500/10 via-brand-card to-brand-card border border-amber-500/30 rounded-2xl space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <h4 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-amber-400" /> VIP Privilege Unlocked: Product Trading Marketplace
+                    </h4>
+                    <p className="text-xs text-slate-300">
+                      As a verified VIP member, you can now trade luxury lifestyle products and participate in admin-settled trade outcomes.
+                    </p>
+                  </div>
+
+                  <Link to="/trades" className="shrink-0">
+                    <Button variant="gold" size="md" leftIcon={<ShoppingBag className="w-4 h-4" />} rightIcon={<ArrowRight className="w-4 h-4" />}>
+                      Access VIP Product Trading
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </div>
           )}
 
@@ -156,6 +194,33 @@ export const VerificationPage: React.FC = () => {
               <p>Reason: {verification.rejectionReason || 'Document photo was blurry or unreadable. Please re-upload.'}</p>
             </div>
           )}
+        </Card>
+      )}
+
+      {/* VIP Perks List (If not verified) */}
+      {!isVIPActive && (
+        <Card className="p-6 space-y-3 bg-brand-surface border border-brand-border">
+          <h3 className="text-sm font-extrabold text-slate-100 flex items-center gap-2">
+            <Crown className="w-4 h-4 text-amber-400" /> Why Become a Verified VIP Member?
+          </h3>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 pt-1">
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span><strong>VIP Product Trading:</strong> Access exclusive product marketplace & trading outcomes.</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span><strong>Gold Badge:</strong> Display verified trust badge on your profile.</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span><strong>Priority Dispatches:</strong> 3x profile engagement for date requests.</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+              <span><strong>Concierge Support:</strong> 24/7 priority customer service responses.</span>
+            </li>
+          </ul>
         </Card>
       )}
 
