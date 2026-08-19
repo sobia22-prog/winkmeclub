@@ -23,7 +23,7 @@ export const AdminLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-brand-dark flex flex-col">
       <Navbar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 items-start">
         <AdminSidebar />
         <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full overflow-x-hidden">
           <Outlet />
