@@ -30,27 +30,27 @@ export class AuthController {
         city,
         gender: gender || 'Female',
         role: 'USER',
-        isVerified: false,
+        isVerified: true,
       });
 
       // Create wallet with initial zero balance
       await WalletService.getOrCreateWallet(user._id.toString());
 
-      // Generate 6-digit OTP
-      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      await OTP.create({
-        email: user.email,
-        otp: otpCode,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 mins
-      });
-
-      console.log(`[OTP Sent to ${user.email}]: ${otpCode}`);
+      const token = generateToken(user._id.toString());
 
       return res.status(201).json({
         success: true,
-        message: 'Registration successful! Verification OTP sent to your email.',
-        email: user.email,
-        otpDemoHint: otpCode, // Provided for instant demo testing ease
+        message: 'Account created successfully!',
+        token,
+        user: {
+          id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          city: user.city,
+          role: user.role,
+          isVIP: user.isVIP,
+          isVerified: user.isVerified,
+        },
       });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Registration failed.' });

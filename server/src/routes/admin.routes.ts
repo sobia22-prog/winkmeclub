@@ -49,7 +49,7 @@ router.delete('/announcements/:id', AdminController.deleteAnnouncement);
 router.get('/tickets', AdminController.getTickets);
 router.post('/tickets/:id/reply', AdminController.replyTicket);
 
-// Audit Logs
-router.get('/audit-logs', AdminController.getAuditLogs);
+// Admin Settings & Total Access Controls
+router.put('/settings', AdminController.updateAdminSettings);
 
 export default router;

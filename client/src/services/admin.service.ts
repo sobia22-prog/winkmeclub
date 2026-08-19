@@ -40,4 +40,5 @@ export const adminService = {
     api.post(`/admin/tickets/${id}/reply`, data),
 
   getAuditLogs: () => api.get('/admin/audit-logs'),
+  updateAdminSettings: (data: any) => api.put('/admin/settings', data),
 };

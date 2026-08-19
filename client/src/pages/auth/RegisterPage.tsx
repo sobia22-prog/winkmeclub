@@ -6,9 +6,11 @@ import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
+import { useAuth } from '../../contexts/AuthContext';
 import { User, Mail, Phone, Lock, ShieldCheck, FileText, CheckSquare, Square } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
+  const { loginSession } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -47,9 +49,8 @@ export const RegisterPage: React.FC = () => {
     try {
       const res = await authService.register(formData);
       if (res.data.success) {
-        navigate('/verify-otp', {
-          state: { email: formData.email, otpDemoHint: res.data.otpDemoHint },
-        });
+        loginSession(res.data.token, res.data.user);
+        navigate('/dashboard');
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed.');

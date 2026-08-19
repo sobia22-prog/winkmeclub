@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import bcrypt from 'bcryptjs';
 import { User } from '../models/user.model';
 import { Wallet } from '../models/wallet.model';
 import { Trade } from '../models/trade.model';
@@ -725,12 +726,40 @@ export class AdminController {
   }
 
   // 10. System Audit Logs
-  static async getAuditLogs(req: AuthRequest, res: Response) {
+  // 11. Admin Self-Management & Bank Details Control
+  static async updateAdminSettings(req: AuthRequest, res: Response) {
     try {
-      const logs = await AuditService.getLogs(100);
-      return res.status(200).json({ success: true, logs });
+      if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
+      const { fullName, email, password, balance } = req.body;
+
+      const admin = await User.findById(req.user._id);
+      if (!admin) return res.status(404).json({ message: 'Admin profile not found.' });
+
+      if (fullName) admin.fullName = fullName;
+      if (email) admin.email = email.toLowerCase();
+      if (password && password.trim().length > 0) {
+        admin.passwordHash = await bcrypt.hash(password, 10);
+      }
+      await admin.save();
+
+      if (balance !== undefined && !isNaN(Number(balance))) {
+        const wallet = await WalletService.getOrCreateWallet(admin._id.toString());
+        wallet.availableBalance = Number(balance);
+        await wallet.save();
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Admin account credentials, username, password, and wallet balance updated successfully.',
+        user: {
+          id: admin._id,
+          fullName: admin.fullName,
+          email: admin.email,
+          role: admin.role,
+        },
+      });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to fetch audit logs.' });
+      return res.status(500).json({ message: error.message || 'Failed to update admin settings.' });
     }
   }
 }

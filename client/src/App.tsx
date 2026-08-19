@@ -56,7 +56,8 @@ export const App: React.FC = () => {
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <Routes>
-            {/* Public Auth Routes */}
+            {/* Public Root & Auth Routes */}
+            <Route path="/" element={<Navigate to="/register" replace />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/verify-otp" element={<VerifyOTPPage />} />
