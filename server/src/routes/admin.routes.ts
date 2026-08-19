@@ -11,9 +11,12 @@ router.use(authenticate, requireAdmin);
 // Dashboard
 router.get('/dashboard', AdminController.getDashboardStats);
 
-// Users Management
+// Users & Match Profiles Management
 router.get('/users', AdminController.getUsers);
+router.post('/users', AdminController.createMatchProfile);
 router.get('/users/:id', AdminController.getUserDetail);
+router.put('/users/:id', AdminController.updateUserProfile);
+router.delete('/users/:id', AdminController.deleteUser);
 router.post('/users/:id/balance', AdminController.adjustUserBalance);
 router.patch('/users/:id/status', AdminController.toggleUserStatus);
 

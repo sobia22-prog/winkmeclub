@@ -8,8 +8,21 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
+import { Textarea } from '../../components/common/Textarea';
 import { Modal } from '../../components/common/Modal';
-import { Users, Search, DollarSign, ShieldAlert, Eye, UserCheck, UserX } from 'lucide-react';
+import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
+import { brandConfig } from '../../config/brand.config';
+import {
+  Users,
+  Search,
+  DollarSign,
+  Eye,
+  UserCheck,
+  UserX,
+  PlusCircle,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -25,6 +38,22 @@ export const AdminUsersPage: React.FC = () => {
     amount: 1000,
     reason: 'Admin operational credit adjustment',
   });
+
+  // Profile Edit / Add Modal State
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [editProfileUser, setEditProfileUser] = useState<User | null>(null);
+  const [profileForm, setProfileForm] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    city: 'Mumbai',
+    gender: 'Female',
+    profileImage: '',
+    bio: '',
+    interests: 'Travel, Dating, Luxury',
+    isVIP: true,
+  });
+
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -70,6 +99,77 @@ export const AdminUsersPage: React.FC = () => {
     }
   };
 
+  const handleOpenAddProfile = () => {
+    setEditProfileUser(null);
+    setProfileForm({
+      fullName: '',
+      email: '',
+      phone: '',
+      city: 'Mumbai',
+      gender: 'Female',
+      profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+      bio: 'Vibrant personality exploring luxury dating & social connections.',
+      interests: 'Travel, Dating, Fashion',
+      isVIP: true,
+    });
+    setShowProfileModal(true);
+  };
+
+  const handleOpenEditProfile = (user: User) => {
+    setEditProfileUser(user);
+    setProfileForm({
+      fullName: user.fullName || '',
+      email: user.email || '',
+      phone: user.phone || '',
+      city: user.city || 'Mumbai',
+      gender: user.gender || 'Female',
+      profileImage: user.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+      bio: user.bio || '',
+      interests: Array.isArray(user.interests) ? user.interests.join(', ') : (user.interests || 'Travel, Dating'),
+      isVIP: user.isVIP ?? true,
+    });
+    setShowProfileModal(true);
+  };
+
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActionLoading(true);
+
+    try {
+      if (editProfileUser) {
+        const res = await adminService.updateUserProfile(editProfileUser.id || editProfileUser._id!, profileForm);
+        if (res.data.success) {
+          setMessage(`Profile ${profileForm.fullName} updated successfully!`);
+          setShowProfileModal(false);
+          fetchUsers();
+        }
+      } else {
+        const res = await adminService.createMatchProfile(profileForm);
+        if (res.data.success) {
+          setMessage(`Match Profile ${profileForm.fullName} created successfully!`);
+          setShowProfileModal(false);
+          fetchUsers();
+        }
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Profile operation failed');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteProfile = async (user: User) => {
+    if (window.confirm(`Are you sure you want to permanently delete profile for ${user.fullName}?`)) {
+      try {
+        await adminService.deleteUserProfile(user.id || user._id!);
+        setMessage(`Profile ${user.fullName} deleted.`);
+        fetchUsers();
+      } catch (err: any) {
+        alert(err.response?.data?.message || 'Failed to delete profile');
+      }
+    }
+  };
+
   const handleToggleStatus = async (user: User) => {
     const newStatus = user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
     if (window.confirm(`Are you sure you want to change ${user.fullName}'s status to ${newStatus}?`)) {
@@ -89,14 +189,21 @@ export const AdminUsersPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Users className="w-6 h-6 text-amber-400" /> Platform User Management
+            <Users className="w-6 h-6 text-amber-400" /> Platform User & Match Profiles
           </h1>
-          <p className="text-xs text-slate-400">Search directory, inspect user wallets, manage VIP badges, & adjust balances.</p>
+          <p className="text-xs text-slate-400">Add, edit, or remove profile photos, manage VIP badges, & adjust balances.</p>
         </div>
+
+        <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
+          Add Match Profile
+        </Button>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400">{message}</div>
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between">
+          <span>{message}</span>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+        </div>
       )}
 
       {/* Filter Bar */}
@@ -139,7 +246,7 @@ export const AdminUsersPage: React.FC = () => {
       ) : users.length === 0 ? (
         <Card className="p-12 text-center text-xs text-slate-500">No users match the search criteria.</Card>
       ) : (
-        <Table headers={['User', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Total', 'Actions']}>
+        <Table headers={['Profile Photo & Name', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Actions']}>
           {users.map((u) => {
             const userIdStr = u.id || u._id!;
             return (
@@ -149,7 +256,7 @@ export const AdminUsersPage: React.FC = () => {
                     <img
                       src={u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}
                       alt={u.fullName}
-                      className="w-9 h-9 rounded-xl object-cover"
+                      className="w-10 h-10 rounded-xl object-cover border border-brand-border"
                     />
                     <div>
                       <h4 className="text-xs font-bold text-slate-100">{u.fullName}</h4>
@@ -172,11 +279,15 @@ export const AdminUsersPage: React.FC = () => {
                 <td className="px-5 py-3 text-amber-400 font-semibold">
                   ₹{u.wallet?.frozenBalance?.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
                 </td>
-                <td className="px-5 py-3 font-bold text-slate-100">
-                  ₹{u.wallet?.totalBalance?.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
-                </td>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
+                    <button
+                      title="Edit Profile Photo & Info"
+                      onClick={() => handleOpenEditProfile(u)}
+                      className="p-1.5 bg-brand-surface border border-brand-border rounded-lg text-slate-300 hover:text-white"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
                     <Link to={`/admin/users/${userIdStr}`}>
                       <button title="View Detail" className="p-1.5 bg-brand-surface border border-brand-border rounded-lg text-slate-300 hover:text-white">
                         <Eye className="w-3.5 h-3.5" />
@@ -198,12 +309,96 @@ export const AdminUsersPage: React.FC = () => {
                     >
                       {u.status === 'ACTIVE' ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
                     </button>
+                    <button
+                      title="Delete Profile"
+                      onClick={() => handleDeleteProfile(u)}
+                      className="p-1.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 hover:bg-rose-500/20"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </td>
               </tr>
             );
           })}
         </Table>
+      )}
+
+      {/* Add / Edit Profile Modal */}
+      {showProfileModal && (
+        <Modal
+          isOpen={true}
+          onClose={() => setShowProfileModal(false)}
+          title={editProfileUser ? `Edit Profile & Photo — ${editProfileUser.fullName}` : 'Add New Match Profile'}
+        >
+          <form onSubmit={handleProfileSubmit} className="space-y-4">
+            <ImageUploadPicker
+              label="Profile Photo Upload"
+              value={profileForm.profileImage}
+              onChange={(url) => setProfileForm({ ...profileForm, profileImage: url })}
+              helperText="Upload profile photo image file"
+              aspectRatio="square"
+            />
+
+            <Input
+              label="Full Name"
+              value={profileForm.fullName}
+              onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
+              required
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+              <Select
+                label="City"
+                value={profileForm.city}
+                onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                options={brandConfig.cities.map((c) => ({ label: c, value: c }))}
+              />
+              <Select
+                label="Gender"
+                value={profileForm.gender}
+                onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
+                options={[
+                  { label: 'Female', value: 'Female' },
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Non-Binary', value: 'Non-Binary' },
+                ]}
+              />
+            </div>
+
+            <Textarea
+              label="Bio / Introduction"
+              value={profileForm.bio}
+              onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+              rows={2}
+            />
+
+            <Input
+              label="Interests (comma separated)"
+              value={profileForm.interests}
+              onChange={(e) => setProfileForm({ ...profileForm, interests: e.target.value })}
+            />
+
+            <Select
+              label="VIP Membership Badge"
+              value={profileForm.isVIP ? 'true' : 'false'}
+              onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
+              options={[
+                { label: 'Gold VIP Member', value: 'true' },
+                { label: 'Standard Member', value: 'false' },
+              ]}
+            />
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="secondary" onClick={() => setShowProfileModal(false)} type="button">
+                Cancel
+              </Button>
+              <Button variant="gold" type="submit" isLoading={actionLoading}>
+                Save Profile
+              </Button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {/* Adjust Balance Modal */}

@@ -4,6 +4,9 @@ export const adminService = {
   getDashboardStats: () => api.get('/admin/dashboard'),
   getUsers: (params?: any) => api.get('/admin/users', { params }),
   getUserDetail: (id: string) => api.get(`/admin/users/${id}`),
+  createMatchProfile: (data: any) => api.post('/admin/users', data),
+  updateUserProfile: (id: string, data: any) => api.put(`/admin/users/${id}`, data),
+  deleteUserProfile: (id: string) => api.delete(`/admin/users/${id}`),
   adjustUserBalance: (id: string, data: { action: 'ADD' | 'FREEZE' | 'UNFREEZE' | 'DEDUCT'; amount: number; reason: string }) =>
     api.post(`/admin/users/${id}/balance`, data),
   toggleUserStatus: (id: string, data: { status?: 'ACTIVE' | 'SUSPENDED'; isVIP?: boolean }) =>

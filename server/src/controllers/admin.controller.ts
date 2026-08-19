@@ -257,6 +257,82 @@ export class AdminController {
     }
   }
 
+  static async updateUserProfile(req: AuthRequest, res: Response) {
+    try {
+      const { fullName, email, phone, city, gender, profileImage, bio, interests, isVIP, status } = req.body;
+      const user = await User.findById(req.params.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      if (fullName) user.fullName = fullName;
+      if (email) user.email = email;
+      if (phone) user.phone = phone;
+      if (city) user.city = city;
+      if (gender) user.gender = gender;
+      if (profileImage !== undefined) user.profileImage = profileImage;
+      if (bio !== undefined) user.bio = bio;
+      if (interests !== undefined) user.interests = Array.isArray(interests) ? interests : interests.split(',').map((s: string) => s.trim());
+      if (isVIP !== undefined) user.isVIP = isVIP;
+      if (status) user.status = status;
+
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Profile details & media updated successfully.',
+        user,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to update profile.' });
+    }
+  }
+
+  static async createMatchProfile(req: AuthRequest, res: Response) {
+    try {
+      const { fullName, email, phone, city, gender, profileImage, bio, interests, isVIP } = req.body;
+
+      const randomEmail = email || `match_${Date.now()}@winkmedatingclub.com`;
+      const user = await User.create({
+        fullName,
+        email: randomEmail,
+        phone: phone || '+91 98765 00000',
+        city: city || 'Mumbai',
+        gender: gender || 'Female',
+        profileImage: profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+        bio: bio || 'Vibrant personality exploring luxury dating & social connections.',
+        interests: Array.isArray(interests) ? interests : (interests ? interests.split(',').map((s: string) => s.trim()) : ['Travel', 'Dating', 'Luxury']),
+        isVIP: isVIP ?? true,
+        status: 'ACTIVE',
+        isVerified: true,
+        verificationStatus: 'VERIFIED',
+        role: 'USER',
+      });
+
+      await Wallet.create({ userId: user._id, availableBalance: 10000 });
+
+      return res.status(201).json({
+        success: true,
+        message: 'New match profile created successfully.',
+        user,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to create profile.' });
+    }
+  }
+
+  static async deleteUser(req: AuthRequest, res: Response) {
+    try {
+      const user = await User.findByIdAndDelete(req.params.id);
+      if (!user) return res.status(404).json({ message: 'Profile not found.' });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Profile removed successfully.',
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to delete profile.' });
+    }
+  }
+
   // 3. Recharge Management
   static async getRecharges(req: AuthRequest, res: Response) {
     try {
