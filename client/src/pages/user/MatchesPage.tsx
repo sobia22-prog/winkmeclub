@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { brandConfig } from '../../config/brand.config';
 import { profileService } from '../../services/profile.service';
 import { Profile } from '../../types';
@@ -170,14 +171,16 @@ export const MatchesPage: React.FC = () => {
                   >
                     View Details
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    leftIcon={<Calendar className="w-3.5 h-3.5" />}
-                    onClick={() => setDateModalProfile(profile)}
-                  >
-                    Apply Date
-                  </Button>
+                  <Link to="/verification" className="flex-1">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="w-full"
+                      leftIcon={<Calendar className="w-3.5 h-3.5" />}
+                    >
+                      Apply Date
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </Card>
