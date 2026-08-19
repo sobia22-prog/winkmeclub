@@ -1,7 +1,7 @@
 export const brandConfig = {
-  name: "Wink Me Club",
-  shortName: "Wink Me Club",
+  name: "Winkmedatingclub",
+  shortName: "Winkmedatingclub",
   tagline: "Connect. Discover. Experience.",
-  supportEmail: "support@winkmeclub.com",
+  supportEmail: "support@winkmedatingclub.com",
   copyrightYear: new Date().getFullYear(),
 };
