@@ -206,7 +206,7 @@ export const TradesPage: React.FC = () => {
         {products.length === 0 ? (
           <Card className="p-8 text-center text-xs text-slate-500">Loading catalog items...</Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {products.map((product) => {
               const isSelected = selectedProduct?._id === product._id;
               return (
