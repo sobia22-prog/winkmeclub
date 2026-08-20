@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { walletService } from '../../services/wallet.service';
+import { systemSettingsService } from '../../services/systemSettings.service';
 import { RechargeRequest, WithdrawalRequest } from '../../types';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
@@ -39,10 +40,24 @@ export const WalletPage: React.FC = () => {
   const [selectedQrUrl, setSelectedQrUrl] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState(false);
 
-  // Custom Admin USDT Dollar Rate & Wallet Address
-  const usdtRateINR = 92.0; // ₹92 per 1 USDT
-  const cryptoDepositAddress = 'TXYZ987654321WinkMeClubUSDTDepositAddr';
-  const telegramFinanceUrl = 'https://t.me/winkmedatingclub_finance';
+  // Dynamic Admin USDT Dollar Rate & Wallet Address fetched from DB
+  const [usdtRateINR, setUsdtRateINR] = useState(92.0);
+  const [cryptoDepositAddress, setCryptoDepositAddress] = useState('TXYZ987654321WinkMeClubUSDTDepositAddr');
+  const [telegramFinanceUrl, setTelegramFinanceUrl] = useState('https://t.me/winkmedatingclub_finance');
+
+  useEffect(() => {
+    systemSettingsService
+      .getSettings()
+      .then((res) => {
+        if (res.data.success && res.data.settings) {
+          const s = res.data.settings;
+          if (s.usdtExchangeRate) setUsdtRateINR(s.usdtExchangeRate);
+          if (s.usdtWalletAddress) setCryptoDepositAddress(s.usdtWalletAddress);
+          if (s.telegramFinanceLink) setTelegramFinanceUrl(s.telegramFinanceLink);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Recharge Form
   const [rechargeForm, setRechargeForm] = useState({

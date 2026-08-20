@@ -12,6 +12,7 @@ import tradeRoutes from './trade.routes';
 import notificationRoutes from './notification.routes';
 import supportRoutes from './support.routes';
 import announcementRoutes from './announcement.routes';
+import systemSettingsRoutes from './systemSettings.routes';
 import adminRoutes from './admin.routes';
 
 const router = Router();
@@ -29,6 +30,7 @@ router.use('/trades', tradeRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/support', supportRoutes);
 router.use('/announcements', announcementRoutes);
+router.use('/system-settings', systemSettingsRoutes);
 router.use('/admin', adminRoutes);
 
 export default router;

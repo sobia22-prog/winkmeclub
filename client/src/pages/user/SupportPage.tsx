@@ -10,11 +10,25 @@ import { Textarea } from '../../components/common/Textarea';
 import { Badge } from '../../components/common/Badge';
 import { Headphones, PlusCircle, MessageSquare, Send, User, ShieldCheck, MessageCircle, ExternalLink } from 'lucide-react';
 
+import { systemSettingsService } from '../../services/systemSettings.service';
+
 export const SupportPage: React.FC = () => {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [replyMessage, setReplyMessage] = useState('');
+  const [telegramSupportUrl, setTelegramSupportUrl] = useState('https://t.me/winkmedatingclub_support');
+
+  useEffect(() => {
+    systemSettingsService
+      .getSettings()
+      .then((res) => {
+        if (res.data.success && res.data.settings?.telegramSupportLink) {
+          setTelegramSupportUrl(res.data.settings.telegramSupportLink);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Create Ticket Form
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -123,7 +137,7 @@ export const SupportPage: React.FC = () => {
           </div>
 
           <a
-            href="https://t.me/winkmedatingclub_support"
+            href={telegramSupportUrl}
             target="_blank"
             rel="noreferrer"
             className="shrink-0"

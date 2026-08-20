@@ -1,0 +1,68 @@
+import { Request, Response } from 'express';
+import { SystemSettings } from '../models/systemSettings.model';
+import { AuthRequest } from '../middleware/auth.middleware';
+
+export class SystemSettingsController {
+  static async getSettings(req: Request, res: Response) {
+    try {
+      let settings = await SystemSettings.findOne();
+      if (!settings) {
+        settings = await SystemSettings.create({});
+      }
+
+      return res.status(200).json({
+        success: true,
+        settings,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to fetch settings.' });
+    }
+  }
+
+  static async updateSettings(req: AuthRequest, res: Response) {
+    try {
+      if (!req.user || req.user.role !== 'ADMIN') {
+        return res.status(403).json({ message: 'Unauthorized. Admin access required.' });
+      }
+
+      const {
+        telegramFinanceLink,
+        telegramSupportLink,
+        usdtWalletAddress,
+        usdtExchangeRate,
+        adminUpiId,
+        bankName,
+        accountHolder,
+        accountNumber,
+        ifscCode,
+      } = req.body;
+
+      let settings = await SystemSettings.findOne();
+      if (!settings) {
+        settings = new SystemSettings({});
+      }
+
+      if (telegramFinanceLink !== undefined) settings.telegramFinanceLink = telegramFinanceLink;
+      if (telegramSupportLink !== undefined) settings.telegramSupportLink = telegramSupportLink;
+      if (usdtWalletAddress !== undefined) settings.usdtWalletAddress = usdtWalletAddress;
+      if (usdtExchangeRate !== undefined && !isNaN(Number(usdtExchangeRate))) {
+        settings.usdtExchangeRate = Number(usdtExchangeRate);
+      }
+      if (adminUpiId !== undefined) settings.adminUpiId = adminUpiId;
+      if (bankName !== undefined) settings.bankName = bankName;
+      if (accountHolder !== undefined) settings.accountHolder = accountHolder;
+      if (accountNumber !== undefined) settings.accountNumber = accountNumber;
+      if (ifscCode !== undefined) settings.ifscCode = ifscCode;
+
+      await settings.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'System payment & Telegram settings updated successfully!',
+        settings,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to update settings.' });
+    }
+  }
+}
