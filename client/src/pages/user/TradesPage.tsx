@@ -212,7 +212,7 @@ export const TradesPage: React.FC = () => {
               return (
                 <div
                   key={product._id}
-                  onClick={() => setSelectedProduct(product)}
+                  onClick={() => setSelectedProduct((prev) => (prev?._id === product._id ? null : product))}
                   className={`relative rounded-3xl p-5 bg-brand-surface border-2 transition-all cursor-pointer flex flex-col justify-between gap-4 text-center shadow-xl group ${
                     isSelected
                       ? 'border-fuchsia-500 bg-gradient-to-b from-fuchsia-950/40 via-brand-surface to-brand-surface shadow-fuchsia-500/30 scale-[1.02]'
