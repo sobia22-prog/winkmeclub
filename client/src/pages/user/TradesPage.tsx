@@ -49,7 +49,6 @@ export const TradesPage: React.FC = () => {
       ]);
       if (prodRes.data.success && prodRes.data.products.length > 0) {
         setProducts(prodRes.data.products);
-        setSelectedProduct(prodRes.data.products[0]);
       }
       if (trdRes.data.success) setTrades(trdRes.data.trades);
     } catch (err) {
@@ -301,7 +300,7 @@ export const TradesPage: React.FC = () => {
           <div className="space-y-1 text-xs">
             <div className="text-slate-300">
               <span className="text-slate-400">Selection: </span>
-              <strong className="text-fuchsia-400 font-extrabold">{selectedProduct?.name || 'None'}</strong>
+              <strong className="text-fuchsia-400 font-extrabold">{selectedProduct?.name || 'Please select an item above'}</strong>
             </div>
 
             {/* Quantity Selector */}
