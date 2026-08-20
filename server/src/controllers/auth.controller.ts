@@ -30,7 +30,9 @@ export class AuthController {
         city,
         gender: gender || 'Female',
         role: 'USER',
+        isVIP: true,
         isVerified: true,
+        verificationStatus: 'VERIFIED',
       });
 
       // Create wallet with initial zero balance

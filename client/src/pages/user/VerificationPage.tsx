@@ -15,6 +15,8 @@ import {
   ShieldCheck,
   MessageSquare,
   Award,
+  ArrowRight,
+  TrendingUp,
 } from 'lucide-react';
 
 export const VerificationPage: React.FC = () => {
@@ -61,18 +63,29 @@ export const VerificationPage: React.FC = () => {
           <Badge variant="verified">100% VERIFIED & VIP ACTIVE</Badge>
         </div>
 
-        {/* Status Message Box */}
-        <div className="p-4 bg-brand-card/80 border border-brand-border rounded-2xl space-y-3">
+        {/* Status Message Box with Primary Trading CTA */}
+        <div className="p-5 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-card border border-amber-500/40 rounded-2xl space-y-4 shadow-lg">
           <div className="flex items-start gap-3">
             <MessageSquare className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
             <div className="space-y-1 text-xs">
               <p className="font-bold text-slate-100">
                 Welcome, {user?.fullName || 'VIP Member'}! Your account profile is officially verified.
               </p>
-              <p className="text-[11px] text-slate-400">
-                Your Gold VIP status and Airborne Trading privileges are 100% ACTIVE. You have immediate clearance for product trading and priority date proposals.
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                Your Gold VIP status and Airborne Trading privileges are 100% ACTIVE. You have immediate clearance for product trading and round settlement outcomes.
               </p>
             </div>
+          </div>
+
+          <div className="pt-2 border-t border-amber-500/20">
+            <Link to="/trades">
+              <button
+                type="button"
+                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs tracking-wider uppercase shadow-xl shadow-pink-600/30 flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-95 transition-all cursor-pointer"
+              >
+                <ShoppingBag className="w-4 h-4" /> Start Airborne Product Trading Now <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
           </div>
         </div>
 

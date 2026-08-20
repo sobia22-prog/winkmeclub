@@ -45,7 +45,6 @@ export const TradesPage: React.FC = () => {
       ]);
       if (prodRes.data.success && prodRes.data.products.length > 0) {
         setProducts(prodRes.data.products);
-        // Default select first product
         setSelectedProduct(prodRes.data.products[0]);
       }
       if (trdRes.data.success) setTrades(trdRes.data.trades);
@@ -55,17 +54,14 @@ export const TradesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user?.isVIP || user?.verificationStatus === 'VERIFIED') {
-      fetchTradeData();
-    }
-  }, [user]);
+    fetchTradeData();
+  }, []);
 
   // Round Timer Countdown Loop
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          // Reset round timer and increment round ID
           setRoundId(`2026073${Math.floor(1000 + Math.random() * 9000)}`);
           return 60;
         }
@@ -95,7 +91,7 @@ export const TradesPage: React.FC = () => {
       });
 
       if (res.data.success) {
-        setSuccess(`Trade #${res.data.trade.tradeId} submitted for Round ${roundId}! ₹${(selectedProduct.price * quantity).toLocaleString('en-IN')} held in frozen state.`);
+        setSuccess(`Trade #${res.data.trade.tradeId} submitted for Round ${roundId}! ₹${(selectedProduct.price * quantity).toLocaleString('en-IN')} submitted.`);
         setQuantity(1);
         fetchTradeData();
         refreshSession();
@@ -106,42 +102,6 @@ export const TradesPage: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const isVIPMember = user?.isVIP || user?.verificationStatus === 'VERIFIED';
-
-  // If Non-VIP Member, render VIP Access Gate Screen
-  if (!isVIPMember) {
-    return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-gradient-to-r from-amber-950/40 via-brand-surface to-brand-surface border border-amber-500/30 rounded-3xl p-8 text-center space-y-6 shadow-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
-            <Crown className="w-8 h-8 fill-amber-400" />
-          </div>
-
-          <div className="space-y-2 max-w-md mx-auto">
-            <h1 className="text-2xl font-extrabold text-slate-100">VIP Exclusive Feature</h1>
-            <h2 className="text-sm font-bold text-amber-400">Airborne Activities & Product Trading</h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Product trading activities and round settlement outcomes are reserved exclusively for Verified Gold VIP Members. Complete identity verification to unlock trading privileges.
-            </p>
-          </div>
-
-          <div className="pt-2">
-            <Link to="/verification">
-              <Button
-                variant="gold"
-                size="md"
-                leftIcon={<ShieldCheck className="w-4 h-4" />}
-                rightIcon={<ArrowRight className="w-4 h-4" />}
-              >
-                Get Verified & Unlock VIP Trading
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const availableBalance = wallet?.availableBalance ?? 0;
   const totalAmount = selectedProduct ? selectedProduct.price * quantity : 0;
@@ -299,7 +259,7 @@ export const TradesPage: React.FC = () => {
             disabled={loading || !selectedProduct}
             className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-extrabold text-sm shadow-lg shadow-pink-500/25 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
           >
-            {loading ? 'Processing...' : 'Confirm'}
+            {loading ? 'Processing...' : 'Confirm Trade'}
           </button>
         </div>
       </div>
@@ -323,7 +283,7 @@ export const TradesPage: React.FC = () => {
                   ₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-4 py-3">
-                  {t.status === 'PENDING' ? <Badge variant="pending">HOLDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
+                  {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
                 </td>
                 <td className="px-4 py-3">
                   {t.outcome === 'WIN' && <Badge variant="vip">WIN 🎉</Badge>}
