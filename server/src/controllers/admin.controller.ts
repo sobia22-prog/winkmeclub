@@ -354,11 +354,15 @@ export class AdminController {
   static async reviewRecharge(req: AuthRequest, res: Response) {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
-      const { action, rejectionReason } = req.body;
+      const { action, amount, rejectionReason } = req.body;
       const recharge = await RechargeRequest.findById(req.params.id);
 
       if (!recharge || recharge.status !== 'PENDING') {
         return res.status(400).json({ message: 'Recharge request not found or already processed.' });
+      }
+
+      if (amount && !isNaN(Number(amount)) && Number(amount) > 0) {
+        recharge.amount = Number(amount);
       }
 
       if (action === 'APPROVE') {

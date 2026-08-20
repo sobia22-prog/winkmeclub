@@ -8,7 +8,7 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { Select } from '../../components/common/Select';
 import { Input } from '../../components/common/Input';
-import { ArrowDownRight, CheckCircle2, XCircle, Eye } from 'lucide-react';
+import { ArrowDownRight, CheckCircle2, XCircle, Eye, Edit3 } from 'lucide-react';
 
 export const AdminRechargesPage: React.FC = () => {
   const [recharges, setRecharges] = useState<RechargeRequest[]>([]);
@@ -18,6 +18,7 @@ export const AdminRechargesPage: React.FC = () => {
   const [selectedRecharge, setSelectedRecharge] = useState<RechargeRequest | null>(null);
   const [selectedReceiptUrl, setSelectedReceiptUrl] = useState<string | null>(null);
   const [reviewAction, setReviewAction] = useState<'APPROVE' | 'REJECT'>('APPROVE');
+  const [overrideAmount, setOverrideAmount] = useState<number>(0);
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -47,6 +48,7 @@ export const AdminRechargesPage: React.FC = () => {
     try {
       const res = await adminService.reviewRecharge(selectedRecharge._id, {
         action: reviewAction,
+        amount: overrideAmount > 0 ? overrideAmount : selectedRecharge.amount,
         rejectionReason: reason,
       });
 
@@ -69,7 +71,7 @@ export const AdminRechargesPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <ArrowDownRight className="w-6 h-6 text-emerald-400" /> Recharge / Add-Funds Management
           </h1>
-          <p className="text-xs text-slate-400">Review user add-funds requests, inspect payment proof receipts, & approve wallet credits.</p>
+          <p className="text-xs text-slate-400">Review user add-funds requests, edit deposit amounts, inspect payment proof receipts, & approve wallet credits.</p>
         </div>
 
         <div className="w-full sm:w-48">
@@ -129,6 +131,7 @@ export const AdminRechargesPage: React.FC = () => {
                       leftIcon={<CheckCircle2 className="w-3.5 h-3.5" />}
                       onClick={() => {
                         setSelectedRecharge(r);
+                        setOverrideAmount(r.amount);
                         setReviewAction('APPROVE');
                       }}
                     >
@@ -140,6 +143,7 @@ export const AdminRechargesPage: React.FC = () => {
                       leftIcon={<XCircle className="w-3.5 h-3.5" />}
                       onClick={() => {
                         setSelectedRecharge(r);
+                        setOverrideAmount(r.amount);
                         setReviewAction('REJECT');
                       }}
                     >
@@ -175,12 +179,22 @@ export const AdminRechargesPage: React.FC = () => {
           title={`Confirm Recharge ${reviewAction} — #${selectedRecharge.requestId}`}
         >
           <form onSubmit={handleReviewSubmit} className="space-y-4">
-            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1">
-              <div className="text-xs text-slate-400">User: <span className="font-bold text-slate-100">{typeof selectedRecharge.userId === 'object' ? selectedRecharge.userId.fullName : 'User'}</span></div>
-              <div className="text-xs text-slate-400">Recharge Amount: <span className="font-bold text-emerald-400">₹{selectedRecharge.amount.toFixed(2)}</span></div>
-              <div className="text-xs text-slate-400">Method: <span className="font-bold text-slate-200">{selectedRecharge.paymentMethod}</span></div>
-              <div className="text-xs text-slate-400">Reference: <span className="font-mono font-bold text-slate-200">{selectedRecharge.referenceNumber}</span></div>
+            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1 text-xs">
+              <div>User: <span className="font-bold text-slate-100">{typeof selectedRecharge.userId === 'object' ? selectedRecharge.userId.fullName : 'User'}</span></div>
+              <div>Method: <span className="font-bold text-slate-200">{selectedRecharge.paymentMethod}</span></div>
+              <div>Reference: <span className="font-mono font-bold text-slate-200">{selectedRecharge.referenceNumber}</span></div>
             </div>
+
+            {reviewAction === 'APPROVE' && (
+              <Input
+                label="Confirm / Edit Deposit Amount (₹)"
+                type="number"
+                value={overrideAmount}
+                onChange={(e) => setOverrideAmount(Number(e.target.value))}
+                helperText="You can edit the deposit amount credited to the user's available balance"
+                required
+              />
+            )}
 
             {selectedRecharge.receiptUrl && (
               <div className="space-y-1">
@@ -191,11 +205,10 @@ export const AdminRechargesPage: React.FC = () => {
 
             {reviewAction === 'REJECT' && (
               <Input
-                label="Rejection Reason"
+                label="Rejection Reason (Optional)"
                 placeholder="UTR mismatch / Payment not received"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                required
               />
             )}
 

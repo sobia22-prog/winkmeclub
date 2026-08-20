@@ -13,8 +13,10 @@ export const adminService = {
     api.patch(`/admin/users/${id}/status`, data),
   
   getRecharges: (params?: { status?: string }) => api.get('/admin/recharges', { params }),
-  reviewRecharge: (id: string, data: { action: 'APPROVE' | 'REJECT'; rejectionReason?: string }) =>
-    api.post(`/admin/recharges/${id}/review`, data),
+  reviewRecharge: (
+    id: string,
+    data: { action: 'APPROVE' | 'REJECT'; amount?: number; rejectionReason?: string }
+  ) => api.post(`/admin/recharges/${id}/review`, data),
 
   getWithdrawals: (params?: { status?: string }) => api.get('/admin/withdrawals', { params }),
   reviewWithdrawal: (id: string, data: { action: 'APPROVE' | 'REJECT' | 'COMPLETE'; rejectionReason?: string }) =>
