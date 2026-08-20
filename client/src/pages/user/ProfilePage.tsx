@@ -109,12 +109,7 @@ export const ProfilePage: React.FC = () => {
       icon: <ShoppingBag className="w-6 h-6 text-amber-400" />,
       badge: 'Trading Active',
     },
-    {
-      title: 'Transaction Ledger',
-      description: 'View full audit log of all balance deposits and payouts',
-      path: '/transactions',
-      icon: <History className="w-6 h-6 text-purple-400" />,
-    },
+
     {
       title: 'Notification Center',
       description: 'View date proposals, trade outcomes, & system alerts',
