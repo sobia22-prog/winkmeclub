@@ -21,7 +21,7 @@ export const VerificationPage: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       {/* Clean Single VIP Hero Section */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/70 via-brand-surface to-brand-surface border border-amber-500/40 p-6 md:p-8 space-y-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-amber-500/20 pb-4">
