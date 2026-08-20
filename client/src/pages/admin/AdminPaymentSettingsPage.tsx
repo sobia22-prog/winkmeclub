@@ -3,12 +3,14 @@ import { systemSettingsService, SystemSettingsData } from '../../services/system
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
+import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
 import { Settings, Send, MessageCircle, QrCode, DollarSign, Building, CheckCircle2 } from 'lucide-react';
 
 export const AdminPaymentSettingsPage: React.FC = () => {
   const [form, setForm] = useState<SystemSettingsData>({
     telegramFinanceLink: 'https://t.me/winkmedatingclub_finance',
     telegramSupportLink: 'https://t.me/winkmedatingclub_support',
+    telegramSupportQrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support',
     usdtWalletAddress: 'TXYZ987654321WinkMeClubUSDTDepositAddr',
     usdtExchangeRate: 92,
     adminUpiId: 'winkmeclub@upi',
@@ -108,6 +110,13 @@ export const AdminPaymentSettingsPage: React.FC = () => {
               leftIcon={<MessageCircle className="w-4 h-4 text-sky-400" />}
               helperText="Users click this link on /support for 24/7 VIP assistance"
               required
+            />
+
+            <ImageUploadPicker
+              label="Telegram Support Account QR Code Image (Upload or Paste URL)"
+              value={form.telegramSupportQrCode}
+              onChange={(url) => setForm({ ...form, telegramSupportQrCode: url })}
+              helperText="Upload your custom Telegram account QR Code image. Users will scan this on /support page."
             />
           </div>
 

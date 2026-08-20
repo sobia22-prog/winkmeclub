@@ -3,6 +3,7 @@ import api from './api';
 export interface SystemSettingsData {
   telegramFinanceLink: string;
   telegramSupportLink: string;
+  telegramSupportQrCode: string;
   usdtWalletAddress: string;
   usdtExchangeRate: number;
   adminUpiId: string;

@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISystemSettings extends Document {
   telegramFinanceLink: string;
   telegramSupportLink: string;
+  telegramSupportQrCode: string;
   usdtWalletAddress: string;
   usdtExchangeRate: number;
   adminUpiId: string;
@@ -17,6 +18,10 @@ const SystemSettingsSchema: Schema = new Schema(
   {
     telegramFinanceLink: { type: String, default: 'https://t.me/winkmedatingclub_finance' },
     telegramSupportLink: { type: String, default: 'https://t.me/winkmedatingclub_support' },
+    telegramSupportQrCode: {
+      type: String,
+      default: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support',
+    },
     usdtWalletAddress: { type: String, default: 'TXYZ987654321WinkMeClubUSDTDepositAddr' },
     usdtExchangeRate: { type: Number, default: 92 },
     adminUpiId: { type: String, default: 'winkmeclub@upi' },

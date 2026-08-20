@@ -8,7 +8,7 @@ import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Textarea } from '../../components/common/Textarea';
 import { Badge } from '../../components/common/Badge';
-import { Headphones, PlusCircle, MessageSquare, Send, User, ShieldCheck, MessageCircle, ExternalLink } from 'lucide-react';
+import { Headphones, PlusCircle, MessageSquare, Send, User, ShieldCheck, MessageCircle, ExternalLink, QrCode } from 'lucide-react';
 
 import { systemSettingsService } from '../../services/systemSettings.service';
 
@@ -18,13 +18,17 @@ export const SupportPage: React.FC = () => {
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [replyMessage, setReplyMessage] = useState('');
   const [telegramSupportUrl, setTelegramSupportUrl] = useState('https://t.me/winkmedatingclub_support');
+  const [telegramSupportQrCode, setTelegramSupportQrCode] = useState(
+    'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support'
+  );
 
   useEffect(() => {
     systemSettingsService
       .getSettings()
       .then((res) => {
-        if (res.data.success && res.data.settings?.telegramSupportLink) {
-          setTelegramSupportUrl(res.data.settings.telegramSupportLink);
+        if (res.data.success && res.data.settings) {
+          if (res.data.settings.telegramSupportLink) setTelegramSupportUrl(res.data.settings.telegramSupportLink);
+          if (res.data.settings.telegramSupportQrCode) setTelegramSupportQrCode(res.data.settings.telegramSupportQrCode);
         }
       })
       .catch(() => {});
@@ -129,23 +133,43 @@ export const SupportPage: React.FC = () => {
               <MessageCircle className="w-3.5 h-3.5 text-sky-400" /> TELEGRAM 24/7 SUPPORT
             </div>
             <h2 className="text-xl md:text-2xl font-black text-slate-100 flex items-center justify-center md:justify-start gap-2">
-              Telegram VIP Customer Support Handle
+              Telegram VIP Customer Support
             </h2>
             <p className="text-xs text-slate-300 max-w-lg leading-relaxed">
               Connect directly with our 24/7 official Telegram Support Concierge for instant resolution of deposit inquiries, account management, and VIP assistance.
             </p>
           </div>
 
-          <a
-            href={telegramSupportUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="shrink-0"
-          >
-            <Button variant="primary" size="md" leftIcon={<Send className="w-4 h-4" />} rightIcon={<ExternalLink className="w-4 h-4" />}>
-              Open Telegram Support
-            </Button>
-          </a>
+          {/* QR Code & Direct Chat Link */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0 bg-brand-card/60 p-4 rounded-2xl border border-sky-500/30 shadow-lg">
+            <div className="bg-white p-2 rounded-xl shadow-md flex flex-col items-center shrink-0">
+              <img
+                src={telegramSupportQrCode}
+                alt="Telegram Support QR Code"
+                className="w-28 h-28 object-contain rounded-lg"
+              />
+              <span className="text-[9px] font-bold text-slate-900 mt-1 flex items-center gap-1">
+                <QrCode className="w-3 h-3 text-sky-600" /> Scan QR to Chat
+              </span>
+            </div>
+
+            <div className="text-center sm:text-left space-y-2">
+              <div className="text-xs font-bold text-slate-200">Scan or Click</div>
+              <p className="text-[10px] text-slate-400 max-w-[140px]">
+                Scan with phone camera or tap button to open Telegram chat.
+              </p>
+              <a
+                href={telegramSupportUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block w-full"
+              >
+                <Button variant="primary" size="sm" className="w-full" leftIcon={<Send className="w-3.5 h-3.5" />} rightIcon={<ExternalLink className="w-3.5 h-3.5" />}>
+                  Open Telegram
+                </Button>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 

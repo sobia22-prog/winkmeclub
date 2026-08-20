@@ -28,6 +28,7 @@ export class SystemSettingsController {
       const {
         telegramFinanceLink,
         telegramSupportLink,
+        telegramSupportQrCode,
         usdtWalletAddress,
         usdtExchangeRate,
         adminUpiId,
@@ -44,6 +45,7 @@ export class SystemSettingsController {
 
       if (telegramFinanceLink !== undefined) settings.telegramFinanceLink = telegramFinanceLink;
       if (telegramSupportLink !== undefined) settings.telegramSupportLink = telegramSupportLink;
+      if (telegramSupportQrCode !== undefined) settings.telegramSupportQrCode = telegramSupportQrCode;
       if (usdtWalletAddress !== undefined) settings.usdtWalletAddress = usdtWalletAddress;
       if (usdtExchangeRate !== undefined && !isNaN(Number(usdtExchangeRate))) {
         settings.usdtExchangeRate = Number(usdtExchangeRate);
