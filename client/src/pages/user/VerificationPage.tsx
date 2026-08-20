@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { brandConfig } from '../../config/brand.config';
@@ -7,23 +7,18 @@ import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 import {
   Crown,
-  Bot,
   Sparkles,
   ShoppingBag,
   Heart,
   Wallet,
   CheckCircle2,
-  Zap,
-  ArrowRight,
   ShieldCheck,
   MessageSquare,
+  Award,
 } from 'lucide-react';
 
 export const VerificationPage: React.FC = () => {
   const { user } = useAuth();
-  const [botStatusMessage, setBotStatusMessage] = useState(
-    `Welcome, ${user?.fullName || 'VIP Member'}! I am your Automated VIP Manager Bot. I have automatically verified your account profile. Your Gold VIP status and Airborne Trading privileges are 100% ACTIVE.`
-  );
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -31,49 +26,51 @@ export const VerificationPage: React.FC = () => {
       <div className="bg-gradient-to-r from-amber-950/50 via-brand-surface to-brand-surface border border-amber-500/40 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
         <div className="space-y-2 text-center md:text-left">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
-            <Bot className="w-3.5 h-3.5 text-amber-400" /> AUTOMATED VIP MANAGER BOT
+            <Award className="w-3.5 h-3.5 text-amber-400" /> OFFICIAL VIP MEMBER
           </div>
           <h1 className="text-2xl md:text-3xl font-black text-slate-100 flex items-center justify-center md:justify-start gap-2">
             <Crown className="w-7 h-7 text-amber-400 fill-amber-400" /> VIP Concierge & Verification
           </h1>
           <p className="text-xs text-slate-300 max-w-lg">
-            Your personal VIP Manager Bot manages your Gold VIP status, profile verification, and exclusive benefits automatically with zero manual paperwork.
+            Your official Gold VIP membership card, profile verification, and exclusive privileges.
           </p>
         </div>
 
-        <div className="p-4 bg-brand-card border border-brand-border rounded-2xl shrink-0 text-center space-y-1 shadow-lg">
-          <Bot className="w-10 h-10 text-amber-400 mx-auto animate-bounce" />
-          <div className="text-xs font-bold text-slate-100">Bot Manager Active</div>
-          <p className="text-[10px] text-emerald-400 font-bold">24/7 Automated System</p>
+        <div className="p-4 bg-brand-card border border-amber-500/30 rounded-2xl shrink-0 text-center space-y-1 shadow-lg">
+          <Crown className="w-9 h-9 text-amber-400 fill-amber-400 mx-auto" />
+          <div className="text-xs font-bold text-slate-100">Gold VIP Active</div>
+          <p className="text-[10px] text-emerald-400 font-bold">100% Verified Member</p>
         </div>
       </div>
 
-      {/* Automated VIP Bot Chat & Card Section */}
+      {/* VIP Verification Card Section */}
       <Card className="border-l-4 border-l-amber-500 p-6 space-y-6">
         <div className="flex items-center justify-between border-b border-brand-border pb-4">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-pink-500 flex items-center justify-center text-slate-950 font-bold shadow-md">
-              <Bot className="w-6 h-6 text-slate-950" />
+              <Crown className="w-6 h-6 text-slate-950 fill-slate-950" />
             </div>
             <div>
               <h3 className="text-sm font-extrabold text-slate-100 flex items-center gap-2">
-                Automated VIP Manager Bot <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                VIP Account Verification Status <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               </h3>
-              <p className="text-[11px] text-slate-400">Personal Membership Manager Assistant</p>
+              <p className="text-[11px] text-slate-400">Official Membership Clearance</p>
             </div>
           </div>
 
           <Badge variant="verified">100% VERIFIED & VIP ACTIVE</Badge>
         </div>
 
-        {/* Bot Message Box */}
+        {/* Status Message Box */}
         <div className="p-4 bg-brand-card/80 border border-brand-border rounded-2xl space-y-3">
           <div className="flex items-start gap-3">
             <MessageSquare className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
             <div className="space-y-1 text-xs">
-              <p className="font-bold text-slate-100">{botStatusMessage}</p>
+              <p className="font-bold text-slate-100">
+                Welcome, {user?.fullName || 'VIP Member'}! Your account profile is officially verified.
+              </p>
               <p className="text-[11px] text-slate-400">
-                No document uploads or manual review required. You have immediate clearance for product trading and priority date proposals.
+                Your Gold VIP status and Airborne Trading privileges are 100% ACTIVE. You have immediate clearance for product trading and priority date proposals.
               </p>
             </div>
           </div>
@@ -101,7 +98,7 @@ export const VerificationPage: React.FC = () => {
           <div className="flex items-center justify-between pt-2 border-t border-slate-950/20 text-xs font-bold">
             <span>CITY: {user?.city || 'Mumbai'}</span>
             <span className="flex items-center gap-1">
-              <ShieldCheck className="w-4 h-4 fill-slate-950 text-amber-500" /> VERIFIED BY BOT
+              <ShieldCheck className="w-4 h-4 fill-slate-950 text-amber-500" /> VERIFIED MEMBER
             </span>
           </div>
         </div>
@@ -167,7 +164,7 @@ export const VerificationPage: React.FC = () => {
 
           <div className="p-3 bg-brand-card rounded-xl border border-brand-border flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
-            <span><strong>Bot Concierge Support:</strong> 24/7 automated membership manager support.</span>
+            <span><strong>24/7 VIP Concierge Support:</strong> Premium membership desk & support assistance.</span>
           </div>
         </div>
       </Card>
