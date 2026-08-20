@@ -78,7 +78,7 @@ export const AdminPaymentSettingsPage: React.FC = () => {
         </div>
       )}
 
-      <Card className="p-6 md:p-8 space-y-6 max-w-3xl bg-brand-surface border border-brand-border">
+      <Card className="p-6 md:p-8 space-y-6 w-full bg-brand-surface border border-brand-border">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-300 space-y-1">
             <strong>📢 Live Dynamic Synchronization:</strong>

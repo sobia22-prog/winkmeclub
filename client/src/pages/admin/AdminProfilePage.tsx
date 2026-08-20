@@ -4,16 +4,15 @@ import { adminService } from '../../services/admin.service';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
-import { User, Mail, Lock, DollarSign, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export const AdminProfilePage: React.FC = () => {
-  const { user: adminUser, wallet: adminWallet, refreshSession } = useAuth();
+  const { user: adminUser, refreshSession } = useAuth();
 
   const [form, setForm] = useState({
     fullName: adminUser?.fullName || 'System Administrator',
     email: adminUser?.email || 'admin@winkmedatingclub.com',
     password: '',
-    balance: adminWallet?.availableBalance || 50000,
   });
 
   const [loading, setLoading] = useState(false);
@@ -29,7 +28,7 @@ export const AdminProfilePage: React.FC = () => {
     try {
       const res = await adminService.updateAdminSettings(form);
       if (res.data.success) {
-        setMessage('Admin profile credentials and wallet balance updated successfully!');
+        setMessage('Admin profile credentials updated successfully!');
         setForm((prev) => ({ ...prev, password: '' }));
         refreshSession();
       }
@@ -47,7 +46,7 @@ export const AdminProfilePage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <User className="w-6 h-6 text-amber-400" /> Admin Profile Credentials
           </h1>
-          <p className="text-xs text-slate-400">Manage administrator account name, login email, password, and vault balance.</p>
+          <p className="text-xs text-slate-400">Manage administrator display name, login email, and security password.</p>
         </div>
 
         <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
@@ -71,8 +70,8 @@ export const AdminProfilePage: React.FC = () => {
         </div>
       )}
 
-      <Card className="p-6 md:p-8 space-y-6 max-w-2xl bg-brand-surface border border-brand-border">
-        <form onSubmit={handleSubmit} className="space-y-5">
+      <Card className="p-6 md:p-8 space-y-6 w-full bg-brand-surface border border-brand-border">
+        <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
           <Input
             label="Admin Full Name / Display Title"
             value={form.fullName}
@@ -97,15 +96,6 @@ export const AdminProfilePage: React.FC = () => {
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             leftIcon={<Lock className="w-4 h-4 text-amber-400" />}
-          />
-
-          <Input
-            label="Admin Platform Vault Balance (₹)"
-            type="number"
-            value={form.balance}
-            onChange={(e) => setForm({ ...form, balance: Number(e.target.value) })}
-            leftIcon={<DollarSign className="w-4 h-4 text-emerald-400" />}
-            required
           />
 
           <div className="pt-4 border-t border-brand-border flex justify-end">
