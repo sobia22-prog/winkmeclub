@@ -105,37 +105,43 @@ export const VerificationPage: React.FC = () => {
 
         {/* VIP Action Buttons Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <Link to="/trades">
-            <Button
-              variant="gold"
-              className="w-full h-full py-4 flex-col gap-1"
-              leftIcon={<ShoppingBag className="w-5 h-5" />}
-            >
-              <span className="font-bold text-xs">Airborne Product Trade</span>
-              <span className="text-[10px] opacity-80">Access Trading Market</span>
-            </Button>
+          <Link
+            to="/trades"
+            className="p-5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 text-slate-950 font-extrabold flex flex-col items-center justify-center text-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] active:scale-95 transition-all group cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-xl bg-slate-950/10 flex items-center justify-center text-slate-950">
+              <ShoppingBag className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black tracking-wide">Airborne Product Trade</div>
+              <div className="text-[11px] font-semibold opacity-80 mt-0.5">Access Trading Market</div>
+            </div>
           </Link>
 
-          <Link to="/matches">
-            <Button
-              variant="primary"
-              className="w-full h-full py-4 flex-col gap-1"
-              leftIcon={<Heart className="w-5 h-5" />}
-            >
-              <span className="font-bold text-xs">Explore VIP Encounters</span>
-              <span className="text-[10px] opacity-80">City Matches</span>
-            </Button>
+          <Link
+            to="/matches"
+            className="p-5 rounded-2xl bg-gradient-to-r from-pink-600 via-rose-600 to-brand-wine text-white font-extrabold flex flex-col items-center justify-center text-center gap-2 shadow-lg shadow-pink-600/20 hover:scale-[1.02] active:scale-95 transition-all group cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+              <Heart className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black tracking-wide">Explore VIP Encounters</div>
+              <div className="text-[11px] font-semibold text-pink-100 mt-0.5">City Matches</div>
+            </div>
           </Link>
 
-          <Link to="/wallet">
-            <Button
-              variant="secondary"
-              className="w-full h-full py-4 flex-col gap-1"
-              leftIcon={<Wallet className="w-5 h-5" />}
-            >
-              <span className="font-bold text-xs">Manage VIP Wallet</span>
-              <span className="text-[10px] opacity-80">Add Funds & Withdrawals</span>
-            </Button>
+          <Link
+            to="/wallet"
+            className="p-5 rounded-2xl bg-brand-card border border-brand-border text-slate-100 font-extrabold flex flex-col items-center justify-center text-center gap-2 shadow-lg hover:border-slate-500 hover:scale-[1.02] active:scale-95 transition-all group cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center text-emerald-400">
+              <Wallet className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-xs font-black tracking-wide">Manage VIP Wallet</div>
+              <div className="text-[11px] font-semibold text-slate-400 mt-0.5">Add Funds & Withdrawals</div>
+            </div>
           </Link>
         </div>
       </Card>
