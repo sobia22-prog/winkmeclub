@@ -5,7 +5,7 @@ import { authService } from '../../services/auth.service';
 import { brandConfig } from '../../config/brand.config';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Lock, Mail, Sparkles } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -31,11 +31,6 @@ export const LoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    setEmail('user@winkmeclub.com');
-    setPassword('User@123');
   };
 
   return (
@@ -80,27 +75,13 @@ export const LoginPage: React.FC = () => {
           </Button>
         </form>
 
-        <div className="pt-2 text-center space-y-3">
-          <button
-            onClick={handleDemoLogin}
-            className="w-full py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs font-semibold text-amber-400 hover:bg-amber-500/20 transition-colors flex items-center justify-center gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Fill Demo Credentials (user@winkmeclub.com)
-          </button>
-
+        <div className="pt-2 text-center">
           <p className="text-xs text-slate-400">
             Don't have an account?{' '}
             <Link to="/register" className="text-brand-wine hover:underline font-semibold">
               Create Account
             </Link>
           </p>
-
-          <div className="pt-2 border-t border-brand-border">
-            <Link to="/admin/login" className="text-[11px] text-slate-500 hover:text-slate-300">
-              Admin Control Panel Login →
-            </Link>
-          </div>
         </div>
       </div>
     </div>
