@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { Trade, ITrade, TradeOutcome } from '../models/trade.model';
 import { WalletService } from './wallet.service';
 import { NotificationService } from './notification.service';
-import { financialConfig } from '../config/financial.config';
+import { Wallet } from '../models/wallet.model';
 
 export class TradeSettlementService {
   static async executeTrade(
@@ -16,14 +16,11 @@ export class TradeSettlementService {
     const totalAmount = Number((price * quantity).toFixed(2));
     const tradeId = `TRD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
 
-    // Freeze total amount from user wallet
-    await WalletService.freezeBalance(
-      userId,
-      totalAmount,
-      'TRADE_HOLD',
-      `Trade execution hold for ${productName} (x${quantity})`,
-      tradeId
-    );
+    // Ensure user has enough available balance
+    const wallet = await WalletService.getOrCreateWallet(userId);
+    if (wallet.availableBalance < totalAmount) {
+      throw new Error(`Insufficient available balance for this trade. Available: ₹${wallet.availableBalance.toFixed(2)}, Required: ₹${totalAmount.toFixed(2)}`);
+    }
 
     const trade = await Trade.create({
       tradeId,
@@ -40,8 +37,8 @@ export class TradeSettlementService {
 
     await NotificationService.createNotification(
       userId,
-      'Trade Placed',
-      `Your trade request #${tradeId} for ${productName} (₹${totalAmount.toFixed(2)}) is now PENDING review.`,
+      'Airborne Trade Request Placed',
+      `Your trade request #${tradeId} for ${productName} (Qty: ${quantity}, Amount: ₹${totalAmount.toFixed(2)}) is now PENDING Admin review.`,
       'TRADE',
       '/trades'
     );
@@ -53,6 +50,7 @@ export class TradeSettlementService {
     tradeId: string,
     outcome: TradeOutcome,
     adminId: string | mongoose.Types.ObjectId,
+    profitPercentage: number = 20,
     note: string = ''
   ): Promise<ITrade> {
     const trade = await Trade.findOne({ tradeId, status: 'PENDING' });
@@ -60,32 +58,26 @@ export class TradeSettlementService {
       throw new Error(`Pending trade with ID ${tradeId} not found or already settled.`);
     }
 
+    const tradeAmount = trade.totalAmount;
+
     if (outcome === 'WIN') {
-      const payoutMultiplier = financialConfig.defaultTradeWinMultiplier;
-      const payoutAmount = Number((trade.totalAmount * payoutMultiplier).toFixed(2));
+      // WIN: Calculate profit percentage (20%, 40%, 60%, 80%, 100%)
+      const profitPct = [20, 40, 60, 80, 100].includes(profitPercentage) ? profitPercentage : 20;
+      const profitAmount = Number((tradeAmount * (profitPct / 100)).toFixed(2));
 
-      // Release frozen balance (without crediting back directly)
-      await WalletService.releaseFrozenBalance(
-        trade.userId,
-        trade.totalAmount,
-        false,
-        'TRADE_WIN',
-        `Trade #${trade.tradeId} WIN hold release`,
-        trade.tradeId
-      );
-
-      // Credit payout amount to available balance
+      // Credit profit amount to user's Available Balance
       await WalletService.creditAvailableBalance(
         trade.userId,
-        payoutAmount,
+        profitAmount,
         'TRADE_WIN',
-        `Trade #${trade.tradeId} WIN Payout (${payoutMultiplier}x)`,
+        `Airborne Trade #${trade.tradeId} WIN Profit (${profitPct}%)`,
         trade.tradeId
       );
 
       trade.status = 'SETTLED';
       trade.outcome = 'WIN';
-      trade.payoutAmount = payoutAmount;
+      trade.profitPercentage = profitPct;
+      trade.payoutAmount = profitAmount;
       trade.processedBy = new mongoose.Types.ObjectId(adminId);
       trade.processedAt = new Date();
       trade.note = note;
@@ -93,19 +85,18 @@ export class TradeSettlementService {
 
       await NotificationService.createNotification(
         trade.userId,
-        'Trade Outcome: WIN! 🎉',
-        `Congratulations! Trade #${trade.tradeId} resulted in a WIN. Payout of ₹${payoutAmount.toFixed(2)} added to your available balance.`,
+        'Trade Result: WIN! 🎉',
+        `Congratulations! Your trade #${trade.tradeId} for ${trade.productName} resulted in a WIN. Profit of +₹${profitAmount.toFixed(2)} (${profitPct}%) credited to your Available Balance!`,
         'TRADE',
         '/trades'
       );
     } else if (outcome === 'LOSE') {
-      // Release frozen balance (without crediting back to available balance)
-      await WalletService.releaseFrozenBalance(
+      // LOSE: Move trade amount from Available Balance to Frozen Balance
+      await WalletService.freezeBalance(
         trade.userId,
-        trade.totalAmount,
-        false,
+        tradeAmount,
         'TRADE_LOSE',
-        `Trade #${trade.tradeId} LOSE deduction`,
+        `Airborne Trade #${trade.tradeId} LOSE (Moved to Frozen Balance)`,
         trade.tradeId
       );
 
@@ -119,8 +110,8 @@ export class TradeSettlementService {
 
       await NotificationService.createNotification(
         trade.userId,
-        'Trade Outcome: Settled',
-        `Trade #${trade.tradeId} has been settled with outcome: LOSE. ₹${trade.totalAmount.toFixed(2)} deducted from balance.`,
+        'Trade Result: Settled (LOSE)',
+        `Trade #${trade.tradeId} for ${trade.productName} resulted in LOSE. Trade amount ₹${tradeAmount.toFixed(2)} has been moved to your Frozen Balance.`,
         'TRADE',
         '/trades'
       );

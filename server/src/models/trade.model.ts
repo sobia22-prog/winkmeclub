@@ -14,6 +14,7 @@ export interface ITrade extends Document {
   totalAmount: number;
   status: TradeStatus;
   outcome: TradeOutcome;
+  profitPercentage?: number;
   payoutAmount?: number;
   processedBy?: mongoose.Types.ObjectId;
   processedAt?: Date;
@@ -34,6 +35,7 @@ const TradeSchema: Schema = new Schema(
     totalAmount: { type: Number, required: true, min: 0 },
     status: { type: String, enum: ['PENDING', 'SETTLED', 'CANCELLED'], default: 'PENDING', index: true },
     outcome: { type: String, enum: ['WIN', 'LOSE', 'NONE'], default: 'NONE', index: true },
+    profitPercentage: { type: Number, default: 0 },
     payoutAmount: { type: Number, default: 0 },
     processedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     processedAt: { type: Date },

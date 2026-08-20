@@ -21,8 +21,10 @@ export const adminService = {
     api.post(`/admin/withdrawals/${id}/review`, data),
 
   getTrades: (params?: { status?: string }) => api.get('/admin/trades', { params }),
-  settleTrade: (tradeId: string, data: { outcome: 'WIN' | 'LOSE'; note?: string }) =>
-    api.post(`/admin/trades/${tradeId}/settle`, data),
+  settleTrade: (
+    tradeId: string,
+    data: { outcome: 'WIN' | 'LOSE'; profitPercentage?: number; note?: string }
+  ) => api.post(`/admin/trades/${tradeId}/settle`, data),
 
   getVerifications: (params?: { status?: string }) => api.get('/admin/verifications', { params }),
   reviewVerification: (id: string, data: { action: 'APPROVE' | 'REJECT' | 'PENDING'; reason?: string }) =>

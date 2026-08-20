@@ -555,10 +555,16 @@ export class AdminController {
   static async settleTrade(req: AuthRequest, res: Response) {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
-      const { outcome, note } = req.body;
+      const { outcome, profitPercentage, note } = req.body;
       const tradeId = req.params.tradeId;
 
-      const trade = await TradeSettlementService.settleTrade(tradeId, outcome, req.user._id, note);
+      const trade = await TradeSettlementService.settleTrade(
+        tradeId,
+        outcome,
+        req.user._id,
+        Number(profitPercentage) || 20,
+        note
+      );
 
       await AuditService.logAction({
         adminId: req.user._id,
