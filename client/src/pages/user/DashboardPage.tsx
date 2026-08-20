@@ -5,8 +5,10 @@ import { brandConfig } from '../../config/brand.config';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
+import { Modal } from '../../components/common/Modal';
 import { MultiSelectCity } from '../../components/common/MultiSelectCity';
 import { profileService } from '../../services/profile.service';
+import { announcementService } from '../../services/announcement.service';
 import { Profile } from '../../types';
 import {
   Sparkles,
@@ -29,6 +31,36 @@ export const DashboardPage: React.FC = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [activeFilter, setActiveFilter] = useState<'all' | 'vip' | 'popular' | 'city'>('all');
   const [loading, setLoading] = useState(true);
+
+  // Announcement Pop-up Modal State
+  const [showAnnouncementPopup, setShowAnnouncementPopup] = useState(false);
+  const [popupAnnouncement, setPopupAnnouncement] = useState<any>(null);
+
+  // Fetch published announcements for Pop-up Modal
+  useEffect(() => {
+    announcementService
+      .getAnnouncements()
+      .then((res) => {
+        if (res.data.success && res.data.announcements.length > 0) {
+          setPopupAnnouncement(res.data.announcements[0]);
+          setShowAnnouncementPopup(true);
+        } else {
+          // Default fallback pop-up announcement
+          setPopupAnnouncement({
+            title: `${brandConfig.name} Gold VIP Membership Announcement`,
+            content: `Welcome to ${brandConfig.name}! All new members receive priority access to city encounters, 24/7 concierge support, and Airborne Product Trading privileges. Upgrade your VIP card today.`,
+          });
+          setShowAnnouncementPopup(true);
+        }
+      })
+      .catch(() => {
+        setPopupAnnouncement({
+          title: `${brandConfig.name} Gold VIP Membership Announcement`,
+          content: `Welcome to ${brandConfig.name}! All new members receive priority access to city encounters, 24/7 concierge support, and Airborne Product Trading privileges. Upgrade your VIP card today.`,
+        });
+        setShowAnnouncementPopup(true);
+      });
+  }, []);
 
   // Fetch profiles from backend MongoDB Atlas
   const loadProfiles = useCallback(async () => {
@@ -78,6 +110,35 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Announcement Pop-up Modal on Home Page */}
+      {showAnnouncementPopup && popupAnnouncement && (
+        <Modal
+          isOpen={true}
+          onClose={() => setShowAnnouncementPopup(false)}
+          title="📢 Platform Announcement"
+        >
+          <div className="space-y-4">
+            <div className="p-4 bg-gradient-to-r from-amber-950/60 via-brand-surface to-brand-surface border border-amber-500/40 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-amber-400 font-extrabold text-sm">
+                <Crown className="w-5 h-5 fill-amber-400" /> {popupAnnouncement.title}
+              </div>
+              <p className="text-xs text-slate-200 leading-relaxed">{popupAnnouncement.content}</p>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="secondary" onClick={() => setShowAnnouncementPopup(false)}>
+                Close
+              </Button>
+              <Link to="/verification">
+                <Button variant="gold" leftIcon={<Crown className="w-4 h-4" />}>
+                  Claim Gold VIP Card
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {/* Hero Banner Card 1 */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-rose-600 to-brand-wine border border-rose-400/30 p-6 md:p-8 text-white shadow-2xl">
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none" />
