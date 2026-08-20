@@ -125,7 +125,7 @@ export const TradesPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-32">
+    <div className="w-full space-y-6 pb-32">
       {/* Header Bar */}
       <div className="flex items-center justify-between pb-3 border-b border-brand-border">
         <div className="flex items-center gap-3">
@@ -207,7 +207,7 @@ export const TradesPage: React.FC = () => {
         {products.length === 0 ? (
           <Card className="p-8 text-center text-xs text-slate-500">Loading catalog items...</Card>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((product) => {
               const isSelected = selectedProduct?._id === product._id;
               return (
@@ -295,8 +295,8 @@ export const TradesPage: React.FC = () => {
       )}
 
       {/* Floating Bottom Trade Controls Drawer */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-2xl border-t border-brand-border p-4 shadow-2xl">
-        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/95 backdrop-blur-2xl border-t border-brand-border p-4 shadow-2xl">
+        <div className="w-full px-2 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {/* Details Column */}
           <div className="space-y-1 text-xs">
             <div className="text-slate-300">
