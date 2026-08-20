@@ -172,7 +172,7 @@ export const AdminPaymentSettingsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-brand-border flex justify-end">
+          <div className="pt-2 flex justify-end">
             <Button variant="gold" type="submit" isLoading={loading}>
               Save Payment Settings Live
             </Button>

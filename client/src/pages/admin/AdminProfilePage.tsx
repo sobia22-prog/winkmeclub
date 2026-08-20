@@ -98,7 +98,7 @@ export const AdminProfilePage: React.FC = () => {
             leftIcon={<Lock className="w-4 h-4 text-amber-400" />}
           />
 
-          <div className="pt-4 border-t border-brand-border flex justify-end">
+          <div className="pt-2 flex justify-end">
             <Button variant="gold" type="submit" isLoading={loading}>
               Save Profile Settings
             </Button>
