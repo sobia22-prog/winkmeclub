@@ -8,7 +8,19 @@ import { Button } from '../../components/common/Button';
 import { MultiSelectCity } from '../../components/common/MultiSelectCity';
 import { profileService } from '../../services/profile.service';
 import { Profile } from '../../types';
-import { Sparkles, Calendar, MapPin, Heart, ArrowRight, Flame, Crown } from 'lucide-react';
+import {
+  Sparkles,
+  Calendar,
+  MapPin,
+  Heart,
+  ArrowRight,
+  Flame,
+  Crown,
+  Megaphone,
+  ShoppingBag,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -97,18 +109,57 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Banner Card 2 */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500/20 via-brand-surface to-brand-surface border border-rose-500/30 p-5 flex items-center gap-4 shadow-lg">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-wine to-pink-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-brand-wine/30">
-          <Heart className="w-7 h-7 fill-white" />
+      {/* Official Announcement: VIP Card Benefits Broadcast */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/60 via-brand-surface to-brand-surface border border-amber-500/40 p-6 md:p-8 space-y-6 shadow-2xl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
+              <Megaphone className="w-3.5 h-3.5 text-amber-400" /> OFFICIAL ANNOUNCEMENT
+            </div>
+            <h2 className="text-xl md:text-2xl font-black text-slate-100 flex items-center justify-center md:justify-start gap-2">
+              <Crown className="w-6 h-6 text-amber-400 fill-amber-400" /> VIP Card Benefits & Privileges Broadcast
+            </h2>
+            <p className="text-xs text-slate-300 max-w-lg leading-relaxed">
+              Unlock the official {brandConfig.name} Gold VIP Membership Card to access exclusive encounters, airborne trading privileges, and priority profile dispatches.
+            </p>
+          </div>
+
+          <Link to="/verification" className="shrink-0">
+            <Button variant="gold" size="md" leftIcon={<Crown className="w-4 h-4" />} rightIcon={<ArrowRight className="w-4 h-4" />}>
+              Claim Gold VIP Card
+            </Button>
+          </Link>
         </div>
-        <div className="space-y-1 flex-1">
-          <h3 className="text-sm font-bold text-slate-100">
-            {brandConfig.name} Verified Encounters
-          </h3>
-          <p className="text-xs text-slate-400 leading-snug">
-            All member profiles undergo 100% ID document verification for genuine, high-quality social date proposals.
-          </p>
+
+        {/* 4 VIP Card Benefits Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-amber-500/20">
+          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
+            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Unlimited Encounters
+            </div>
+            <p className="text-[11px] text-slate-400">Direct city-matching & profile dispatches in all cities.</p>
+          </div>
+
+          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
+            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+              <ShoppingBag className="w-3.5 h-3.5" /> Airborne Product Trade
+            </div>
+            <p className="text-[11px] text-slate-400">Exclusive access to product trading & round settlements.</p>
+          </div>
+
+          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
+            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5" /> Gold VIP Badge
+            </div>
+            <p className="text-[11px] text-slate-400">Verified gold trust mark displayed on your profile.</p>
+          </div>
+
+          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
+            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5" /> 3x Priority Reach
+            </div>
+            <p className="text-[11px] text-slate-400">3x engagement rate & priority concierge support.</p>
+          </div>
         </div>
       </div>
 
