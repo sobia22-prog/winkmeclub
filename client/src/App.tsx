@@ -36,28 +36,30 @@ import { AdminProductsPage } from './pages/admin/AdminProductsPage';
 import { AdminTransactionsPage } from './pages/admin/AdminTransactionsPage';
 import { AdminAnnouncementsPage } from './pages/admin/AdminAnnouncementsPage';
 import { AdminSupportPage } from './pages/admin/AdminSupportPage';
-import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
+import { AdminProfilePage } from './pages/admin/AdminProfilePage';
+import { AdminPaymentSettingsPage } from './pages/admin/AdminPaymentSettingsPage';
 
-// Error Pages
-import { NotFoundPage } from './pages/errors/NotFoundPage';
+const queryClient = new QueryClient();
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+const NotFoundPage = () => (
+  <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4 text-center">
+    <div className="space-y-4">
+      <h1 className="text-4xl font-extrabold text-slate-100">404</h1>
+      <p className="text-slate-400">Page not found.</p>
+      <a href="/dashboard" className="inline-block px-4 py-2 bg-brand-wine text-white rounded-xl text-xs font-bold">
+        Back to Dashboard
+      </a>
+    </div>
+  </div>
+);
 
 export const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Public Root & Auth Routes */}
-            <Route path="/" element={<Navigate to="/register" replace />} />
+            {/* Public Auth Routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/verify-otp" element={<VerifyOTPPage />} />
@@ -90,6 +92,8 @@ export const App: React.FC = () => {
               <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
               <Route path="/admin/announcements" element={<AdminAnnouncementsPage />} />
               <Route path="/admin/support" element={<AdminSupportPage />} />
+              <Route path="/admin/settings" element={<AdminPaymentSettingsPage />} />
+              <Route path="/admin/profile" element={<AdminProfilePage />} />
             </Route>
 
             {/* Fallback 404 */}

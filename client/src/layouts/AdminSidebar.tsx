@@ -11,7 +11,8 @@ import {
   History,
   Megaphone,
   Headphones,
-  FileText,
+  User,
+  Settings,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,6 +31,8 @@ export const AdminSidebar: React.FC = () => {
     { label: 'Transactions', path: '/admin/transactions', icon: <History className="w-4 h-4" /> },
     { label: 'Announcements', path: '/admin/announcements', icon: <Megaphone className="w-4 h-4" /> },
     { label: 'Customer Service', path: '/admin/support', icon: <Headphones className="w-4 h-4" /> },
+    { label: 'Payment Settings', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
+    { label: 'Profile', path: '/admin/profile', icon: <User className="w-4 h-4" /> },
   ];
 
   return (
