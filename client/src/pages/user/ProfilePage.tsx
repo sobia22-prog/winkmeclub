@@ -204,25 +204,18 @@ export const ProfilePage: React.FC = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+        <div className="grid grid-cols-2 gap-4 pt-2">
           <div className="p-3.5 bg-brand-surface rounded-xl border border-brand-border">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Available</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Available Balance</span>
             <span className="text-xl font-extrabold text-emerald-400">
               ₹{wallet?.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
             </span>
           </div>
 
           <div className="p-3.5 bg-brand-surface rounded-xl border border-brand-border">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Frozen</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Frozen Balance</span>
             <span className="text-xl font-extrabold text-amber-400">
               ₹{wallet?.frozenBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
-            </span>
-          </div>
-
-          <div className="p-3.5 bg-brand-surface rounded-xl border border-brand-border col-span-2 sm:col-span-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Portfolio</span>
-            <span className="text-xl font-extrabold text-slate-100">
-              ₹{wallet?.totalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
             </span>
           </div>
         </div>

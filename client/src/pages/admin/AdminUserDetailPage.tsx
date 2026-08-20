@@ -62,18 +62,14 @@ export const AdminUserDetailPage: React.FC = () => {
             <Wallet className="w-4 h-4 text-emerald-400" /> Wallet Balance Summary
           </h3>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="p-3 bg-brand-card rounded-xl border border-brand-border">
-              <span className="text-[10px] text-slate-400 block uppercase">Available</span>
+              <span className="text-[10px] text-slate-400 block uppercase">Available Balance</span>
               <span className="text-lg font-bold text-emerald-400">₹{wallet.availableBalance.toFixed(2)}</span>
             </div>
             <div className="p-3 bg-brand-card rounded-xl border border-brand-border">
-              <span className="text-[10px] text-slate-400 block uppercase">Frozen</span>
+              <span className="text-[10px] text-slate-400 block uppercase">Frozen Balance</span>
               <span className="text-lg font-bold text-amber-400">₹{wallet.frozenBalance.toFixed(2)}</span>
-            </div>
-            <div className="p-3 bg-brand-card rounded-xl border border-brand-border">
-              <span className="text-[10px] text-slate-400 block uppercase">Total Portfolio</span>
-              <span className="text-lg font-bold text-slate-100">₹{wallet.totalBalance.toFixed(2)}</span>
             </div>
           </div>
         </Card>

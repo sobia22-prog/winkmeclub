@@ -135,8 +135,8 @@ export const WalletPage: React.FC = () => {
         </div>
       )}
 
-      {/* Balance Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {/* Balance Summary Cards (Available Balance & Frozen Balance only) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Card className="border-t-4 border-t-emerald-500 space-y-2">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Available Balance</p>
           <h2 className="text-3xl font-extrabold text-slate-100">
@@ -151,14 +151,6 @@ export const WalletPage: React.FC = () => {
             ₹{wallet?.frozenBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
           </h2>
           <p className="text-[11px] text-slate-500">Held during active trades or pending withdrawal requests.</p>
-        </Card>
-
-        <Card className="border-t-4 border-t-brand-wine space-y-2">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Net Balance</p>
-          <h2 className="text-3xl font-extrabold text-slate-100">
-            ₹{wallet?.totalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
-          </h2>
-          <p className="text-[11px] text-slate-500">Combined portfolio value across available and frozen holdings.</p>
         </Card>
       </div>
 
