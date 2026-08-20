@@ -71,7 +71,7 @@ export const AdminProfilePage: React.FC = () => {
       )}
 
       <Card className="p-6 md:p-8 space-y-6 w-full bg-brand-surface border border-brand-border">
-        <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
+        <form onSubmit={handleSubmit} className="space-y-5 w-full">
           <Input
             label="Admin Full Name / Display Title"
             value={form.fullName}
