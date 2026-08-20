@@ -259,37 +259,35 @@ export const AdminUsersPage: React.FC = () => {
       )}
 
       {/* Filters Bar */}
-      <Card className="p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <Input
-            placeholder="Search name, email, or phone..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            leftIcon={<Search className="w-4 h-4" />}
-          />
-          <Select
-            options={[
-              { label: 'All Statuses', value: 'ALL' },
-              { label: 'Active Only', value: 'ACTIVE' },
-              { label: 'Suspended Only', value: 'SUSPENDED' },
-            ]}
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          />
-          <Select
-            options={[
-              { label: 'All Users (VIP & Normal)', value: 'ALL' },
-              { label: 'VIP Members Only', value: 'VIP' },
-              { label: 'Non-VIP Users', value: 'NORMAL' },
-            ]}
-            value={isVIP}
-            onChange={(e) => setIsVIP(e.target.value)}
-          />
-        </div>
-      </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Input
+          placeholder="Search name, email, or phone..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          leftIcon={<Search className="w-4 h-4" />}
+        />
+        <Select
+          options={[
+            { label: 'All Statuses', value: 'ALL' },
+            { label: 'Active Only', value: 'ACTIVE' },
+            { label: 'Suspended Only', value: 'SUSPENDED' },
+          ]}
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        />
+        <Select
+          options={[
+            { label: 'All Users (VIP & Normal)', value: 'ALL' },
+            { label: 'VIP Members Only', value: 'VIP' },
+            { label: 'Non-VIP Users', value: 'NORMAL' },
+          ]}
+          value={isVIP}
+          onChange={(e) => setIsVIP(e.target.value)}
+        />
+      </div>
 
       {/* Users Table */}
-      <Card className="p-0 overflow-hidden">
+      <div className="w-full overflow-x-auto">
         {loading ? (
           <p className="text-center text-xs text-slate-500 py-10">Loading user catalog...</p>
         ) : users.length === 0 ? (
@@ -377,7 +375,7 @@ export const AdminUsersPage: React.FC = () => {
             ))}
           </Table>
         )}
-      </Card>
+      </div>
 
       {/* Styled Custom Confirmation Popup Modal */}
       <ConfirmModal

@@ -36,7 +36,7 @@ export const AdminSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-brand-surface border-r border-brand-border p-4 flex flex-col justify-between shrink-0 hidden md:flex self-start">
+    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-brand-surface border-r border-brand-border p-3.5 flex flex-col justify-between shrink-0 hidden md:flex self-start space-y-4">
       <div className="space-y-1">
         {adminNavItems.map((item) => (
           <NavLink
