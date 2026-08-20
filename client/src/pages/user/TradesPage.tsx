@@ -293,56 +293,58 @@ export const TradesPage: React.FC = () => {
         </Modal>
       )}
 
-      {/* Floating Bottom Trade Controls Drawer */}
-      <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/95 backdrop-blur-2xl border-t border-brand-border p-4 shadow-2xl">
-        <div className="w-full px-2 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          {/* Details Column */}
-          <div className="space-y-1 text-xs">
-            <div className="text-slate-300">
-              <span className="text-slate-400">Selection: </span>
-              <strong className="text-fuchsia-400 font-extrabold">{selectedProduct?.name || 'Please select an item above'}</strong>
-            </div>
+      {/* Floating Bottom Trade Controls Drawer (Only appears when an item is selected) */}
+      {selectedProduct && (
+        <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/95 backdrop-blur-2xl border-t border-brand-border p-4 shadow-2xl animate-in slide-in-from-bottom-5">
+          <div className="w-full px-2 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {/* Details Column */}
+            <div className="space-y-1 text-xs">
+              <div className="text-slate-300">
+                <span className="text-slate-400">Selection: </span>
+                <strong className="text-fuchsia-400 font-extrabold">{selectedProduct.name}</strong>
+              </div>
 
-            {/* Quantity Selector */}
-            <div className="flex items-center gap-3 pt-0.5">
-              <span className="text-slate-400 font-bold">Qty:</span>
-              <div className="inline-flex items-center border border-brand-border rounded-xl bg-brand-card overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="p-1.5 text-slate-300 hover:text-white hover:bg-brand-surface transition-colors"
-                >
-                  <Minus className="w-3.5 h-3.5" />
-                </button>
-                <span className="px-3 font-mono font-black text-slate-100">{quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="p-1.5 text-slate-300 hover:text-white hover:bg-brand-surface transition-colors"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
+              {/* Quantity Selector */}
+              <div className="flex items-center gap-3 pt-0.5">
+                <span className="text-slate-400 font-bold">Qty:</span>
+                <div className="inline-flex items-center border border-brand-border rounded-xl bg-brand-card overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="p-1.5 text-slate-300 hover:text-white hover:bg-brand-surface transition-colors"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="px-3 font-mono font-black text-slate-100">{quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((q) => q + 1)}
+                    className="p-1.5 text-slate-300 hover:text-white hover:bg-brand-surface transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-[11px] text-slate-400 pt-0.5 flex items-center gap-3">
+                <span>Cost: <strong className="text-amber-400 font-bold">₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></span>
+                <span>Available: <strong className="text-emerald-400 font-bold">₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></span>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 pt-0.5 flex items-center gap-3">
-              <span>Cost: <strong className="text-amber-400 font-bold">₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></span>
-              <span>Available: <strong className="text-emerald-400 font-bold">₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</strong></span>
-            </div>
+            {/* Confirm Button */}
+            <button
+              type="button"
+              onClick={handleExecuteTrade}
+              disabled={loading}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs tracking-wider uppercase shadow-xl shadow-pink-500/30 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              {loading ? 'Processing...' : 'Confirm Trade'}
+            </button>
           </div>
-
-          {/* Confirm Button */}
-          <button
-            type="button"
-            onClick={handleExecuteTrade}
-            disabled={loading || !selectedProduct}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs tracking-wider uppercase shadow-xl shadow-pink-500/30 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            {loading ? 'Processing...' : 'Confirm Trade'}
-          </button>
         </div>
-      </div>
+      )}
 
       {/* Trades History Table */}
       <div className="space-y-4 pt-6 border-t border-brand-border">
