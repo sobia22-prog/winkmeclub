@@ -24,6 +24,9 @@ import {
   Eye,
   ExternalLink,
   MessageCircle,
+  QrCode,
+  Building,
+  Smartphone,
 } from 'lucide-react';
 
 export const WalletPage: React.FC = () => {
@@ -33,6 +36,7 @@ export const WalletPage: React.FC = () => {
   const [showRechargeModal, setShowRechargeModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedReceiptUrl, setSelectedReceiptUrl] = useState<string | null>(null);
+  const [selectedQrUrl, setSelectedQrUrl] = useState<string | null>(null);
   const [copiedAddress, setCopiedAddress] = useState(false);
 
   // Custom Admin USDT Dollar Rate & Wallet Address
@@ -51,10 +55,13 @@ export const WalletPage: React.FC = () => {
   // Withdrawal Form
   const [withdrawForm, setWithdrawForm] = useState({
     amount: 2000,
-    bankName: 'HDFC Bank',
+    paymentMethod: 'UPI ID',
     accountHolder: '',
+    upiId: '',
+    qrCodeUrl: '',
+    bankName: 'HDFC Bank',
     accountNumber: '',
-    ifscCode: 'HDFC0001234',
+    ifscCode: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -111,7 +118,7 @@ export const WalletPage: React.FC = () => {
     try {
       const res = await walletService.submitWithdrawal(withdrawForm);
       if (res.data.success) {
-        setSuccessMsg('Withdrawal request submitted! Amount moved to frozen balance.');
+        setSuccessMsg('Withdrawal request submitted to Admin! Requested amount moved to frozen balance.');
         setShowWithdrawModal(false);
         fetchHistory();
         refreshSession();
@@ -133,7 +140,7 @@ export const WalletPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <Wallet className="w-6 h-6 text-emerald-400" /> Account Wallet & Balance
           </h1>
-          <p className="text-xs text-slate-400">Manage available balance, add funds, or request bank withdrawals.</p>
+          <p className="text-xs text-slate-400">Manage available balance, add funds, or request bank/UPI/QR withdrawals.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -226,6 +233,49 @@ export const WalletPage: React.FC = () => {
                     </button>
                   ) : (
                     <span className="text-xs text-slate-500">N/A</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </Table>
+        )}
+      </Card>
+
+      {/* Recent Withdrawal Requests Table */}
+      <Card className="space-y-4">
+        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+          <ArrowUpRight className="w-5 h-5 text-rose-400" /> Recent Payout Withdrawal Requests
+        </h3>
+
+        {withdrawals.length === 0 ? (
+          <p className="text-center text-xs text-slate-500 py-6">No payout withdrawal requests submitted.</p>
+        ) : (
+          <Table headers={['Request ID', 'Amount (₹)', 'Method & Details', 'Holder Name', 'Status']}>
+            {withdrawals.map((w: any) => (
+              <tr key={w._id} className="hover:bg-brand-card/50 transition-colors">
+                <td className="px-5 py-3 font-mono font-bold text-slate-200">{w.requestId}</td>
+                <td className="px-5 py-3 font-bold text-rose-400">
+                  -₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="px-5 py-3 text-xs text-slate-300">
+                  <div className="font-semibold text-slate-200">{w.paymentMethod || 'Bank Account'}</div>
+                  {w.upiId && <div className="font-mono text-amber-400">UPI: {w.upiId}</div>}
+                  {w.accountNumber && <div className="font-mono text-slate-400">A/C: {w.accountNumber}</div>}
+                  {w.qrCodeUrl && (
+                    <button onClick={() => setSelectedQrUrl(w.qrCodeUrl)} className="text-[10px] text-sky-400 hover:underline flex items-center gap-1 mt-0.5">
+                      <QrCode className="w-3 h-3 text-sky-400" /> View QR Code
+                    </button>
+                  )}
+                </td>
+                <td className="px-5 py-3 text-xs text-slate-200">{w.accountHolder}</td>
+                <td className="px-5 py-3">
+                  {w.status === 'APPROVED' && <Badge variant="success">APPROVED</Badge>}
+                  {w.status === 'PENDING' && <Badge variant="pending">PENDING</Badge>}
+                  {w.status === 'REJECTED' && (
+                    <div className="space-y-1">
+                      <Badge variant="danger">REJECTED</Badge>
+                      {w.rejectionReason && <p className="text-[10px] text-rose-400">{w.rejectionReason}</p>}
+                    </div>
                   )}
                 </td>
               </tr>
@@ -333,23 +383,34 @@ export const WalletPage: React.FC = () => {
         </Modal>
       )}
 
-      {/* Receipt Image Modal Preview */}
-      {selectedReceiptUrl && (
-        <Modal isOpen={true} onClose={() => setSelectedReceiptUrl(null)} title="Payment Proof Receipt Screenshot">
+      {/* Receipt / QR Image Modal Preview */}
+      {(selectedReceiptUrl || selectedQrUrl) && (
+        <Modal isOpen={true} onClose={() => { setSelectedReceiptUrl(null); setSelectedQrUrl(null); }} title="Image Proof Preview">
           <div className="space-y-4">
-            <img src={selectedReceiptUrl} alt="Payment Receipt" className="w-full max-h-96 object-contain rounded-2xl border border-brand-border" />
+            <img src={selectedReceiptUrl || selectedQrUrl!} alt="Image Preview" className="w-full max-h-96 object-contain rounded-2xl border border-brand-border" />
             <div className="flex justify-end">
-              <Button variant="secondary" onClick={() => setSelectedReceiptUrl(null)}>Close</Button>
+              <Button variant="secondary" onClick={() => { setSelectedReceiptUrl(null); setSelectedQrUrl(null); }}>Close</Button>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* Withdraw Modal */}
+      {/* Withdraw Modal with 3 Methods: UPI ID, QR Code, Bank Account */}
       {showWithdrawModal && (
-        <Modal isOpen={true} onClose={() => setShowWithdrawModal(false)} title="Request Bank Withdrawal">
+        <Modal isOpen={true} onClose={() => setShowWithdrawModal(false)} title="Request Payout Withdrawal">
           <form onSubmit={handleWithdrawSubmit} className="space-y-4">
             {error && <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400">{error}</div>}
+
+            <Select
+              label="Select Payout Method"
+              value={withdrawForm.paymentMethod}
+              onChange={(e) => setWithdrawForm({ ...withdrawForm, paymentMethod: e.target.value })}
+              options={[
+                { label: '1. UPI (ID)', value: 'UPI ID' },
+                { label: '2. QR Code (Upload Photo of QR)', value: 'QR Code' },
+                { label: '3. Bank Account', value: 'Bank Account' },
+              ]}
+            />
 
             <Input
               label="Withdrawal Amount (₹)"
@@ -359,34 +420,87 @@ export const WalletPage: React.FC = () => {
               required
             />
 
-            <Input
-              label="Account Holder Name"
-              value={withdrawForm.accountHolder}
-              onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
-              required
-            />
+            {/* Method 1: UPI ID */}
+            {withdrawForm.paymentMethod === 'UPI ID' && (
+              <div className="space-y-3 p-4 bg-brand-surface rounded-2xl border border-brand-border">
+                <div className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4" /> UPI Payout Details
+                </div>
+                <Input
+                  label="UPI ID (e.g. user@upi)"
+                  placeholder="name@okaxis / user@upi"
+                  value={withdrawForm.upiId}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, upiId: e.target.value })}
+                  required
+                />
+                <Input
+                  label="Account Holder Name"
+                  placeholder="Enter full name on UPI account"
+                  value={withdrawForm.accountHolder}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+                  required
+                />
+              </div>
+            )}
 
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="Bank Name"
-                value={withdrawForm.bankName}
-                onChange={(e) => setWithdrawForm({ ...withdrawForm, bankName: e.target.value })}
-                required
-              />
-              <Input
-                label="IFSC Code"
-                value={withdrawForm.ifscCode}
-                onChange={(e) => setWithdrawForm({ ...withdrawForm, ifscCode: e.target.value })}
-                required
-              />
-            </div>
+            {/* Method 2: QR Code Upload */}
+            {withdrawForm.paymentMethod === 'QR Code' && (
+              <div className="space-y-3 p-4 bg-brand-surface rounded-2xl border border-brand-border">
+                <div className="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+                  <QrCode className="w-4 h-4" /> QR Code Payout Details
+                </div>
+                <Input
+                  label="Account Holder Name"
+                  placeholder="Enter full name of QR holder"
+                  value={withdrawForm.accountHolder}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+                  required
+                />
+                <ImageUploadPicker
+                  label="Upload Photo of your Payment QR Code"
+                  value={withdrawForm.qrCodeUrl}
+                  onChange={(url) => setWithdrawForm({ ...withdrawForm, qrCodeUrl: url })}
+                  helperText="Upload clear QR code image for Admin payout processing"
+                />
+              </div>
+            )}
 
-            <Input
-              label="Bank Account Number / UPI ID"
-              value={withdrawForm.accountNumber}
-              onChange={(e) => setWithdrawForm({ ...withdrawForm, accountNumber: e.target.value })}
-              required
-            />
+            {/* Method 3: Bank Account */}
+            {withdrawForm.paymentMethod === 'Bank Account' && (
+              <div className="space-y-3 p-4 bg-brand-surface rounded-2xl border border-brand-border">
+                <div className="text-xs font-bold text-purple-400 flex items-center gap-1.5">
+                  <Building className="w-4 h-4" /> Bank Account Payout Details
+                </div>
+                <Input
+                  label="Bank Name"
+                  placeholder="e.g. HDFC Bank, SBI, ICICI"
+                  value={withdrawForm.bankName}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, bankName: e.target.value })}
+                  required
+                />
+                <Input
+                  label="Account Holder Name"
+                  placeholder="Enter full account holder name"
+                  value={withdrawForm.accountHolder}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+                  required
+                />
+                <Input
+                  label="Bank Account Number"
+                  placeholder="Enter account number"
+                  value={withdrawForm.accountNumber}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountNumber: e.target.value })}
+                  required
+                />
+                <Input
+                  label="IFSC Code"
+                  placeholder="e.g. HDFC0001234"
+                  value={withdrawForm.ifscCode}
+                  onChange={(e) => setWithdrawForm({ ...withdrawForm, ifscCode: e.target.value })}
+                  required
+                />
+              </div>
+            )}
 
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setShowWithdrawModal(false)} type="button">

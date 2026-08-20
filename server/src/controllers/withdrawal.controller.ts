@@ -3,20 +3,26 @@ import { WithdrawalRequest } from '../models/withdrawal.model';
 import { WalletService } from '../services/wallet.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { NotificationService } from '../services/notification.service';
-import { financialConfig } from '../config/financial.config';
 
 export class WithdrawalController {
   static async submit(req: AuthRequest, res: Response) {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
 
-      const { amount, bankName, accountHolder, accountNumber, ifscCode } = req.body;
-      const numAmount = Number(amount);
+      const {
+        amount,
+        paymentMethod = 'Bank Account',
+        bankName = 'Bank',
+        accountHolder,
+        accountNumber = '',
+        ifscCode = '',
+        upiId = '',
+        qrCodeUrl = '',
+      } = req.body;
 
-      if (numAmount < financialConfig.minWithdrawalAmount) {
-        return res.status(400).json({
-          message: `Minimum withdrawal amount is ${financialConfig.currencySymbol}${financialConfig.minWithdrawalAmount}`,
-        });
+      const numAmount = Number(amount);
+      if (isNaN(numAmount) || numAmount <= 0) {
+        return res.status(400).json({ message: 'Invalid withdrawal amount specified.' });
       }
 
       const wallet = await WalletService.getOrCreateWallet(req.user._id.toString());
@@ -33,7 +39,7 @@ export class WithdrawalController {
         req.user._id,
         numAmount,
         'WITHDRAWAL',
-        `Withdrawal request hold #${requestId}`,
+        `Withdrawal request hold #${requestId} (${paymentMethod})`,
         requestId
       );
 
@@ -41,24 +47,27 @@ export class WithdrawalController {
         requestId,
         userId: req.user._id,
         amount: numAmount,
+        paymentMethod,
         bankName,
         accountHolder,
         accountNumber,
-        ifscCode: ifscCode || '',
+        ifscCode,
+        upiId,
+        qrCodeUrl,
         status: 'PENDING',
       });
 
       await NotificationService.createNotification(
         req.user._id,
         'Withdrawal Request Submitted',
-        `Withdrawal request #${requestId} for ₹${numAmount.toFixed(2)} submitted. Amount has been temporarily moved to frozen balance.`,
+        `Withdrawal request #${requestId} for ₹${numAmount.toFixed(2)} (${paymentMethod}) submitted. Amount has been temporarily moved to frozen balance awaiting Admin approval.`,
         'WITHDRAWAL',
         '/wallet'
       );
 
       return res.status(201).json({
         success: true,
-        message: 'Withdrawal request submitted successfully.',
+        message: 'Withdrawal request submitted successfully to Admin.',
         withdrawal,
       });
     } catch (error: any) {
