@@ -10,6 +10,7 @@ import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Textarea } from '../../components/common/Textarea';
 import { Modal } from '../../components/common/Modal';
+import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
 import { brandConfig } from '../../config/brand.config';
 import {
@@ -22,6 +23,8 @@ import {
   PlusCircle,
   Edit,
   Trash2,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
@@ -39,7 +42,7 @@ export const AdminUsersPage: React.FC = () => {
     reason: 'Admin operational credit adjustment',
   });
 
-  // Profile Edit / Add Modal State
+  // Create / Edit Profile Modal State
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [editProfileUser, setEditProfileUser] = useState<User | null>(null);
   const [profileForm, setProfileForm] = useState({
@@ -48,22 +51,38 @@ export const AdminUsersPage: React.FC = () => {
     phone: '',
     city: 'Mumbai',
     gender: 'Female',
-    profileImage: '',
+    profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
     bio: '',
-    interests: 'Travel, Dating, Luxury',
+    status: 'ACTIVE',
     isVIP: true,
   });
 
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  // Custom Styled Confirmation Popup Modal State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant?: 'danger' | 'gold' | 'primary';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const fetchUsers = async () => {
-    setLoading(true);
     try {
-      const res = await adminService.getUsers({ search, status, isVIP });
-      if (res.data.success) {
-        setUsers(res.data.users);
-      }
+      const res = await adminService.getUsers({
+        search,
+        status: status === 'ALL' ? undefined : status,
+        isVIP: isVIP === 'ALL' ? undefined : isVIP === 'VIP',
+      });
+      if (res.data.success) setUsers(res.data.users);
     } catch (err) {
       console.error(err);
     } finally {
@@ -73,27 +92,23 @@ export const AdminUsersPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [status, isVIP]);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchUsers();
-  };
+  }, [search, status, isVIP]);
 
   const handleBalanceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUserForBalance) return;
     setActionLoading(true);
+    setError('');
 
     try {
       const res = await adminService.adjustUserBalance(selectedUserForBalance.id || selectedUserForBalance._id!, balanceForm);
       if (res.data.success) {
-        setMessage(`Balance updated successfully!`);
+        setMessage(`Balance updated successfully for ${selectedUserForBalance.fullName}!`);
         setSelectedUserForBalance(null);
         fetchUsers();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to adjust balance');
+      setError(err.response?.data?.message || 'Failed to adjust user balance.');
     } finally {
       setActionLoading(false);
     }
@@ -108,8 +123,8 @@ export const AdminUsersPage: React.FC = () => {
       city: 'Mumbai',
       gender: 'Female',
       profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-      bio: 'Vibrant personality exploring luxury dating & social connections.',
-      interests: 'Travel, Dating, Fashion',
+      bio: '',
+      status: 'ACTIVE',
       isVIP: true,
     });
     setShowProfileModal(true);
@@ -123,17 +138,18 @@ export const AdminUsersPage: React.FC = () => {
       phone: user.phone || '',
       city: user.city || 'Mumbai',
       gender: user.gender || 'Female',
-      profileImage: user.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+      profileImage: user.profileImage || '',
       bio: user.bio || '',
-      interests: Array.isArray(user.interests) ? user.interests.join(', ') : (user.interests || 'Travel, Dating'),
+      status: user.status || 'ACTIVE',
       isVIP: user.isVIP ?? true,
     });
     setShowProfileModal(true);
   };
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
+    setError('');
 
     try {
       if (editProfileUser) {
@@ -152,192 +168,240 @@ export const AdminUsersPage: React.FC = () => {
         }
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Profile operation failed');
+      setError(err.response?.data?.message || 'Profile operation failed.');
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleDeleteProfile = async (user: User) => {
-    if (window.confirm(`Are you sure you want to permanently delete profile for ${user.fullName}?`)) {
-      try {
-        await adminService.deleteUserProfile(user.id || user._id!);
-        setMessage(`Profile ${user.fullName} deleted.`);
-        fetchUsers();
-      } catch (err: any) {
-        alert(err.response?.data?.message || 'Failed to delete profile');
-      }
-    }
+  const handleDeleteProfile = (user: User) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete User Profile',
+      message: `Are you sure you want to permanently delete the profile for "${user.fullName}"? This action cannot be undone.`,
+      variant: 'danger',
+      onConfirm: async () => {
+        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        try {
+          await adminService.deleteUserProfile(user.id || user._id!);
+          setMessage(`Profile for ${user.fullName} deleted successfully.`);
+          fetchUsers();
+        } catch (err: any) {
+          setError(err.response?.data?.message || 'Failed to delete profile.');
+        }
+      },
+    });
   };
 
-  const handleToggleStatus = async (user: User) => {
+  const handleToggleStatus = (user: User) => {
     const newStatus = user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    if (window.confirm(`Are you sure you want to change ${user.fullName}'s status to ${newStatus}?`)) {
-      await adminService.toggleUserStatus(user.id || user._id!, { status: newStatus });
-      fetchUsers();
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: `${newStatus === 'ACTIVE' ? 'Activate' : 'Suspend'} Account Status`,
+      message: `Are you sure you want to change "${user.fullName}"'s status to ${newStatus}?`,
+      variant: newStatus === 'SUSPENDED' ? 'danger' : 'gold',
+      onConfirm: async () => {
+        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        try {
+          await adminService.toggleUserStatus(user.id || user._id!, { status: newStatus });
+          setMessage(`Status for ${user.fullName} changed to ${newStatus}.`);
+          fetchUsers();
+        } catch (err: any) {
+          setError(err.response?.data?.message || 'Failed to update account status.');
+        }
+      },
+    });
   };
 
   const handleToggleVIP = async (user: User) => {
     const newVIP = !user.isVIP;
-    await adminService.toggleUserStatus(user.id || user._id!, { isVIP: newVIP });
-    fetchUsers();
+    try {
+      await adminService.toggleUserStatus(user.id || user._id!, { isVIP: newVIP });
+      setMessage(`VIP status updated for ${user.fullName}.`);
+      fetchUsers();
+    } catch (err: any) {
+      setError('Failed to update VIP status.');
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Users className="w-6 h-6 text-amber-400" /> Platform User & Match Profiles
+            <Users className="w-6 h-6 text-amber-400" /> User Directory & Accounts
           </h1>
-          <p className="text-xs text-slate-400">Add, edit, or remove profile photos, manage VIP badges, & adjust balances.</p>
+          <p className="text-xs text-slate-400">Manage registered members, VIP statuses, balances, & profile cards.</p>
         </div>
 
-        <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
-          Add Match Profile
+        <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
+          Add New Profile Card
         </Button>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between">
-          <span>{message}</span>
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4" /> {message}
+          </div>
           <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
         </div>
       )}
 
-      {/* Filter Bar */}
+      {error && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-300 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400" /> {error}
+          </div>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+        </div>
+      )}
+
+      {/* Filters Bar */}
       <Card className="p-4">
-        <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Input
-            placeholder="Search name, email, city..."
+            placeholder="Search name, email, or phone..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             leftIcon={<Search className="w-4 h-4" />}
           />
-
           <Select
-            label=""
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
             options={[
               { label: 'All Statuses', value: 'ALL' },
               { label: 'Active Only', value: 'ACTIVE' },
               { label: 'Suspended Only', value: 'SUSPENDED' },
             ]}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
           />
-
           <Select
-            label=""
-            value={isVIP}
-            onChange={(e) => setIsVIP(e.target.value)}
             options={[
               { label: 'All Users (VIP & Normal)', value: 'ALL' },
               { label: 'VIP Members Only', value: 'VIP' },
-              { label: 'Normal Members Only', value: 'NON_VIP' },
+              { label: 'Non-VIP Users', value: 'NORMAL' },
             ]}
+            value={isVIP}
+            onChange={(e) => setIsVIP(e.target.value)}
           />
-        </form>
+        </div>
       </Card>
 
-      {/* User Table */}
-      {loading ? (
-        <Card className="p-8 text-center text-xs text-slate-500">Loading user directory...</Card>
-      ) : users.length === 0 ? (
-        <Card className="p-12 text-center text-xs text-slate-500">No users match the search criteria.</Card>
-      ) : (
-        <Table headers={['Profile Photo & Name', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Actions']}>
-          {users.map((u) => {
-            const userIdStr = u.id || u._id!;
-            return (
-              <tr key={userIdStr} className="hover:bg-brand-card/50 transition-colors">
+      {/* Users Table */}
+      <Card className="p-0 overflow-hidden">
+        {loading ? (
+          <p className="text-center text-xs text-slate-500 py-10">Loading user catalog...</p>
+        ) : users.length === 0 ? (
+          <p className="text-center text-xs text-slate-500 py-10">No users found matching query.</p>
+        ) : (
+          <Table headers={['Profile Photo & Name', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Actions']}>
+            {users.map((u) => (
+              <tr key={u._id || u.id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
                     <img
-                      src={u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'}
+                      src={u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
                       alt={u.fullName}
-                      className="w-10 h-10 rounded-xl object-cover border border-brand-border"
+                      className="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0"
                     />
                     <div>
-                      <h4 className="text-xs font-bold text-slate-100">{u.fullName}</h4>
-                      <p className="text-[10px] text-slate-400">{u.email}</p>
+                      <div className="text-xs font-bold text-slate-100">{u.fullName}</div>
+                      <div className="text-[11px] text-slate-400">{u.email}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-5 py-3 text-xs text-slate-300">{u.city}</td>
+                <td className="px-5 py-3 text-xs text-slate-300 font-semibold">{u.city || 'Mumbai'}</td>
                 <td className="px-5 py-3">
-                  {u.status === 'ACTIVE' ? <Badge variant="success">ACTIVE</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
+                  {u.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
                 </td>
                 <td className="px-5 py-3">
-                  <button onClick={() => handleToggleVIP(u)}>
-                    {u.isVIP ? <Badge variant="vip" size="sm" /> : <Badge variant="neutral" size="sm">TOGGLE VIP</Badge>}
+                  <button onClick={() => handleToggleVIP(u)} className="cursor-pointer" title="Click to toggle VIP status">
+                    {u.isVIP ? <Badge variant="vip">VIP CLUB</Badge> : <Badge variant="neutral">TOGGLE VIP</Badge>}
                   </button>
                 </td>
-                <td className="px-5 py-3 font-bold text-emerald-400">
-                  ₹{u.wallet?.availableBalance?.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
+                <td className="px-5 py-3 font-bold text-emerald-400 text-xs">
+                  ₹{(u.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
-                <td className="px-5 py-3 text-amber-400 font-semibold">
-                  ₹{u.wallet?.frozenBalance?.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
+                <td className="px-5 py-3 font-bold text-amber-400 text-xs">
+                  ₹{(u.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-5 py-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <button
-                      title="Edit Profile Photo & Info"
                       onClick={() => handleOpenEditProfile(u)}
-                      className="p-1.5 bg-brand-surface border border-brand-border rounded-lg text-slate-300 hover:text-white"
+                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
+                      title="Edit Profile"
                     >
                       <Edit className="w-3.5 h-3.5" />
                     </button>
-                    <Link to={`/admin/users/${userIdStr}`}>
-                      <button title="View Detail" className="p-1.5 bg-brand-surface border border-brand-border rounded-lg text-slate-300 hover:text-white">
-                        <Eye className="w-3.5 h-3.5" />
-                      </button>
+
+                    <Link
+                      to={`/admin/users/${u._id || u.id}`}
+                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
+                      title="View Full User Details & History"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
                     </Link>
+
                     <button
-                      title="Adjust Balance"
                       onClick={() => setSelectedUserForBalance(u)}
-                      className="p-1.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400 hover:bg-amber-500/20"
+                      className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                      title="Adjust Vault Balance"
                     >
                       <DollarSign className="w-3.5 h-3.5" />
                     </button>
+
                     <button
-                      title="Toggle Suspend"
                       onClick={() => handleToggleStatus(u)}
-                      className={`p-1.5 rounded-lg border ${
-                        u.status === 'ACTIVE' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                      className={`p-1.5 rounded-lg border transition-colors ${
+                        u.status === 'ACTIVE'
+                          ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
+                          : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
                       }`}
+                      title={u.status === 'ACTIVE' ? 'Suspend Account' : 'Activate Account'}
                     >
                       {u.status === 'ACTIVE' ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
                     </button>
+
                     <button
-                      title="Delete Profile"
                       onClick={() => handleDeleteProfile(u)}
-                      className="p-1.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 hover:bg-rose-500/20"
+                      className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                      title="Delete Profile Card"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </td>
               </tr>
-            );
-          })}
-        </Table>
-      )}
+            ))}
+          </Table>
+        )}
+      </Card>
 
-      {/* Add / Edit Profile Modal */}
+      {/* Styled Custom Confirmation Popup Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant={confirmModal.variant}
+        confirmText="Confirm Action"
+      />
+
+      {/* Create / Edit Profile Card Modal */}
       {showProfileModal && (
         <Modal
           isOpen={true}
           onClose={() => setShowProfileModal(false)}
-          title={editProfileUser ? `Edit Profile & Photo — ${editProfileUser.fullName}` : 'Add New Match Profile'}
+          title={editProfileUser ? 'Edit Member Profile Card' : 'Add New Member Profile Card'}
         >
-          <form onSubmit={handleProfileSubmit} className="space-y-4">
+          <form onSubmit={handleSaveProfile} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
             <ImageUploadPicker
-              label="Profile Photo Upload"
+              label="Profile Photo (Upload or Paste URL)"
               value={profileForm.profileImage}
               onChange={(url) => setProfileForm({ ...profileForm, profileImage: url })}
-              helperText="Upload profile photo image file"
-              aspectRatio="square"
             />
 
             <Input
@@ -347,86 +411,116 @@ export const AdminUsersPage: React.FC = () => {
               required
             />
 
+            <Input
+              label="Email Address"
+              type="email"
+              value={profileForm.email}
+              onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+              required
+            />
+
+            <Input
+              label="Phone Number"
+              value={profileForm.phone}
+              onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+            />
+
             <div className="grid grid-cols-2 gap-3">
               <Select
                 label="City"
+                options={[
+                  { label: 'Mumbai', value: 'Mumbai' },
+                  { label: 'Delhi', value: 'Delhi' },
+                  { label: 'Bangalore', value: 'Bangalore' },
+                  { label: 'Hyderabad', value: 'Hyderabad' },
+                  { label: 'Pune', value: 'Pune' },
+                  { label: 'Agra', value: 'Agra' },
+                ]}
                 value={profileForm.city}
                 onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                options={brandConfig.cities.map((c) => ({ label: c, value: c }))}
               />
+
               <Select
                 label="Gender"
-                value={profileForm.gender}
-                onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
                 options={[
                   { label: 'Female', value: 'Female' },
                   { label: 'Male', value: 'Male' },
-                  { label: 'Non-Binary', value: 'Non-Binary' },
                 ]}
+                value={profileForm.gender}
+                onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
               />
             </div>
 
             <Textarea
-              label="Bio / Introduction"
+              label="Short Bio / Description"
               value={profileForm.bio}
               onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-              rows={2}
             />
 
-            <Input
-              label="Interests (comma separated)"
-              value={profileForm.interests}
-              onChange={(e) => setProfileForm({ ...profileForm, interests: e.target.value })}
-            />
+            <div className="grid grid-cols-2 gap-3">
+              <Select
+                label="Account Status"
+                options={[
+                  { label: 'Active', value: 'ACTIVE' },
+                  { label: 'Suspended', value: 'SUSPENDED' },
+                ]}
+                value={profileForm.status}
+                onChange={(e) => setProfileForm({ ...profileForm, status: e.target.value })}
+              />
 
-            <Select
-              label="VIP Membership Badge"
-              value={profileForm.isVIP ? 'true' : 'false'}
-              onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
-              options={[
-                { label: 'Gold VIP Member', value: 'true' },
-                { label: 'Standard Member', value: 'false' },
-              ]}
-            />
+              <Select
+                label="VIP Status"
+                options={[
+                  { label: 'VIP Club Member', value: 'true' },
+                  { label: 'Normal Member', value: 'false' },
+                ]}
+                value={String(profileForm.isVIP)}
+                onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
+              />
+            </div>
 
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setShowProfileModal(false)} type="button">
                 Cancel
               </Button>
               <Button variant="gold" type="submit" isLoading={actionLoading}>
-                Save Profile
+                {editProfileUser ? 'Update Profile' : 'Create Profile'}
               </Button>
             </div>
           </form>
         </Modal>
       )}
 
-      {/* Adjust Balance Modal */}
+      {/* Adjust User Vault Balance Modal */}
       {selectedUserForBalance && (
         <Modal
           isOpen={true}
           onClose={() => setSelectedUserForBalance(null)}
-          title={`Adjust Balance — ${selectedUserForBalance.fullName}`}
+          title={`Adjust Vault Balance for ${selectedUserForBalance.fullName}`}
         >
           <form onSubmit={handleBalanceSubmit} className="space-y-4">
+            <div className="p-3 bg-brand-card border border-brand-border rounded-xl text-xs space-y-1">
+              <div>Available Balance: <strong className="text-emerald-400">₹{(selectedUserForBalance.wallet?.availableBalance ?? 0).toFixed(2)}</strong></div>
+              <div>Frozen Balance: <strong className="text-amber-400">₹{(selectedUserForBalance.wallet?.frozenBalance ?? 0).toFixed(2)}</strong></div>
+            </div>
+
             <Select
-              label="Action Type"
-              value={balanceForm.action}
-              onChange={(e: any) => setBalanceForm({ ...balanceForm, action: e.target.value })}
+              label="Adjustment Action"
               options={[
-                { label: 'Add Funds (Credit Available Balance)', value: 'ADD' },
-                { label: 'Freeze Funds (Move Available -> Frozen)', value: 'FREEZE' },
-                { label: 'Unfreeze Funds (Move Frozen -> Available)', value: 'UNFREEZE' },
-                { label: 'Deduct Funds (Direct Debit)', value: 'DEDUCT' },
+                { label: '➕ Add Funds (Increase Available)', value: 'ADD' },
+                { label: '🔒 Freeze Funds (Move Available -> Frozen)', value: 'FREEZE' },
+                { label: '🔓 Unfreeze Funds (Move Frozen -> Available)', value: 'UNFREEZE' },
+                { label: '➖ Deduct Funds (Decrease Available)', value: 'DEDUCT' },
               ]}
+              value={balanceForm.action}
+              onChange={(e) => setBalanceForm({ ...balanceForm, action: e.target.value as any })}
             />
 
             <Input
-              label="Amount (₹)"
+              label="Adjustment Amount (₹)"
               type="number"
               value={balanceForm.amount}
               onChange={(e) => setBalanceForm({ ...balanceForm, amount: Number(e.target.value) })}
-              min={1}
               required
             />
 

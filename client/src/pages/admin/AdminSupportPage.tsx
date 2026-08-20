@@ -20,6 +20,7 @@ export const AdminSupportPage: React.FC = () => {
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [replyMessage, setReplyMessage] = useState('');
   const [replyLoading, setReplyLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchTickets = async () => {
     setLoading(true);
@@ -64,7 +65,7 @@ export const AdminSupportPage: React.FC = () => {
         fetchTickets();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Reply failed');
+      setError(err.response?.data?.message || 'Reply failed.');
     } finally {
       setReplyLoading(false);
     }

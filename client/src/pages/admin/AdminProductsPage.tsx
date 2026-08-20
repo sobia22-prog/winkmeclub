@@ -4,39 +4,51 @@ import { tradeService } from '../../services/trade.service';
 import { Product } from '../../types';
 import { Card } from '../../components/common/Card';
 import { Table } from '../../components/common/Table';
-import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
-import { Modal } from '../../components/common/Modal';
 import { Input } from '../../components/common/Input';
-import { Textarea } from '../../components/common/Textarea';
 import { Select } from '../../components/common/Select';
+import { Textarea } from '../../components/common/Textarea';
+import { Modal } from '../../components/common/Modal';
+import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
-import { Package, PlusCircle, Trash2, Edit } from 'lucide-react';
+import { Package, PlusCircle, Edit, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export const AdminProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Product Modal State
   const [showModal, setShowModal] = useState(false);
-  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
   const [form, setForm] = useState({
     name: '',
     description: '',
     price: 1000,
-    image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500&auto=format&fit=crop&q=80',
-    category: 'Lifestyle & Home',
+    image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
+    category: 'Toys & Gifts',
     status: 'ACTIVE',
   });
+
   const [actionLoading, setActionLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+
+  // Confirm Modal State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
 
   const fetchProducts = async () => {
-    setLoading(true);
     try {
       const res = await tradeService.getProducts();
-      if (res.data.success) {
-        setProducts(res.data.products);
-      }
+      if (res.data.success) setProducts(res.data.products);
     } catch (err) {
       console.error(err);
     } finally {
@@ -48,28 +60,28 @@ export const AdminProductsPage: React.FC = () => {
     fetchProducts();
   }, []);
 
-  const handleOpenCreate = () => {
-    setEditProduct(null);
+  const handleOpenAdd = () => {
+    setEditingProduct(null);
     setForm({
       name: '',
       description: '',
       price: 1000,
-      image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=500&auto=format&fit=crop&q=80',
-      category: 'Lifestyle & Home',
+      image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
+      category: 'Toys & Gifts',
       status: 'ACTIVE',
     });
     setShowModal(true);
   };
 
   const handleOpenEdit = (prod: Product) => {
-    setEditProduct(prod);
+    setEditingProduct(prod);
     setForm({
       name: prod.name,
-      description: prod.description,
+      description: prod.description || '',
       price: prod.price,
       image: prod.image,
-      category: prod.category,
-      status: prod.status,
+      category: prod.category || 'Toys & Gifts',
+      status: prod.status || 'ACTIVE',
     });
     setShowModal(true);
   };
@@ -77,31 +89,45 @@ export const AdminProductsPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setActionLoading(true);
+    setError('');
 
     try {
-      if (editProduct) {
-        await adminService.updateProduct(editProduct._id, form);
+      if (editingProduct) {
+        await adminService.updateProduct(editingProduct._id, form);
+        setMessage(`Product "${form.name}" updated successfully!`);
       } else {
         await adminService.createProduct(form);
+        setMessage(`Product "${form.name}" created successfully!`);
       }
       setShowModal(false);
       fetchProducts();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Operation failed');
+      setError(err.response?.data?.message || 'Operation failed.');
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      await adminService.deleteProduct(id);
-      fetchProducts();
-    }
+  const handleDelete = (id: string, name: string) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Catalog Product',
+      message: `Are you sure you want to delete "${name}" from the product trading catalog?`,
+      onConfirm: async () => {
+        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
+        try {
+          await adminService.deleteProduct(id);
+          setMessage(`Product "${name}" deleted.`);
+          fetchProducts();
+        } catch (err: any) {
+          setError('Failed to delete product.');
+        }
+      },
+    });
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
@@ -110,55 +136,99 @@ export const AdminProductsPage: React.FC = () => {
           <p className="text-xs text-slate-400">Configure lifestyle products available for user trading.</p>
         </div>
 
-        <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenCreate}>
-          Create New Product
+        <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
+          Add New Product
         </Button>
       </div>
 
-      {loading ? (
-        <Card className="p-8 text-center text-xs text-slate-500">Loading catalog...</Card>
-      ) : (
-        <Table headers={['Product Image', 'Name', 'Category', 'Price', 'Status', 'Actions']}>
-          {products.map((p) => (
-            <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3">
-                <img src={p.image} alt={p.name} className="w-12 h-12 rounded-xl object-cover" />
-              </td>
-              <td className="px-5 py-3 font-bold text-slate-100">{p.name}</td>
-              <td className="px-5 py-3 text-slate-400">{p.category}</td>
-              <td className="px-5 py-3 font-bold text-amber-400">
-                ₹{p.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-              </td>
-              <td className="px-5 py-3">
-                {p.status === 'ACTIVE' ? <Badge variant="success">ACTIVE</Badge> : <Badge variant="neutral">INACTIVE</Badge>}
-              </td>
-              <td className="px-5 py-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleOpenEdit(p)}
-                    className="p-1.5 bg-brand-surface border border-brand-border rounded-lg text-slate-300 hover:text-white"
-                  >
-                    <Edit className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(p._id)}
-                    className="p-1.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 hover:bg-rose-500/20"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </Table>
+      {message && (
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4" /> {message}
+          </div>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+        </div>
       )}
 
-      {/* Product Form Modal */}
+      {error && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-300 flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400" /> {error}
+          </div>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+        </div>
+      )}
+
+      <Card className="p-0 overflow-hidden">
+        {loading ? (
+          <p className="text-center text-xs text-slate-500 py-10">Loading product catalog...</p>
+        ) : products.length === 0 ? (
+          <p className="text-center text-xs text-slate-500 py-10">No products created yet.</p>
+        ) : (
+          <Table headers={['Product Image & Name', 'Category', 'Price (₹)', 'Status', 'Actions']}>
+            {products.map((p) => (
+              <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="w-12 h-12 rounded-xl object-cover border border-brand-border bg-black/40"
+                    />
+                    <div>
+                      <div className="text-xs font-bold text-slate-100">{p.name}</div>
+                      <div className="text-[11px] text-slate-400 line-clamp-1">{p.description}</div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-5 py-3 text-xs text-slate-300 font-medium">{p.category}</td>
+                <td className="px-5 py-3 font-bold text-amber-400 text-xs">
+                  ₹{p.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="px-5 py-3">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    {p.status}
+                  </span>
+                </td>
+                <td className="px-5 py-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenEdit(p)}
+                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
+                      title="Edit Product"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p._id, p.name)}
+                      className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                      title="Delete Product"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </Table>
+        )}
+      </Card>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        variant="danger"
+        confirmText="Delete Product"
+      />
+
       {showModal && (
         <Modal
           isOpen={true}
           onClose={() => setShowModal(false)}
-          title={editProduct ? 'Edit Product' : 'Create Marketplace Product'}
+          title={editingProduct ? 'Edit Catalog Product' : 'Add New Catalog Product'}
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -167,49 +237,46 @@ export const AdminProductsPage: React.FC = () => {
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
+
             <Textarea
-              label="Description"
+              label="Product Description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+
+            <Input
+              label="Price (₹)"
+              type="number"
+              value={form.price}
+              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
               required
             />
-            <div className="grid grid-cols-2 gap-3">
-              <Input
-                label="Price (₹)"
-                type="number"
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
-                required
-              />
-              <Input
-                label="Category"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                required
-              />
-            </div>
+
             <ImageUploadPicker
-              label="Product Image Upload"
+              label="Product Image (Upload or Paste URL)"
               value={form.image}
               onChange={(url) => setForm({ ...form, image: url })}
-              helperText="Upload photo for product catalog item"
             />
+
             <Select
-              label="Status"
-              value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value })}
+              label="Category"
               options={[
-                { label: 'Active', value: 'ACTIVE' },
-                { label: 'Inactive', value: 'INACTIVE' },
+                { label: 'Toys & Gifts', value: 'Toys & Gifts' },
+                { label: 'Personal Wellness', value: 'Personal Wellness' },
+                { label: 'Lifestyle & Home', value: 'Lifestyle & Home' },
+                { label: 'Personal Care', value: 'Personal Care' },
+                { label: 'Luxury Accessories', value: 'Luxury Accessories' },
               ]}
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
             />
 
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setShowModal(false)} type="button">
                 Cancel
               </Button>
-              <Button variant="primary" type="submit" isLoading={actionLoading}>
-                Save Product
+              <Button variant="gold" type="submit" isLoading={actionLoading}>
+                {editingProduct ? 'Update Product' : 'Create Product'}
               </Button>
             </div>
           </form>

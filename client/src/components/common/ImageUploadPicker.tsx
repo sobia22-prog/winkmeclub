@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Camera, Upload, Image as ImageIcon, X } from 'lucide-react';
 
 interface ImageUploadPickerProps {
@@ -17,14 +17,16 @@ export const ImageUploadPicker: React.FC<ImageUploadPickerProps> = ({
   aspectRatio = 'banner',
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('Selected image file exceeds 5MB size limit.');
+        setErrorMsg('Selected image file exceeds 5MB size limit.');
         return;
       }
+      setErrorMsg('');
       const reader = new FileReader();
       reader.onloadend = () => {
         onChange(reader.result as string);
@@ -92,6 +94,7 @@ export const ImageUploadPicker: React.FC<ImageUploadPickerProps> = ({
           </div>
         </div>
       )}
+      {errorMsg && <p className="text-[11px] text-rose-400 font-semibold">{errorMsg}</p>}
     </div>
   );
 };

@@ -20,6 +20,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
   const [actionType, setActionType] = useState<'APPROVE' | 'COMPLETE' | 'REJECT'>('COMPLETE');
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchWithdrawals = async () => {
     setLoading(true);
@@ -56,7 +57,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
         fetchWithdrawals();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Withdrawal action failed');
+      setError(err.response?.data?.message || 'Withdrawal action failed.');
     } finally {
       setActionLoading(false);
     }

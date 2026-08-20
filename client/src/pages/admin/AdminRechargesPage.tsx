@@ -21,6 +21,7 @@ export const AdminRechargesPage: React.FC = () => {
   const [overrideAmount, setOverrideAmount] = useState<number>(0);
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchRecharges = async () => {
     setLoading(true);
@@ -58,7 +59,7 @@ export const AdminRechargesPage: React.FC = () => {
         fetchRecharges();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Review action failed');
+      setError(err.response?.data?.message || 'Review action failed.');
     } finally {
       setActionLoading(false);
     }

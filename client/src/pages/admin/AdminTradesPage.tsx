@@ -20,6 +20,7 @@ export const AdminTradesPage: React.FC = () => {
   const [profitPercentage, setProfitPercentage] = useState<number>(20);
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const fetchTrades = async () => {
     setLoading(true);
@@ -56,7 +57,7 @@ export const AdminTradesPage: React.FC = () => {
         fetchTrades();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Settlement failed');
+      setError(err.response?.data?.message || 'Settlement failed.');
     } finally {
       setActionLoading(false);
     }

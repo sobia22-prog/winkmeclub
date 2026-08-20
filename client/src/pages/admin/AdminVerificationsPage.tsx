@@ -20,6 +20,7 @@ export const AdminVerificationsPage: React.FC = () => {
   const [reason, setReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const fetchVerifications = async () => {
     setLoading(true);
@@ -50,7 +51,7 @@ export const AdminVerificationsPage: React.FC = () => {
         fetchVerifications();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Status update failed');
+      setError(err.response?.data?.message || 'Verification action failed.');
     }
   };
 
@@ -72,7 +73,7 @@ export const AdminVerificationsPage: React.FC = () => {
         fetchVerifications();
       }
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Review failed');
+      setError(err.response?.data?.message || 'Review failed.');
     } finally {
       setActionLoading(false);
     }
