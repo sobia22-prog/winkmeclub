@@ -293,8 +293,8 @@ export const AdminUsersPage: React.FC = () => {
         ) : users.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No users found matching query.</p>
         ) : (
-          <Table headers={['Profile Photo & Name', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Actions']}>
-            {users.map((u) => (
+          <Table headers={['Profile Photo & Name', 'Assigned Staff', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Actions']}>
+            {users.map((u: any) => (
               <tr key={u._id || u.id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
@@ -308,6 +308,15 @@ export const AdminUsersPage: React.FC = () => {
                       <div className="text-[11px] text-slate-400">{u.email}</div>
                     </div>
                   </div>
+                </td>
+                <td className="px-5 py-3 text-xs">
+                  {u.assignedStaff ? (
+                    <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-bold text-[11px]">
+                      {u.assignedStaff.invitationCode || u.assignedStaff.fullName}
+                    </span>
+                  ) : (
+                    <span className="text-slate-500 text-[11px] italic">Unassigned</span>
+                  )}
                 </td>
                 <td className="px-5 py-3 text-xs text-slate-300 font-semibold">{u.city || 'Mumbai'}</td>
                 <td className="px-5 py-3">

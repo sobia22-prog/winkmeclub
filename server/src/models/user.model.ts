@@ -7,7 +7,9 @@ export interface IUser extends Document {
   passwordHash: string;
   city: string;
   gender: string;
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'ADMIN' | 'STAFF';
+  invitationCode?: string;
+  assignedStaff?: mongoose.Types.ObjectId;
   isVIP: boolean;
   vipExpiresAt?: Date;
   isVerified: boolean; // Email OTP verified
@@ -31,7 +33,9 @@ const UserSchema: Schema = new Schema(
     passwordHash: { type: String, required: true },
     city: { type: String, required: true, trim: true, index: true },
     gender: { type: String, required: true, enum: ['Male', 'Female', 'Non-Binary', 'Other'], default: 'Female' },
-    role: { type: String, enum: ['USER', 'ADMIN'], default: 'USER', index: true },
+    role: { type: String, enum: ['USER', 'ADMIN', 'STAFF'], default: 'USER', index: true },
+    invitationCode: { type: String, unique: true, sparse: true, trim: true, index: true },
+    assignedStaff: { type: Schema.Types.ObjectId, ref: 'User', index: true },
     isVIP: { type: Boolean, default: false, index: true },
     vipExpiresAt: { type: Date },
     isVerified: { type: Boolean, default: false },
@@ -49,5 +53,7 @@ const UserSchema: Schema = new Schema(
 
 UserSchema.index({ email: 1, status: 1 });
 UserSchema.index({ city: 1, isVIP: 1, status: 1 });
+UserSchema.index({ invitationCode: 1 });
+UserSchema.index({ assignedStaff: 1 });
 
 export const User = mongoose.model<IUser>('User', UserSchema);

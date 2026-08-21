@@ -38,6 +38,7 @@ import { AdminAnnouncementsPage } from './pages/admin/AdminAnnouncementsPage';
 import { AdminSupportPage } from './pages/admin/AdminSupportPage';
 import { AdminProfilePage } from './pages/admin/AdminProfilePage';
 import { AdminPaymentSettingsPage } from './pages/admin/AdminPaymentSettingsPage';
+import { AdminStaffPage } from './pages/admin/AdminStaffPage';
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ export const App: React.FC = () => {
             {/* Protected Admin Routes */}
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin/staff" element={<AdminStaffPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
               <Route path="/admin/trades" element={<AdminTradesPage />} />

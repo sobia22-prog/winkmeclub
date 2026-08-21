@@ -7,7 +7,7 @@ import { Select } from '../../components/common/Select';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { useAuth } from '../../contexts/AuthContext';
-import { User, Mail, Phone, Lock, ShieldCheck, FileText, CheckSquare, Square } from 'lucide-react';
+import { User, Mail, Phone, Lock, ShieldCheck, FileText, CheckSquare, Square, Key } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
   const { loginSession } = useAuth();
@@ -19,6 +19,7 @@ export const RegisterPage: React.FC = () => {
     confirmPassword: '',
     city: 'Mumbai',
     gender: 'Female',
+    invitationCode: '',
   });
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
@@ -77,6 +78,16 @@ export const RegisterPage: React.FC = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
+          <Input
+            label="Staff Invitation Code (Required)"
+            name="invitationCode"
+            placeholder="e.g. ST18492041"
+            value={formData.invitationCode}
+            onChange={handleChange}
+            leftIcon={<Key className="w-4 h-4 text-amber-400" />}
+            helperText="Enter the official staff invitation code provided by administration."
+            required
+          />
           <Input
             label="Full Name"
             name="fullName"

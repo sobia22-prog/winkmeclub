@@ -32,3 +32,17 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     return res.status(401).json({ message: 'Invalid token or session expired.' });
   }
 };
+
+export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'STAFF')) {
+    return res.status(403).json({ message: 'Administrative or Staff access required.' });
+  }
+  next();
+};
+
+export const requireSuperAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user || req.user.role !== 'ADMIN') {
+    return res.status(403).json({ message: 'Super Admin privileges required.' });
+  }
+  next();
+};

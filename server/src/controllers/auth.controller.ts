@@ -14,7 +14,22 @@ const generateToken = (userId: string) => {
 export class AuthController {
   static async register(req: Request, res: Response) {
     try {
-      const { fullName, email, phone, password, city, gender } = req.body;
+      const { fullName, email, phone, password, city, gender, invitationCode } = req.body;
+
+      if (!invitationCode || typeof invitationCode !== 'string' || !invitationCode.trim()) {
+        return res.status(400).json({ message: 'Staff Invitation Code is mandatory for registration.' });
+      }
+
+      // Check if invitation code belongs to a valid Staff or Admin
+      const staffUser = await User.findOne({
+        invitationCode: invitationCode.trim().toUpperCase(),
+        role: { $in: ['STAFF', 'ADMIN'] },
+        status: 'ACTIVE',
+      });
+
+      if (!staffUser) {
+        return res.status(400).json({ message: 'Invalid or inactive Staff Invitation Code. Registration requires a valid staff code.' });
+      }
 
       const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
@@ -30,6 +45,7 @@ export class AuthController {
         city,
         gender: gender || 'Female',
         role: 'USER',
+        assignedStaff: staffUser._id,
         isVIP: true,
         isVerified: true,
         verificationStatus: 'VERIFIED',
@@ -50,6 +66,7 @@ export class AuthController {
           email: user.email,
           city: user.city,
           role: user.role,
+          assignedStaff: user.assignedStaff,
           isVIP: user.isVIP,
           isVerified: user.isVerified,
         },
@@ -159,6 +176,7 @@ export class AuthController {
           city: user.city,
           gender: user.gender,
           role: user.role,
+          assignedStaff: user.assignedStaff,
           isVIP: user.isVIP,
           verificationStatus: user.verificationStatus,
           profileImage: user.profileImage,
@@ -177,27 +195,36 @@ export class AuthController {
         return res.status(400).json({ message: 'Email and password are required.' });
       }
 
-      const user = await User.findOne({ email: email.toLowerCase(), role: 'ADMIN' });
+      // Allow ADMIN and STAFF role to log into admin portal
+      const user = await User.findOne({ email: email.toLowerCase(), role: { $in: ['ADMIN', 'STAFF'] } });
 
       if (!user) {
-        return res.status(401).json({ message: 'Invalid admin credentials or unauthorized account.' });
+        return res.status(401).json({ message: 'Invalid credentials or unauthorized staff account.' });
+      }
+
+      if (user.status === 'SUSPENDED') {
+        return res.status(403).json({ message: 'Your staff account is suspended. Contact Super Admin.' });
       }
 
       const isMatch = await bcrypt.compare(password, user.passwordHash);
       if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid admin credentials.' });
+        return res.status(401).json({ message: 'Invalid admin or staff credentials.' });
       }
+
+      user.lastLoginAt = new Date();
+      await user.save();
 
       const token = generateToken(user._id.toString());
       return res.status(200).json({
         success: true,
-        message: 'Welcome to Admin Control Panel.',
+        message: `Welcome to Administrative Command Center (${user.role}).`,
         token,
         user: {
           id: user._id,
           fullName: user.fullName,
           email: user.email,
           role: user.role,
+          invitationCode: user.invitationCode,
         },
       });
     } catch (error: any) {
@@ -220,6 +247,8 @@ export class AuthController {
           city: req.user.city,
           gender: req.user.gender,
           role: req.user.role,
+          invitationCode: req.user.invitationCode,
+          assignedStaff: req.user.assignedStaff,
           isVIP: req.user.isVIP,
           vipExpiresAt: req.user.vipExpiresAt,
           verificationStatus: req.user.verificationStatus,

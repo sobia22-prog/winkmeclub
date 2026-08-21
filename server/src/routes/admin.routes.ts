@@ -1,15 +1,22 @@
 import { Router } from 'express';
 import { AdminController } from '../controllers/admin.controller';
 import { authenticate } from '../middleware/auth.middleware';
-import { requireAdmin } from '../middleware/admin.middleware';
+import { requireAdmin, requireSuperAdmin } from '../middleware/admin.middleware';
 
 const router = Router();
 
-// Protect all admin routes with JWT Auth + Admin Guard
+// Protect all admin routes with JWT Auth + Admin Guard (ADMIN or STAFF)
 router.use(authenticate, requireAdmin);
 
 // Dashboard
 router.get('/dashboard', AdminController.getDashboardStats);
+
+// Staff Members Management (Super Admin Only)
+router.get('/staff', requireSuperAdmin, AdminController.getStaffMembers);
+router.post('/staff', requireSuperAdmin, AdminController.createStaffMember);
+router.put('/staff/:id', requireSuperAdmin, AdminController.updateStaffMember);
+router.delete('/staff/:id', requireSuperAdmin, AdminController.deleteStaffMember);
+router.put('/users/:userId/assign-staff', requireSuperAdmin, AdminController.assignClientStaff);
 
 // Users & Match Profiles Management
 router.get('/users', AdminController.getUsers);

@@ -14,14 +14,18 @@ import {
   User,
   Settings,
   LogOut,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const AdminSidebar: React.FC = () => {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   const adminNavItems = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    ...(user?.role === 'ADMIN'
+      ? [{ label: 'Staff Members', path: '/admin/staff', icon: <UserCheck className="w-4 h-4" /> }]
+      : []),
     { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
     { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
     { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },

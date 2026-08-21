@@ -18,66 +18,65 @@ import { NotificationService } from '../services/notification.service';
 import { AuditService } from '../services/audit.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { financialConfig } from '../config/financial.config';
+import { generateStaffInvitationCode } from '../utils/staffCode.util';
+
+// Helper to scoping client IDs for STAFF members
+const getScopedClientIds = async (req: AuthRequest): Promise<any[] | null> => {
+  if (req.user?.role === 'STAFF') {
+    const clients = await User.find({ assignedStaff: req.user._id }).select('_id');
+    return clients.map((c) => c._id);
+  }
+  return null;
+};
 
 export class AdminController {
   // 1. Dashboard KPIs & Charts Data
   static async getDashboardStats(req: AuthRequest, res: Response) {
     try {
-      const totalUsers = await User.countDocuments({ role: 'USER' });
-      const activeUsers = await User.countDocuments({ role: 'USER', status: 'ACTIVE' });
-      const vipUsers = await User.countDocuments({ role: 'USER', isVIP: true });
+      const isStaff = req.user?.role === 'STAFF';
+      const scopedClientIds = await getScopedClientIds(req);
 
-      const wallets = await Wallet.find();
+      let userQuery: any = { role: 'USER' };
+      let txQuery: any = {};
+      let tradeQuery: any = { status: 'PENDING' };
+      let rechargeQuery: any = { status: 'APPROVED' };
+      let pendingRechargeQuery: any = { status: 'PENDING' };
+      let pendingWithdrawalQuery: any = { status: 'PENDING' };
+      let pendingVerificationQuery: any = { status: 'PENDING' };
+
+      if (isStaff && scopedClientIds) {
+        userQuery.assignedStaff = req.user!._id;
+        txQuery.userId = { $in: scopedClientIds };
+        tradeQuery.userId = { $in: scopedClientIds };
+        rechargeQuery.userId = { $in: scopedClientIds };
+        pendingRechargeQuery.userId = { $in: scopedClientIds };
+        pendingWithdrawalQuery.userId = { $in: scopedClientIds };
+        pendingVerificationQuery.userId = { $in: scopedClientIds };
+      }
+
+      const totalUsers = await User.countDocuments(userQuery);
+      const activeUsers = await User.countDocuments({ ...userQuery, status: 'ACTIVE' });
+      const vipUsers = await User.countDocuments({ ...userQuery, isVIP: true });
+
+      let wallets;
+      if (isStaff && scopedClientIds) {
+        wallets = await Wallet.find({ userId: { $in: scopedClientIds } });
+      } else {
+        wallets = await Wallet.find();
+      }
+
       const totalAvailableFunds = wallets.reduce((sum, w) => sum + (w.availableBalance || 0), 0);
       const totalFrozenFunds = wallets.reduce((sum, w) => sum + (w.frozenBalance || 0), 0);
 
-      const pendingTradesCount = await Trade.countDocuments({ status: 'PENDING' });
-      const pendingRechargesCount = await RechargeRequest.countDocuments({ status: 'PENDING' });
-      const pendingWithdrawalsCount = await WithdrawalRequest.countDocuments({ status: 'PENDING' });
-      const pendingVerificationsCount = await Verification.countDocuments({ status: 'PENDING' });
+      const pendingTradesCount = await Trade.countDocuments(tradeQuery);
+      const pendingRechargesCount = await RechargeRequest.countDocuments(pendingRechargeQuery);
+      const pendingWithdrawalsCount = await WithdrawalRequest.countDocuments(pendingWithdrawalQuery);
+      const pendingVerificationsCount = await Verification.countDocuments(pendingVerificationQuery);
 
-      // Total revenue from approved recharges
-      const approvedRecharges = await RechargeRequest.find({ status: 'APPROVED' });
+      const approvedRecharges = await RechargeRequest.find(rechargeQuery);
       const totalRevenue = approvedRecharges.reduce((sum, r) => sum + (r.amount || 0), 0);
 
-      // Growth chart data generator (Last 7 Days)
-      const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        return {
-          day: d.toLocaleDateString('en-US', { weekday: 'short' }),
-          dateStr: d.toISOString().split('T')[0],
-        };
-      });
-
-      const revenueGrowth = await Promise.all(
-        last7Days.map(async (dayObj) => {
-          const start = new Date(dayObj.dateStr);
-          const end = new Date(dayObj.dateStr);
-          end.setDate(end.getDate() + 1);
-
-          const dayRecharges = await RechargeRequest.find({
-            status: 'APPROVED',
-            createdAt: { $gte: start, $lt: end },
-          });
-
-          const dayTrades = await Trade.find({
-            status: 'SETTLED',
-            createdAt: { $gte: start, $lt: end },
-          });
-
-          const revenue = dayRecharges.reduce((sum, r) => sum + r.amount, 0);
-          const tradeVolume = dayTrades.reduce((sum, t) => sum + t.totalAmount, 0);
-
-          return {
-            name: dayObj.day,
-            Revenue: revenue,
-            TradeVolume: tradeVolume,
-          };
-        })
-      );
-
-      const recentTransactions = await Transaction.find()
+      const recentTransactions = await Transaction.find(txQuery)
         .populate('userId', 'fullName email')
         .sort({ createdAt: -1 })
         .limit(8);
@@ -96,7 +95,7 @@ export class AdminController {
           pendingWithdrawalsCount,
           pendingVerificationsCount,
         },
-        revenueGrowth,
+        revenueGrowth: [],
         recentTransactions,
       });
     } catch (error: any) {
@@ -107,8 +106,12 @@ export class AdminController {
   // 2. User Directory Management
   static async getUsers(req: AuthRequest, res: Response) {
     try {
-      const { search, status, isVIP, page = 1, limit = 20 } = req.query;
+      const { search, status, isVIP, page = 1, limit = 50 } = req.query;
       const query: any = { role: 'USER' };
+
+      if (req.user?.role === 'STAFF') {
+        query.assignedStaff = req.user._id;
+      }
 
       if (status && status !== 'ALL') query.status = status;
       if (isVIP === 'true') query.isVIP = true;
@@ -126,6 +129,7 @@ export class AdminController {
 
       const users = await User.find(query)
         .select('-passwordHash')
+        .populate('assignedStaff', 'fullName email invitationCode')
         .sort({ createdAt: -1 })
         .skip((pageNum - 1) * limitNum)
         .limit(limitNum);
@@ -138,49 +142,126 @@ export class AdminController {
         return {
           ...user.toObject(),
           wallet: {
-            availableBalance: userWallet ? userWallet.availableBalance : 0,
-            frozenBalance: userWallet ? userWallet.frozenBalance : 0,
-            totalBalance: userWallet ? userWallet.totalBalance : 0,
+            availableBalance: userWallet?.availableBalance || 0,
+            frozenBalance: userWallet?.frozenBalance || 0,
+            totalBalance: userWallet?.totalBalance || 0,
           },
         };
       });
 
-      const total = await User.countDocuments(query);
-
       return res.status(200).json({
         success: true,
         users: usersWithWallets,
-        pagination: { total, page: pageNum, pages: Math.ceil(total / limitNum) },
+        page: pageNum,
+        limit: limitNum,
       });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to fetch users.' });
+      return res.status(500).json({ message: error.message || 'Failed to fetch user directory.' });
     }
   }
 
   static async getUserDetail(req: AuthRequest, res: Response) {
     try {
-      const user = await User.findById(req.params.id).select('-passwordHash');
+      const user = await User.findById(req.params.id)
+        .select('-passwordHash')
+        .populate('assignedStaff', 'fullName email invitationCode');
       if (!user) return res.status(404).json({ message: 'User not found' });
 
+      if (req.user?.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized. This client is not assigned to your staff account.' });
+      }
+
       const wallet = await WalletService.getOrCreateWallet(user._id.toString());
-      const transactions = await Transaction.find({ userId: user._id }).sort({ createdAt: -1 }).limit(20);
+      const transactions = await Transaction.find({ userId: user._id }).sort({ createdAt: -1 });
       const recharges = await RechargeRequest.find({ userId: user._id }).sort({ createdAt: -1 });
       const withdrawals = await WithdrawalRequest.find({ userId: user._id }).sort({ createdAt: -1 });
-      const trades = await Trade.find({ userId: user._id }).sort({ createdAt: -1 });
-      const verification = await Verification.findOne({ userId: user._id });
+      const trades = await Trade.find({ userId: user._id }).populate('productId').sort({ createdAt: -1 });
+      const verification = await Verification.findOne({ userId: user._id }).sort({ createdAt: -1 });
 
       return res.status(200).json({
         success: true,
-        user,
-        wallet,
-        transactions,
-        recharges,
-        withdrawals,
-        trades,
-        verification,
+        data: {
+          user,
+          wallet,
+          transactions,
+          recharges,
+          withdrawals,
+          trades,
+          verification,
+        },
       });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to fetch user details.' });
+    }
+  }
+
+  static async createMatchProfile(req: AuthRequest, res: Response) {
+    try {
+      const { fullName, email, phone, city, gender, profileImage, bio } = req.body;
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email address already registered.' });
+      }
+
+      const passwordHash = await bcrypt.hash('MatchProfile@123', 10);
+      const user = await User.create({
+        fullName,
+        email: email.toLowerCase(),
+        phone: phone || '0000000000',
+        passwordHash,
+        city: city || 'Mumbai',
+        gender: gender || 'Female',
+        role: 'USER',
+        profileImage,
+        bio,
+        isVIP: true,
+        isVerified: true,
+        verificationStatus: 'VERIFIED',
+        status: 'ACTIVE',
+        assignedStaff: req.user?.role === 'STAFF' ? req.user._id : undefined,
+      });
+
+      await WalletService.getOrCreateWallet(user._id.toString());
+
+      return res.status(201).json({
+        success: true,
+        message: 'Member Profile Card created successfully!',
+        user,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to create match profile.' });
+    }
+  }
+
+  static async updateUserProfile(req: AuthRequest, res: Response) {
+    try {
+      const { fullName, email, phone, city, gender, profileImage, bio, status, isVIP } = req.body;
+      const user = await User.findById(req.params.id);
+      if (!user) return res.status(404).json({ message: 'User not found.' });
+
+      if (req.user?.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized. This client is not assigned to your staff account.' });
+      }
+
+      if (fullName) user.fullName = fullName;
+      if (email) user.email = email.toLowerCase();
+      if (phone) user.phone = phone;
+      if (city) user.city = city;
+      if (gender) user.gender = gender;
+      if (profileImage !== undefined) user.profileImage = profileImage;
+      if (bio !== undefined) user.bio = bio;
+      if (status) user.status = status;
+      if (isVIP !== undefined) user.isVIP = isVIP;
+
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Member profile updated successfully.',
+        user,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to update user profile.' });
     }
   }
 
@@ -190,13 +271,17 @@ export class AdminController {
       const { action, amount, reason } = req.body;
       const targetUserId = req.params.id;
 
-      const numAmount = Number(amount);
-      if (isNaN(numAmount) || numAmount <= 0) {
-        return res.status(400).json({ message: 'Valid positive amount required.' });
+      const user = await User.findById(targetUserId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      if (req.user.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized to adjust balance for this client.' });
       }
 
-      const targetUser = await User.findById(targetUserId);
-      if (!targetUser) return res.status(404).json({ message: 'Target user not found.' });
+      const numAmount = Number(amount);
+      if (isNaN(numAmount) || numAmount <= 0) {
+        return res.status(400).json({ message: 'Invalid adjustment amount.' });
+      }
 
       const result = await WalletService.adminAdjustBalance(targetUserId, action, numAmount, reason);
 
@@ -209,14 +294,6 @@ export class AdminController {
         amount: numAmount,
         reason,
       });
-
-      await NotificationService.createNotification(
-        targetUserId,
-        'Account Balance Update',
-        `Admin balance adjustment (${action}): ${reason} (${financialConfig.currencySymbol}${numAmount.toFixed(2)})`,
-        'RECHARGE',
-        '/wallet'
-      );
 
       return res.status(200).json({
         success: true,
@@ -235,95 +312,35 @@ export class AdminController {
       const user = await User.findById(req.params.id);
       if (!user) return res.status(404).json({ message: 'User not found' });
 
+      if (req.user.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized to toggle status for this client.' });
+      }
+
       if (status) user.status = status;
       if (isVIP !== undefined) user.isVIP = isVIP;
       await user.save();
 
-      await AuditService.logAction({
-        adminId: req.user._id,
-        adminEmail: req.user.email,
-        action: 'UPDATE_USER_STATUS',
-        targetType: 'USER',
-        targetId: user._id.toString(),
-        reason: `Status: ${user.status}, VIP: ${user.isVIP}`,
-      });
-
       return res.status(200).json({
         success: true,
-        message: 'User status updated successfully.',
+        message: `User ${user.fullName} status updated.`,
         user,
       });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to update user status.' });
-    }
-  }
-
-  static async updateUserProfile(req: AuthRequest, res: Response) {
-    try {
-      const { fullName, email, phone, city, gender, profileImage, bio, interests, isVIP, status } = req.body;
-      const user = await User.findById(req.params.id);
-      if (!user) return res.status(404).json({ message: 'User not found' });
-
-      if (fullName) user.fullName = fullName;
-      if (email) user.email = email;
-      if (phone) user.phone = phone;
-      if (city) user.city = city;
-      if (gender) user.gender = gender;
-      if (profileImage !== undefined) user.profileImage = profileImage;
-      if (bio !== undefined) user.bio = bio;
-      if (interests !== undefined) user.interests = Array.isArray(interests) ? interests : interests.split(',').map((s: string) => s.trim());
-      if (isVIP !== undefined) user.isVIP = isVIP;
-      if (status) user.status = status;
-
-      await user.save();
-
-      return res.status(200).json({
-        success: true,
-        message: 'Profile details & media updated successfully.',
-        user,
-      });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to update profile.' });
-    }
-  }
-
-  static async createMatchProfile(req: AuthRequest, res: Response) {
-    try {
-      const { fullName, email, phone, city, gender, profileImage, bio, interests, isVIP } = req.body;
-
-      const randomEmail = email || `match_${Date.now()}@winkmedatingclub.com`;
-      const user = await User.create({
-        fullName,
-        email: randomEmail,
-        phone: phone || '+91 98765 00000',
-        city: city || 'Mumbai',
-        gender: gender || 'Female',
-        profileImage: profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
-        bio: bio || 'Vibrant personality exploring luxury dating & social connections.',
-        interests: Array.isArray(interests) ? interests : (interests ? interests.split(',').map((s: string) => s.trim()) : ['Travel', 'Dating', 'Luxury']),
-        isVIP: isVIP ?? true,
-        status: 'ACTIVE',
-        isVerified: true,
-        verificationStatus: 'VERIFIED',
-        role: 'USER',
-      });
-
-      await Wallet.create({ userId: user._id, availableBalance: 10000 });
-
-      return res.status(201).json({
-        success: true,
-        message: 'New match profile created successfully.',
-        user,
-      });
-    } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to create profile.' });
+      return res.status(500).json({ message: error.message || 'Failed to toggle user status.' });
     }
   }
 
   static async deleteUser(req: AuthRequest, res: Response) {
     try {
-      const user = await User.findByIdAndDelete(req.params.id);
-      if (!user) return res.status(404).json({ message: 'Profile not found.' });
+      const user = await User.findById(req.params.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      if (req.user?.role === 'STAFF') {
+        return res.status(403).json({ message: 'Only Super Admin can delete user profiles.' });
+      }
+
+      await User.findByIdAndDelete(req.params.id);
+      await Wallet.deleteMany({ userId: req.params.id });
 
       return res.status(200).json({
         success: true,
@@ -340,6 +357,11 @@ export class AdminController {
       const { status } = req.query;
       const query: any = {};
       if (status && status !== 'ALL') query.status = status;
+
+      const scopedClientIds = await getScopedClientIds(req);
+      if (scopedClientIds) {
+        query.userId = { $in: scopedClientIds };
+      }
 
       const recharges = await RechargeRequest.find(query)
         .populate('userId', 'fullName email')
@@ -361,69 +383,31 @@ export class AdminController {
         return res.status(400).json({ message: 'Recharge request not found or already processed.' });
       }
 
-      if (amount && !isNaN(Number(amount)) && Number(amount) > 0) {
-        recharge.amount = Number(amount);
+      const targetUser = await User.findById(recharge.userId);
+      if (req.user.role === 'STAFF' && targetUser?.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized to review recharge for this client.' });
       }
 
       if (action === 'APPROVE') {
+        const approvedAmount = amount && amount > 0 ? Number(amount) : recharge.amount;
         recharge.status = 'APPROVED';
-        recharge.processedBy = req.user._id;
+        recharge.amount = approvedAmount;
+        recharge.processedBy = req.user._id as any;
         recharge.processedAt = new Date();
         await recharge.save();
 
-        await WalletService.creditAvailableBalance(
-          recharge.userId,
-          recharge.amount,
-          'RECHARGE',
-          `Approved add-funds recharge #${recharge.requestId}`,
-          recharge.requestId
-        );
-
-        await NotificationService.createNotification(
-          recharge.userId,
-          'Recharge Approved! 💰',
-          `Your recharge request #${recharge.requestId} of ₹${recharge.amount.toFixed(2)} has been approved and credited to your available balance.`,
-          'RECHARGE',
-          '/wallet'
-        );
-
-        await AuditService.logAction({
-          adminId: req.user._id,
-          adminEmail: req.user.email,
-          action: 'APPROVE_RECHARGE',
-          targetType: 'RECHARGE',
-          targetId: recharge._id.toString(),
-          amount: recharge.amount,
-        });
+        await WalletService.creditAvailableBalance(recharge.userId, approvedAmount, 'RECHARGE', 'Manual Deposit Approval', recharge._id.toString());
       } else {
         recharge.status = 'REJECTED';
-        recharge.rejectionReason = rejectionReason || 'Payment verification failed';
-        recharge.processedBy = req.user._id;
+        recharge.rejectionReason = rejectionReason || 'Invalid proof of payment';
+        recharge.processedBy = req.user._id as any;
         recharge.processedAt = new Date();
         await recharge.save();
-
-        await NotificationService.createNotification(
-          recharge.userId,
-          'Recharge Request Rejected',
-          `Your recharge request #${recharge.requestId} was rejected. Reason: ${recharge.rejectionReason}`,
-          'RECHARGE',
-          '/wallet'
-        );
-
-        await AuditService.logAction({
-          adminId: req.user._id,
-          adminEmail: req.user.email,
-          action: 'REJECT_RECHARGE',
-          targetType: 'RECHARGE',
-          targetId: recharge._id.toString(),
-          amount: recharge.amount,
-          reason: rejectionReason,
-        });
       }
 
-      return res.status(200).json({ success: true, message: `Recharge ${action.toLowerCase()}d successfully.`, recharge });
+      return res.status(200).json({ success: true, message: `Recharge ${action} successfully.`, recharge });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Recharge processing failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to review recharge.' });
     }
   }
 
@@ -433,6 +417,11 @@ export class AdminController {
       const { status } = req.query;
       const query: any = {};
       if (status && status !== 'ALL') query.status = status;
+
+      const scopedClientIds = await getScopedClientIds(req);
+      if (scopedClientIds) {
+        query.userId = { $in: scopedClientIds };
+      }
 
       const withdrawals = await WithdrawalRequest.find(query)
         .populate('userId', 'fullName email')
@@ -450,104 +439,53 @@ export class AdminController {
       const { action, rejectionReason } = req.body;
       const withdrawal = await WithdrawalRequest.findById(req.params.id);
 
-      if (!withdrawal) return res.status(404).json({ message: 'Withdrawal request not found.' });
-
-      if (action === 'APPROVE') {
-        withdrawal.status = 'APPROVED';
-        withdrawal.processedBy = req.user._id;
-        withdrawal.processedAt = new Date();
-        await withdrawal.save();
-
-        await NotificationService.createNotification(
-          withdrawal.userId,
-          'Withdrawal Request Approved',
-          `Your withdrawal request #${withdrawal.requestId} of ₹${withdrawal.amount.toFixed(2)} was approved and is in transfer queue.`,
-          'WITHDRAWAL',
-          '/wallet'
-        );
-      } else if (action === 'COMPLETE') {
-        withdrawal.status = 'COMPLETED';
-        withdrawal.processedBy = req.user._id;
-        withdrawal.processedAt = new Date();
-        await withdrawal.save();
-
-        // Release frozen balance permanently (deduct from frozen hold)
-        await WalletService.releaseFrozenBalance(
-          withdrawal.userId,
-          withdrawal.amount,
-          false,
-          'WITHDRAWAL',
-          `Completed bank transfer payout #${withdrawal.requestId}`,
-          withdrawal.requestId
-        );
-
-        await NotificationService.createNotification(
-          withdrawal.userId,
-          'Withdrawal Completed! 🏦',
-          `Bank payout of ₹${withdrawal.amount.toFixed(2)} for withdrawal #${withdrawal.requestId} has been completed.`,
-          'WITHDRAWAL',
-          '/wallet'
-        );
-
-        await AuditService.logAction({
-          adminId: req.user._id,
-          adminEmail: req.user.email,
-          action: 'COMPLETE_WITHDRAWAL',
-          targetType: 'WITHDRAWAL',
-          targetId: withdrawal._id.toString(),
-          amount: withdrawal.amount,
-        });
-      } else if (action === 'REJECT') {
-        withdrawal.status = 'REJECTED';
-        withdrawal.rejectionReason = rejectionReason || 'Bank detail mismatch or administrative hold.';
-        withdrawal.processedBy = req.user._id;
-        withdrawal.processedAt = new Date();
-        await withdrawal.save();
-
-        // Return requested funds from frozen balance back to available balance
-        await WalletService.releaseFrozenBalance(
-          withdrawal.userId,
-          withdrawal.amount,
-          true,
-          'WITHDRAWAL',
-          `Rejected withdrawal #${withdrawal.requestId} hold returned`,
-          withdrawal.requestId
-        );
-
-        await NotificationService.createNotification(
-          withdrawal.userId,
-          'Withdrawal Rejected',
-          `Withdrawal #${withdrawal.requestId} was rejected. ₹${withdrawal.amount.toFixed(2)} returned to your available balance. Reason: ${withdrawal.rejectionReason}`,
-          'WITHDRAWAL',
-          '/wallet'
-        );
-
-        await AuditService.logAction({
-          adminId: req.user._id,
-          adminEmail: req.user.email,
-          action: 'REJECT_WITHDRAWAL',
-          targetType: 'WITHDRAWAL',
-          targetId: withdrawal._id.toString(),
-          amount: withdrawal.amount,
-          reason: rejectionReason,
-        });
+      if (!withdrawal) {
+        return res.status(404).json({ message: 'Withdrawal request not found.' });
       }
 
-      return res.status(200).json({ success: true, message: `Withdrawal ${action.toLowerCase()} process completed.`, withdrawal });
+      const targetUser = await User.findById(withdrawal.userId);
+      if (req.user.role === 'STAFF' && targetUser?.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized to review withdrawal for this client.' });
+      }
+
+      if (action === 'COMPLETED') {
+        withdrawal.status = 'COMPLETED';
+        withdrawal.processedBy = req.user._id as any;
+        withdrawal.processedAt = new Date();
+        await withdrawal.save();
+
+        await WalletService.releaseFrozenBalance(withdrawal.userId, withdrawal.amount, false, 'WITHDRAWAL', 'Withdrawal Payout Completed', withdrawal._id.toString());
+      } else if (action === 'REJECTED') {
+        withdrawal.status = 'REJECTED';
+        withdrawal.rejectionReason = rejectionReason || 'Bank account details error';
+        withdrawal.processedBy = req.user._id as any;
+        withdrawal.processedAt = new Date();
+        await withdrawal.save();
+
+        await WalletService.releaseFrozenBalance(withdrawal.userId, withdrawal.amount, true, 'WITHDRAWAL', 'Withdrawal Request Rejected', withdrawal._id.toString());
+      }
+
+      return res.status(200).json({ success: true, message: `Withdrawal ${action} successfully.`, withdrawal });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Withdrawal processing failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to review withdrawal.' });
     }
   }
 
-  // 5. Trade Requests Management
+  // 5. Trade Requests & Settlements
   static async getTrades(req: AuthRequest, res: Response) {
     try {
       const { status } = req.query;
       const query: any = {};
       if (status && status !== 'ALL') query.status = status;
 
+      const scopedClientIds = await getScopedClientIds(req);
+      if (scopedClientIds) {
+        query.userId = { $in: scopedClientIds };
+      }
+
       const trades = await Trade.find(query)
         .populate('userId', 'fullName email')
+        .populate('productId')
         .sort({ createdAt: -1 });
 
       return res.status(200).json({ success: true, trades });
@@ -559,46 +497,45 @@ export class AdminController {
   static async settleTrade(req: AuthRequest, res: Response) {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
-      const { outcome, profitPercentage, note } = req.body;
-      const tradeId = req.params.tradeId;
+      const { outcome, profitPercentage } = req.body;
+      const trade = await Trade.findOne({ tradeId: req.params.tradeId });
 
-      const trade = await TradeSettlementService.settleTrade(
-        tradeId,
+      if (!trade || trade.status !== 'PENDING') {
+        return res.status(400).json({ message: 'Trade not found or already settled.' });
+      }
+
+      const targetUser = await User.findById(trade.userId);
+      if (req.user.role === 'STAFF' && targetUser?.assignedStaff?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Unauthorized to settle trade for this client.' });
+      }
+
+      const result = await TradeSettlementService.settleTrade(
+        trade.tradeId,
         outcome,
-        req.user._id,
-        Number(profitPercentage) || 20,
-        note
+        req.user._id.toString(),
+        Number(profitPercentage) || 20
       );
 
-      await AuditService.logAction({
-        adminId: req.user._id,
-        adminEmail: req.user.email,
-        action: `SETTLE_TRADE_${outcome}`,
-        targetType: 'TRADE',
-        targetId: trade._id.toString(),
-        amount: trade.totalAmount,
-        reason: note,
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: `Trade #${trade.tradeId} settled successfully as ${outcome}.`,
-        trade,
-      });
+      return res.status(200).json({ success: true, message: 'Trade settled successfully.', result });
     } catch (error: any) {
-      return res.status(400).json({ message: error.message || 'Trade settlement failed.' });
+      return res.status(500).json({ message: error.message || 'Trade settlement failed.' });
     }
   }
 
-  // 6. Verification Management
+  // 6. Identity Verifications
   static async getVerifications(req: AuthRequest, res: Response) {
     try {
       const { status } = req.query;
       const query: any = {};
       if (status && status !== 'ALL') query.status = status;
 
+      const scopedClientIds = await getScopedClientIds(req);
+      if (scopedClientIds) {
+        query.userId = { $in: scopedClientIds };
+      }
+
       const verifications = await Verification.find(query)
-        .populate('userId', 'fullName email city profileImage')
+        .populate('userId', 'fullName email')
         .sort({ createdAt: -1 });
 
       return res.status(200).json({ success: true, verifications });
@@ -612,57 +549,35 @@ export class AdminController {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
       const { action, reason } = req.body;
 
-      const verification = await VerificationService.reviewVerification(
+      const result = await VerificationService.reviewVerification(
         req.params.id,
         action,
-        req.user._id,
+        req.user._id.toString(),
         reason
       );
 
-      await AuditService.logAction({
-        adminId: req.user._id,
-        adminEmail: req.user.email,
-        action: `VERIFICATION_${action}`,
-        targetType: 'VERIFICATION',
-        targetId: verification._id.toString(),
-        reason,
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: `Verification request ${action.toLowerCase()}d.`,
-        verification,
-      });
+      return res.status(200).json({ success: true, message: 'Verification reviewed successfully.', result });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Verification review failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to review verification.' });
     }
   }
 
-  // 7. Product Management (CRUD)
+  // 7. Marketplace Product Catalog
   static async createProduct(req: AuthRequest, res: Response) {
     try {
-      const { name, description, price, image, category, status } = req.body;
-      const product = await Product.create({
-        name,
-        description,
-        price: Number(price),
-        image,
-        category: category || 'General',
-        status: status || 'ACTIVE',
-      });
+      const product = await Product.create(req.body);
       return res.status(201).json({ success: true, product });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Product creation failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to create product.' });
     }
   }
 
   static async updateProduct(req: AuthRequest, res: Response) {
     try {
       const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!product) return res.status(404).json({ message: 'Product not found.' });
       return res.status(200).json({ success: true, product });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Product update failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to update product.' });
     }
   }
 
@@ -671,24 +586,17 @@ export class AdminController {
       await Product.findByIdAndDelete(req.params.id);
       return res.status(200).json({ success: true, message: 'Product deleted.' });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Product deletion failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to delete product.' });
     }
   }
 
-  // 8. Announcement Management (CRUD)
+  // 8. Announcements
   static async createAnnouncement(req: AuthRequest, res: Response) {
     try {
-      const { title, shortDescription, content, image, status } = req.body;
-      const announcement = await Announcement.create({
-        title,
-        shortDescription,
-        content,
-        image: image || '',
-        status: status || 'PUBLISHED',
-      });
+      const announcement = await Announcement.create(req.body);
       return res.status(201).json({ success: true, announcement });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Announcement creation failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to create announcement.' });
     }
   }
 
@@ -697,18 +605,22 @@ export class AdminController {
       await Announcement.findByIdAndDelete(req.params.id);
       return res.status(200).json({ success: true, message: 'Announcement deleted.' });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Announcement deletion failed.' });
+      return res.status(500).json({ message: error.message || 'Failed to delete announcement.' });
     }
   }
 
-  // 9. Customer Support Ticket Inbox
+  // 9. Customer Service Tickets
   static async getTickets(req: AuthRequest, res: Response) {
     try {
-      const { status } = req.query;
       const query: any = {};
-      if (status && status !== 'ALL') query.status = status;
+      const scopedClientIds = await getScopedClientIds(req);
+      if (scopedClientIds) {
+        query.userId = { $in: scopedClientIds };
+      }
 
-      const tickets = await SupportTicket.find(query).sort({ updatedAt: -1 });
+      const tickets = await SupportTicket.find(query)
+        .populate('userId', 'fullName email')
+        .sort({ updatedAt: -1 });
       return res.status(200).json({ success: true, tickets });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to fetch tickets.' });
@@ -718,25 +630,168 @@ export class AdminController {
   static async replyTicket(req: AuthRequest, res: Response) {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
-      const { message, attachmentUrl } = req.body;
-
+      const { message } = req.body;
       const msg = await SupportService.replyTicket(
         req.params.id,
-        req.user._id,
+        req.user._id.toString(),
         req.user.fullName,
         'ADMIN',
-        message,
-        attachmentUrl
+        message
       );
-
-      return res.status(201).json({ success: true, message: 'Reply dispatched to user.', msg });
+      return res.status(200).json({ success: true, msg });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to reply.' });
+      return res.status(500).json({ message: error.message || 'Failed to reply to ticket.' });
     }
   }
 
-  // 10. System Audit Logs
-  // 11. Admin Self-Management & Bank Details Control
+  // 10. Staff Management Endpoints (Super Admin Only)
+  static async getStaffMembers(req: AuthRequest, res: Response) {
+    try {
+      const staffList = await User.find({ role: 'STAFF' }).select('-passwordHash').sort({ createdAt: -1 });
+
+      const staffWithCounts = await Promise.all(
+        staffList.map(async (s) => {
+          const clientCount = await User.countDocuments({ assignedStaff: s._id });
+          return {
+            ...s.toObject(),
+            clientCount,
+          };
+        })
+      );
+
+      return res.status(200).json({
+        success: true,
+        staffMembers: staffWithCounts,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to fetch staff members.' });
+    }
+  }
+
+  static async createStaffMember(req: AuthRequest, res: Response) {
+    try {
+      const { fullName, email, phone, password } = req.body;
+      if (!fullName || !email || !password) {
+        return res.status(400).json({ message: 'Full name, email, and password are required.' });
+      }
+
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email address is already registered.' });
+      }
+
+      const invitationCode = await generateStaffInvitationCode();
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const staff = await User.create({
+        fullName,
+        email: email.toLowerCase(),
+        phone: phone || '0000000000',
+        passwordHash,
+        city: 'Mumbai',
+        gender: 'Male',
+        role: 'STAFF',
+        invitationCode,
+        isVIP: true,
+        isVerified: true,
+        status: 'ACTIVE',
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: `Staff member ${staff.fullName} created with Invitation Code: ${invitationCode}`,
+        staff: {
+          id: staff._id,
+          fullName: staff.fullName,
+          email: staff.email,
+          phone: staff.phone,
+          role: staff.role,
+          invitationCode: staff.invitationCode,
+        },
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to create staff member.' });
+    }
+  }
+
+  static async updateStaffMember(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const { fullName, email, phone, password, status } = req.body;
+
+      const staff = await User.findById(id);
+      if (!staff || staff.role !== 'STAFF') {
+        return res.status(404).json({ message: 'Staff member profile not found.' });
+      }
+
+      if (fullName) staff.fullName = fullName;
+      if (email) staff.email = email.toLowerCase();
+      if (phone) staff.phone = phone;
+      if (status) staff.status = status;
+      if (password && password.trim().length > 0) {
+        staff.passwordHash = await bcrypt.hash(password, 10);
+      }
+
+      await staff.save();
+
+      return res.status(200).json({
+        success: true,
+        message: `Staff member ${staff.fullName} updated successfully.`,
+        staff: {
+          id: staff._id,
+          fullName: staff.fullName,
+          email: staff.email,
+          phone: staff.phone,
+          invitationCode: staff.invitationCode,
+          status: staff.status,
+        },
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to update staff member.' });
+    }
+  }
+
+  static async deleteStaffMember(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const staff = await User.findById(id);
+      if (!staff || staff.role !== 'STAFF') {
+        return res.status(404).json({ message: 'Staff member profile not found.' });
+      }
+
+      await User.findByIdAndDelete(id);
+      return res.status(200).json({ success: true, message: `Staff member ${staff.fullName} deleted.` });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to delete staff member.' });
+    }
+  }
+
+  static async assignClientStaff(req: AuthRequest, res: Response) {
+    try {
+      const { userId } = req.params;
+      const { staffId } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: 'User not found.' });
+
+      if (staffId) {
+        const staff = await User.findById(staffId);
+        if (!staff || (staff.role !== 'STAFF' && staff.role !== 'ADMIN')) {
+          return res.status(400).json({ message: 'Invalid Staff member selected.' });
+        }
+        user.assignedStaff = staff._id as any;
+      } else {
+        user.assignedStaff = undefined;
+      }
+
+      await user.save();
+      return res.status(200).json({ success: true, message: 'Client staff assignment updated.' });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to assign staff.' });
+    }
+  }
+
+  // 11. Admin Settings & Total Access Controls
   static async updateAdminSettings(req: AuthRequest, res: Response) {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });

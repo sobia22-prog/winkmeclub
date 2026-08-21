@@ -12,6 +12,12 @@ export const adminService = {
   toggleUserStatus: (id: string, data: { status?: 'ACTIVE' | 'SUSPENDED'; isVIP?: boolean }) =>
     api.patch(`/admin/users/${id}/status`, data),
   
+  getStaffMembers: () => api.get('/admin/staff'),
+  createStaffMember: (data: any) => api.post('/admin/staff', data),
+  updateStaffMember: (id: string, data: any) => api.put(`/admin/staff/${id}`, data),
+  deleteStaffMember: (id: string) => api.delete(`/admin/staff/${id}`),
+  assignClientStaff: (userId: string, staffId: string) => api.put(`/admin/users/${userId}/assign-staff`, { staffId }),
+
   getRecharges: (params?: { status?: string }) => api.get('/admin/recharges', { params }),
   reviewRecharge: (
     id: string,
