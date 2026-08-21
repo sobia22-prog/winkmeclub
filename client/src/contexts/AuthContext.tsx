@@ -60,11 +60,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    const wasAdmin = user?.role === 'ADMIN' || window.location.pathname.startsWith('/admin');
     localStorage.removeItem('wink_token');
     setToken(null);
     setUser(null);
     setWallet(null);
-    window.location.href = '/login';
+    window.location.href = wasAdmin ? '/admin/login' : '/login';
   };
 
   return (
