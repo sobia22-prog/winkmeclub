@@ -33,11 +33,6 @@ export const AdminLoginPage: React.FC = () => {
     }
   };
 
-  const handleDemoAdminFill = () => {
-    setEmail('admin@winkmeclub.com');
-    setPassword('Admin@123');
-  };
-
   return (
     <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-brand-surface border border-amber-500/30 rounded-3xl p-8 shadow-2xl space-y-6">
@@ -55,7 +50,7 @@ export const AdminLoginPage: React.FC = () => {
           <Input
             label="Admin Email"
             type="email"
-            placeholder="admin@winkmeclub.com"
+            placeholder="admin@domain.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             leftIcon={<Mail className="w-4 h-4" />}
@@ -75,13 +70,6 @@ export const AdminLoginPage: React.FC = () => {
             Authenticate Admin
           </Button>
         </form>
-
-        <button
-          onClick={handleDemoAdminFill}
-          className="w-full py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs font-semibold text-amber-400 hover:bg-amber-500/20 transition-colors"
-        >
-          Fill Demo Admin Credentials (admin@winkmeclub.com)
-        </button>
       </div>
     </div>
   );
