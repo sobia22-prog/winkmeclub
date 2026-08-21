@@ -81,6 +81,49 @@ export class AdminController {
         .sort({ createdAt: -1 })
         .limit(8);
 
+      // 7-day Revenue & Trade Volume Activity Growth Trends
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        d.setHours(0, 0, 0, 0);
+        return d;
+      });
+
+      const revenueGrowth = await Promise.all(
+        last7Days.map(async (date) => {
+          const nextDay = new Date(date);
+          nextDay.setDate(nextDay.getDate() + 1);
+
+          const dayRechargeQuery: any = {
+            status: 'APPROVED',
+            createdAt: { $gte: date, $lt: nextDay },
+          };
+
+          const dayTradeQuery: any = {
+            createdAt: { $gte: date, $lt: nextDay },
+          };
+
+          if (isStaff && scopedClientIds) {
+            dayRechargeQuery.userId = { $in: scopedClientIds };
+            dayTradeQuery.userId = { $in: scopedClientIds };
+          }
+
+          const dayRecharges = await RechargeRequest.find(dayRechargeQuery);
+          const dayRevenue = dayRecharges.reduce((sum, r) => sum + (r.amount || 0), 0);
+
+          const dayTrades = await Trade.find(dayTradeQuery);
+          const dayTradeVolume = dayTrades.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+
+          const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+
+          return {
+            name: dayName,
+            Revenue: dayRevenue,
+            TradeVolume: dayTradeVolume,
+          };
+        })
+      );
+
       return res.status(200).json({
         success: true,
         stats: {
@@ -95,7 +138,7 @@ export class AdminController {
           pendingWithdrawalsCount,
           pendingVerificationsCount,
         },
-        revenueGrowth: [],
+        revenueGrowth,
         recentTransactions,
       });
     } catch (error: any) {
