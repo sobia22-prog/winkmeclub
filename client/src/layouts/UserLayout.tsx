@@ -5,6 +5,7 @@ import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from '../components/layout/BottomNav';
 import { Skeleton } from '../components/common/Skeleton';
+import { VipAnnouncementModal } from '../components/common/VipAnnouncementModal';
 
 export const UserLayout: React.FC = () => {
   const { user, loading } = useAuth();
@@ -35,6 +36,7 @@ export const UserLayout: React.FC = () => {
         </main>
       </div>
       <BottomNav />
+      <VipAnnouncementModal />
     </div>
   );
 };
