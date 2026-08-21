@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Navbar } from './Navbar';
 import { AdminSidebar } from './AdminSidebar';
@@ -7,6 +7,7 @@ import { Skeleton } from '../components/common/Skeleton';
 
 export const AdminLayout: React.FC = () => {
   const { user, loading, isAdmin } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -18,6 +19,20 @@ export const AdminLayout: React.FC = () => {
 
   if (!user || !isAdmin) {
     return <Navigate to="/admin/login" replace />;
+  }
+
+  // Restrict Staff from accessing platform settings, dashboard, and staff management pages
+  const forbiddenStaffPaths = [
+    '/admin',
+    '/admin/dashboard',
+    '/admin/products',
+    '/admin/announcements',
+    '/admin/settings',
+    '/admin/staff',
+  ];
+
+  if (user.role === 'STAFF' && forbiddenStaffPaths.includes(location.pathname)) {
+    return <Navigate to="/admin/users" replace />;
   }
 
   return (

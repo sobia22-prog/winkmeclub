@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { adminService } from '../../services/admin.service';
 import { Card } from '../../components/common/Card';
 import { StatCard } from '../../components/common/StatCard';
@@ -27,10 +28,15 @@ import {
 } from 'recharts';
 
 export const AdminDashboardPage: React.FC = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [revenueGrowth, setRevenueGrowth] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  if (user?.role === 'STAFF') {
+    return <Navigate to="/admin/users" replace />;
+  }
 
   useEffect(() => {
     adminService

@@ -44,13 +44,15 @@ export const AdminProfilePage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border pb-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <User className="w-6 h-6 text-amber-400" /> Admin Profile Credentials
+            <User className="w-6 h-6 text-amber-400" /> {adminUser?.role === 'STAFF' ? 'Staff Profile Settings' : 'Admin Profile Credentials'}
           </h1>
-          <p className="text-xs text-slate-400">Manage administrator display name, login email, and security password.</p>
+          <p className="text-xs text-slate-400">
+            {adminUser?.role === 'STAFF' ? 'Manage your staff display name, login email, and password.' : 'Manage administrator display name, login email, and security password.'}
+          </p>
         </div>
 
         <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
-          <ShieldCheck className="w-4 h-4 text-amber-400" /> SUPER ADMIN ACCESS
+          <ShieldCheck className="w-4 h-4 text-amber-400" /> {adminUser?.role === 'STAFF' ? 'STAFF MEMBER ACCESS' : 'SUPER ADMIN ACCESS'}
         </div>
       </div>
 

@@ -20,24 +20,34 @@ import { useAuth } from '../contexts/AuthContext';
 
 export const AdminSidebar: React.FC = () => {
   const { user, logout } = useAuth();
+  const isStaff = user?.role === 'STAFF';
 
-  const adminNavItems = [
-    { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-    ...(user?.role === 'ADMIN'
-      ? [{ label: 'Staff Members', path: '/admin/staff', icon: <UserCheck className="w-4 h-4" /> }]
-      : []),
-    { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
-    { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
-    { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },
-    { label: 'Withdrawal Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
-    { label: 'Verifications', path: '/admin/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
-    { label: 'Products', path: '/admin/products', icon: <Package className="w-4 h-4" /> },
-    { label: 'Transactions', path: '/admin/transactions', icon: <History className="w-4 h-4" /> },
-    { label: 'Announcements', path: '/admin/announcements', icon: <Megaphone className="w-4 h-4" /> },
-    { label: 'Customer Service', path: '/admin/support', icon: <Headphones className="w-4 h-4" /> },
-    { label: 'Payment Settings', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
-    { label: 'Profile', path: '/admin/profile', icon: <User className="w-4 h-4" /> },
-  ];
+  const adminNavItems = isStaff
+    ? [
+        { label: 'Users Directory', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+        { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
+        { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },
+        { label: 'Withdrawal Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
+        { label: 'Verifications', path: '/admin/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
+        { label: 'Transactions', path: '/admin/transactions', icon: <History className="w-4 h-4" /> },
+        { label: 'Customer Service', path: '/admin/support', icon: <Headphones className="w-4 h-4" /> },
+        { label: 'Profile', path: '/admin/profile', icon: <User className="w-4 h-4" /> },
+      ]
+    : [
+        { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+        { label: 'Staff Members', path: '/admin/staff', icon: <UserCheck className="w-4 h-4" /> },
+        { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
+        { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
+        { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },
+        { label: 'Withdrawal Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
+        { label: 'Verifications', path: '/admin/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
+        { label: 'Products', path: '/admin/products', icon: <Package className="w-4 h-4" /> },
+        { label: 'Transactions', path: '/admin/transactions', icon: <History className="w-4 h-4" /> },
+        { label: 'Announcements', path: '/admin/announcements', icon: <Megaphone className="w-4 h-4" /> },
+        { label: 'Customer Service', path: '/admin/support', icon: <Headphones className="w-4 h-4" /> },
+        { label: 'Payment Settings', path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
+        { label: 'Profile', path: '/admin/profile', icon: <User className="w-4 h-4" /> },
+      ];
 
   return (
     <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-brand-surface border-r border-brand-border p-3.5 flex flex-col justify-between shrink-0 hidden md:flex self-start space-y-4">
