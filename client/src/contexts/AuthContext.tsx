@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    const wasAdmin = user?.role === 'ADMIN' || window.location.pathname.startsWith('/admin');
+    const wasAdmin = user?.role === 'ADMIN' || user?.role === 'STAFF' || window.location.pathname.startsWith('/admin');
     localStorage.removeItem('wink_token');
     setToken(null);
     setUser(null);
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         token,
         loading,
         isAuthenticated: !!user,
-        isAdmin: user?.role === 'ADMIN',
+        isAdmin: user?.role === 'ADMIN' || user?.role === 'STAFF',
         loginSession,
         logout,
         refreshSession: fetchSession,
