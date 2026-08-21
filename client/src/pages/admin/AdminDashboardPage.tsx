@@ -141,7 +141,7 @@ export const AdminDashboardPage: React.FC = () => {
               <tr key={tx._id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3 font-mono font-bold text-slate-200">{tx.transactionId}</td>
                 <td className="px-5 py-3 text-slate-300">
-                  {typeof tx.userId === 'object' ? tx.userId.fullName : 'User'}
+                  {tx.userId && typeof tx.userId === 'object' ? (tx.userId as any).fullName : 'User / Deleted Account'}
                 </td>
                 <td className="px-5 py-3">
                   <Badge variant="neutral" size="sm">

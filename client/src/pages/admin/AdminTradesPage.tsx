@@ -156,7 +156,7 @@ export const AdminTradesPage: React.FC = () => {
             <tr key={t._id} className="hover:bg-brand-card/50 transition-colors">
               <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
               <td className="px-5 py-3 font-semibold text-slate-200">
-                {typeof t.userId === 'object' ? t.userId.fullName : 'User'}
+                {t.userId && typeof t.userId === 'object' ? t.userId.fullName : 'User'}
               </td>
               <td className="px-5 py-3 text-slate-300 font-medium">{t.productName}</td>
               <td className="px-5 py-3 text-slate-300">x{t.quantity}</td>
@@ -229,7 +229,7 @@ export const AdminTradesPage: React.FC = () => {
         >
           <form onSubmit={handleSettleSubmit} className="space-y-4">
             <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1.5 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{typeof selectedTrade.userId === 'object' ? selectedTrade.userId.fullName : 'User'}</span></div>
+              <div>User: <span className="font-bold text-slate-100">{selectedTrade.userId && typeof selectedTrade.userId === 'object' ? selectedTrade.userId.fullName : 'User'}</span></div>
               <div>Product: <span className="font-bold text-slate-100">{selectedTrade.productName} (Qty: {selectedTrade.quantity})</span></div>
               <div>Trade Amount: <span className="font-bold text-emerald-400">₹{selectedTrade.totalAmount.toFixed(2)}</span></div>
               <div>Decided Outcome: <span className={`font-bold ${settlementOutcome === 'WIN' ? 'text-emerald-400' : 'text-rose-400'}`}>{settlementOutcome}</span></div>

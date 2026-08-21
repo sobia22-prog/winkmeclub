@@ -119,7 +119,7 @@ export const AdminVerificationsPage: React.FC = () => {
           {verifications.map((v) => (
             <tr key={v._id} className="hover:bg-brand-card/50 transition-colors">
               <td className="px-5 py-3 font-semibold text-slate-200">
-                {typeof v.userId === 'object' ? v.userId.fullName : 'User'}
+                {v.userId && typeof v.userId === 'object' ? v.userId.fullName : 'User'}
               </td>
               <td className="px-5 py-3 text-slate-300">{v.fullName}</td>
               <td className="px-5 py-3 text-slate-400">{v.idType}</td>

@@ -98,7 +98,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
             <tr key={w._id} className="hover:bg-brand-card/50 transition-colors">
               <td className="px-5 py-3 font-mono font-bold text-slate-200">{w.requestId}</td>
               <td className="px-5 py-3 font-semibold text-slate-200">
-                {typeof w.userId === 'object' ? w.userId.fullName : 'User'}
+                {w.userId && typeof w.userId === 'object' ? w.userId.fullName : 'User'}
               </td>
               <td className="px-5 py-3 font-bold text-rose-400">
                 -₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -183,7 +183,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
         >
           <form onSubmit={handleActionSubmit} className="space-y-4">
             <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{typeof selectedWithdrawal.userId === 'object' ? selectedWithdrawal.userId.fullName : 'User'}</span></div>
+              <div>User: <span className="font-bold text-slate-100">{selectedWithdrawal.userId && typeof selectedWithdrawal.userId === 'object' ? selectedWithdrawal.userId.fullName : 'User'}</span></div>
               <div>Amount: <span className="font-bold text-rose-400">₹{selectedWithdrawal.amount.toFixed(2)}</span></div>
               <div>Payout Method: <span className="font-bold text-amber-400">{selectedWithdrawal.paymentMethod || 'Bank Account'}</span></div>
               <div>Holder Name: <span className="font-bold text-slate-200">{selectedWithdrawal.accountHolder}</span></div>

@@ -99,7 +99,7 @@ export const AdminRechargesPage: React.FC = () => {
             <tr key={r._id} className="hover:bg-brand-card/50 transition-colors">
               <td className="px-5 py-3 font-mono font-bold text-slate-200">{r.requestId}</td>
               <td className="px-5 py-3 font-semibold text-slate-200">
-                {typeof r.userId === 'object' ? r.userId.fullName : 'User'}
+                {r.userId && typeof r.userId === 'object' ? (r.userId as any).fullName : 'User'}
               </td>
               <td className="px-5 py-3 font-bold text-emerald-400">
                 +₹{r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -181,7 +181,7 @@ export const AdminRechargesPage: React.FC = () => {
         >
           <form onSubmit={handleReviewSubmit} className="space-y-4">
             <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{typeof selectedRecharge.userId === 'object' ? selectedRecharge.userId.fullName : 'User'}</span></div>
+              <div>User: <span className="font-bold text-slate-100">{selectedRecharge.userId && typeof selectedRecharge.userId === 'object' ? (selectedRecharge.userId as any).fullName : 'User'}</span></div>
               <div>Method: <span className="font-bold text-slate-200">{selectedRecharge.paymentMethod}</span></div>
               <div>Reference: <span className="font-mono font-bold text-slate-200">{selectedRecharge.referenceNumber}</span></div>
             </div>
