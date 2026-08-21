@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   await connectDB();
   app.listen(PORT, () => {
-    console.log(`[Server] Wink Me Club API running on http://localhost:${PORT}`);
+    console.log(`[Server] Wink Me Club API live & listening on port ${PORT}`);
   });
 };
 
