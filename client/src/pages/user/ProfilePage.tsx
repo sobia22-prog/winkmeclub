@@ -195,7 +195,7 @@ export const ProfilePage: React.FC = () => {
           </Link>
 
           {/* Item 7: Account */}
-          <Link to="/profile/essential-information" className="flex flex-col items-center gap-2 group col-span-2 sm:col-span-2 md:col-span-3 mx-auto">
+          <Link to="/profile/account" className="flex flex-col items-center gap-2 group col-span-2 sm:col-span-2 md:col-span-3 mx-auto">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
               <Headphones className="w-6 h-6" />
             </div>

@@ -20,6 +20,7 @@ import { DashboardPage } from './pages/user/DashboardPage';
 import { MatchesPage } from './pages/user/MatchesPage';
 import { ProfilePage } from './pages/user/ProfilePage';
 import { EssentialInformationPage } from './pages/user/EssentialInformationPage';
+import { AccountPage } from './pages/user/AccountPage';
 import { AnnouncementsPage } from './pages/user/AnnouncementsPage';
 import { WithdrawalSecretPage } from './pages/user/WithdrawalSecretPage';
 import { VipRecordsPage } from './pages/user/VipRecordsPage';
@@ -85,6 +86,7 @@ export const App: React.FC = () => {
                 <Route path="/matches" element={<MatchesPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/essential-information" element={<EssentialInformationPage />} />
+                <Route path="/profile/account" element={<AccountPage />} />
                 <Route path="/profile/withdrawal-secret" element={<WithdrawalSecretPage />} />
                 <Route path="/profile/login-password" element={<LoginPasswordPage />} />
                 <Route path="/profile/vip-records" element={<VipRecordsPage />} />
