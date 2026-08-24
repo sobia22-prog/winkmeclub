@@ -243,13 +243,13 @@ export const ProfilePage: React.FC = () => {
             </span>
           </Link>
 
-          {/* Item 7: Support */}
+          {/* Item 7: Account */}
           <Link to="/support" className="flex flex-col items-center gap-2 group col-span-2 sm:col-span-1 mx-auto">
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
               <Headphones className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
-              Support
+              Account
             </span>
           </Link>
         </div>
