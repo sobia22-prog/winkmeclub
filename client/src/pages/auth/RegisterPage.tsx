@@ -81,7 +81,7 @@ export const RegisterPage: React.FC = () => {
           <Input
             label="Staff Invitation Code (Required)"
             name="invitationCode"
-            placeholder="e.g. ST18492041"
+            placeholder="e.g. ST1234"
             value={formData.invitationCode}
             onChange={handleChange}
             leftIcon={<Key className="w-4 h-4 text-amber-400" />}

@@ -149,7 +149,7 @@ export const AdminStaffPage: React.FC = () => {
             <Users className="w-6 h-6 text-amber-400" /> Staff & Team Management
           </h1>
           <p className="text-xs text-slate-400">
-            Create staff accounts, generate unique client invitation codes (`ST1xxxx`), and monitor team performance.
+            Create staff accounts, generate unique client invitation codes (`STxxxx`), and monitor team performance.
           </p>
         </div>
 
