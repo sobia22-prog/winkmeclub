@@ -232,10 +232,12 @@ export const AdminStaffPage: React.FC = () => {
                 </td>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
-                    <Link to={`/admin/staff/${s._id || s.id}`}>
-                      <Button variant="gold" size="sm" leftIcon={<Eye className="w-3.5 h-3.5" />}>
-                        View Profile
-                      </Button>
+                    <Link
+                      to={`/admin/staff/${s._id || s.id}`}
+                      className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                      title="View Staff Profile & Operations Summary"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
                     </Link>
                     <button
                       onClick={() => handleOpenEdit(s)}

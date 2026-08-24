@@ -6,12 +6,14 @@ import { StatCard } from '../../components/common/StatCard';
 import { Badge } from '../../components/common/Badge';
 import { Table } from '../../components/common/Table';
 import { Button } from '../../components/common/Button';
+import { Modal } from '../../components/common/Modal';
 import {
   Users,
   ArrowLeft,
   Key,
   DollarSign,
   TrendingUp,
+  TrendingDown,
   ArrowDownRight,
   ArrowUpRight,
   ShieldCheck,
@@ -21,6 +23,11 @@ import {
   AlertCircle,
   Activity,
   UserCheck,
+  Clock,
+  ExternalLink,
+  Lock,
+  Wallet,
+  ShoppingBag,
 } from 'lucide-react';
 
 export const AdminStaffDetailPage: React.FC = () => {
@@ -31,6 +38,9 @@ export const AdminStaffDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'clients' | 'trades' | 'recharges' | 'withdrawals' | 'transactions'>('clients');
+
+  // Selected Client Summary Modal State
+  const [selectedClient, setSelectedClient] = useState<any | null>(null);
 
   const fetchStaffDetail = async () => {
     if (!id) return;
@@ -75,6 +85,28 @@ export const AdminStaffDetailPage: React.FC = () => {
 
   const { staff = {}, stats = {}, clients = [], trades = [], recharges = [], withdrawals = [], transactions = [] } = data || {};
 
+  // Filter trades, recharges, withdrawals, transactions specifically for selected client in modal
+  const getClientData = (clientId: string) => {
+    const clientTrades = trades.filter((t: any) => {
+      const uId = typeof t.userId === 'object' ? t.userId?._id || t.userId?.id : t.userId;
+      return String(uId) === String(clientId);
+    });
+    const clientRecharges = recharges.filter((r: any) => {
+      const uId = typeof r.userId === 'object' ? r.userId?._id || r.userId?.id : r.userId;
+      return String(uId) === String(clientId);
+    });
+    const clientWithdrawals = withdrawals.filter((w: any) => {
+      const uId = typeof w.userId === 'object' ? w.userId?._id || w.userId?.id : w.userId;
+      return String(uId) === String(clientId);
+    });
+    const clientTransactions = transactions.filter((tx: any) => {
+      const uId = typeof tx.userId === 'object' ? tx.userId?._id || tx.userId?.id : tx.userId;
+      return String(uId) === String(clientId);
+    });
+
+    return { clientTrades, clientRecharges, clientWithdrawals, clientTransactions };
+  };
+
   return (
     <div className="space-y-6 w-full">
       {/* Top Navigation */}
@@ -83,16 +115,16 @@ export const AdminStaffDetailPage: React.FC = () => {
           Back to Staff Directory
         </Button>
 
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/40 rounded-full font-mono text-xs font-bold text-amber-400">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-500/10 border border-amber-500/40 rounded-full font-mono text-xs font-bold text-amber-400 shadow-lg shadow-amber-500/5">
           <Key className="w-3.5 h-3.5" /> Code: {staff.invitationCode || 'N/A'}
         </div>
       </div>
 
       {/* Staff Header Profile Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/60 via-brand-surface to-brand-surface border border-amber-500/30 p-6 md:p-8 space-y-6 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-950/40 via-brand-surface to-brand-surface border border-amber-500/30 p-6 md:p-8 space-y-6 shadow-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 text-amber-400 flex items-center justify-center font-black text-2xl shadow-xl shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-amber-500/10 border-2 border-amber-500/40 text-amber-400 flex items-center justify-center font-black text-2xl shadow-xl shrink-0">
               {staff.fullName?.charAt(0).toUpperCase() || 'S'}
             </div>
             <div>
@@ -131,7 +163,7 @@ export const AdminStaffDetailPage: React.FC = () => {
             icon={<TrendingUp className="w-5 h-5 text-purple-400" />}
           />
           <StatCard
-            title="Total Trade Activity"
+            title="Total Trade Orders"
             value={stats.tradesCount}
             subtitle="Executed trade orders"
             icon={<Activity className="w-5 h-5 text-cyan-400" />}
@@ -160,7 +192,7 @@ export const AdminStaffDetailPage: React.FC = () => {
               : 'text-slate-400 hover:text-slate-200 hover:bg-brand-card'
           }`}
         >
-          <TrendingUp className="w-4 h-4" /> Trades ({trades.length})
+          <TrendingUp className="w-4 h-4" /> All Client Trades ({trades.length})
         </button>
 
         <button
@@ -197,7 +229,7 @@ export const AdminStaffDetailPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Tab 1: Associated Clients */}
+      {/* Tab 1: Associated Clients with In-Page Quick Summary Modal trigger */}
       {activeTab === 'clients' && (
         <div className="w-full overflow-x-auto">
           {clients.length === 0 ? (
@@ -235,11 +267,14 @@ export const AdminStaffDetailPage: React.FC = () => {
                     ₹{(c.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
                   <td className="px-5 py-3">
-                    <Link to={`/admin/users/${c._id || c.id}`}>
-                      <Button variant="secondary" size="sm" leftIcon={<Eye className="w-3.5 h-3.5" />}>
-                        Inspect Client
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="gold"
+                      size="sm"
+                      leftIcon={<Eye className="w-3.5 h-3.5" />}
+                      onClick={() => setSelectedClient(c)}
+                    >
+                      Quick Summary
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -248,31 +283,40 @@ export const AdminStaffDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* Tab 2: Trades */}
+      {/* Tab 2: Trades with Clear WIN/LOSE Bird-Eye Visual Indicators */}
       {activeTab === 'trades' && (
         <div className="w-full overflow-x-auto">
           {trades.length === 0 ? (
             <Card className="p-8 text-center text-xs text-slate-500">No trades executed by assigned clients yet.</Card>
           ) : (
-            <Table headers={['Trade ID', 'Client Name', 'Product', 'Qty', 'Total Amount', 'Outcome', 'Status', 'Date']}>
+            <Table headers={['Trade ID', 'Client Name', 'Product', 'Qty', 'Total Amount', 'Bird-Eye Outcome', 'Status', 'Date']}>
               {trades.map((t: any) => (
                 <tr key={t._id} className="hover:bg-brand-card/50 transition-colors">
                   <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
                   <td className="px-5 py-3 font-semibold text-slate-200">
-                    {t.userId && typeof t.userId === 'object' ? t.userId.fullName : 'Client'}
+                    {t.userId && typeof t.userId === 'object' ? (t.userId as any).fullName || 'Client' : 'Client'}
                   </td>
                   <td className="px-5 py-3 text-slate-300 font-medium">{t.productName}</td>
                   <td className="px-5 py-3 text-slate-300">x{t.quantity}</td>
-                  <td className="px-5 py-3 font-bold text-emerald-400">
+                  <td className="px-5 py-3 font-bold text-slate-100">
                     ₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
                   <td className="px-5 py-3">
                     {t.outcome === 'WIN' ? (
-                      <Badge variant="success">WIN (+{t.profitPercentage || 20}%)</Badge>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-xs font-black text-emerald-400 shadow-md shadow-emerald-500/10">
+                        <TrendingUp className="w-4 h-4 text-emerald-400 animate-pulse" />
+                        <span>▲ WIN (+{t.profitPercentage || 20}%)</span>
+                      </div>
                     ) : t.outcome === 'LOSE' ? (
-                      <Badge variant="danger">LOSE</Badge>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/20 border border-rose-500/50 rounded-xl text-xs font-black text-rose-400 shadow-md shadow-rose-500/10">
+                        <TrendingDown className="w-4 h-4 text-rose-400" />
+                        <span>▼ LOSE</span>
+                      </div>
                     ) : (
-                      <Badge variant="pending">PENDING</Badge>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-500/50 rounded-xl text-xs font-bold text-amber-400">
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        <span>⏳ IN PROGRESS</span>
+                      </div>
                     )}
                   </td>
                   <td className="px-5 py-3">
@@ -297,7 +341,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                 <tr key={r._id} className="hover:bg-brand-card/50 transition-colors">
                   <td className="px-5 py-3 font-mono font-bold text-slate-200">{r.requestId}</td>
                   <td className="px-5 py-3 font-semibold text-slate-200">
-                    {r.userId && typeof r.userId === 'object' ? r.userId.fullName : 'Client'}
+                    {r.userId && typeof r.userId === 'object' ? (r.userId as any).fullName || 'Client' : 'Client'}
                   </td>
                   <td className="px-5 py-3 font-bold text-emerald-400">
                     +₹{r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -332,7 +376,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                 <tr key={w._id} className="hover:bg-brand-card/50 transition-colors">
                   <td className="px-5 py-3 font-mono font-bold text-slate-200">{w.requestId}</td>
                   <td className="px-5 py-3 font-semibold text-slate-200">
-                    {w.userId && typeof w.userId === 'object' ? w.userId.fullName : 'Client'}
+                    {w.userId && typeof w.userId === 'object' ? (w.userId as any).fullName || 'Client' : 'Client'}
                   </td>
                   <td className="px-5 py-3 font-bold text-rose-400">
                     -₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -368,7 +412,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                 <tr key={tx._id} className="hover:bg-brand-card/50 transition-colors">
                   <td className="px-5 py-3 font-mono font-bold text-slate-200">{tx.transactionId}</td>
                   <td className="px-5 py-3 font-semibold text-slate-200">
-                    {tx.userId && typeof tx.userId === 'object' ? tx.userId.fullName : 'Client'}
+                    {tx.userId && typeof tx.userId === 'object' ? (tx.userId as any).fullName || 'Client' : 'Client'}
                   </td>
                   <td className="px-5 py-3">
                     <Badge variant="neutral" size="sm">
@@ -386,6 +430,157 @@ export const AdminStaffDetailPage: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* IN-PAGE CLIENT COMPLETE SUMMARY POPUP MODAL */}
+      {selectedClient && (() => {
+        const { clientTrades, clientRecharges, clientWithdrawals, clientTransactions } = getClientData(selectedClient._id || selectedClient.id);
+        const winTradesCount = clientTrades.filter((t: any) => t.outcome === 'WIN').length;
+        const loseTradesCount = clientTrades.filter((t: any) => t.outcome === 'LOSE').length;
+
+        return (
+          <Modal
+            isOpen={true}
+            onClose={() => setSelectedClient(null)}
+            title={`Client Summary & Live Operations — ${selectedClient.fullName}`}
+          >
+            <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-1">
+              {/* Header Info */}
+              <div className="flex items-center gap-4 p-4 bg-brand-dark/60 border border-brand-border rounded-2xl">
+                <img
+                  src={selectedClient.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
+                  alt={selectedClient.fullName}
+                  className="w-14 h-14 rounded-2xl object-cover border-2 border-amber-500/40 shrink-0"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-100">{selectedClient.fullName}</h3>
+                    {selectedClient.isVIP && <Badge variant="vip" size="sm" />}
+                    {selectedClient.status === 'ACTIVE' ? <Badge variant="verified" size="sm">ACTIVE</Badge> : <Badge variant="danger" size="sm">SUSPENDED</Badge>}
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">{selectedClient.email} • {selectedClient.phone || 'No Phone'}</p>
+                  <p className="text-[11px] text-slate-500">📍 {selectedClient.city || 'Mumbai'} • {selectedClient.gender || 'Female'}</p>
+                </div>
+              </div>
+
+              {/* Financial Vault Balance Box */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl">
+                  <div className="flex items-center justify-between text-xs text-emerald-400 font-bold mb-1">
+                    <span>Available Balance</span>
+                    <Wallet className="w-4 h-4 text-emerald-400" />
+                  </div>
+                  <div className="text-lg font-black text-emerald-400">
+                    ₹{(selectedClient.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </div>
+                </div>
+
+                <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl">
+                  <div className="flex items-center justify-between text-xs text-amber-400 font-bold mb-1">
+                    <span>Frozen Balance</span>
+                    <Lock className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div className="text-lg font-black text-amber-400">
+                    ₹{(selectedClient.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Trades Summary Box with Clear Green/Red Indicators */}
+              <div className="space-y-3 pt-2 border-t border-brand-border">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-purple-400" /> Trade Orders Summary
+                  </h4>
+                  <div className="flex items-center gap-2 text-[11px] font-bold">
+                    <span className="text-emerald-400">🟢 {winTradesCount} Wins</span>
+                    <span className="text-rose-400">🔴 {loseTradesCount} Losses</span>
+                  </div>
+                </div>
+
+                {clientTrades.length === 0 ? (
+                  <p className="text-center text-xs text-slate-500 py-3 bg-brand-card/50 rounded-xl">No trades recorded for this client.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {clientTrades.map((t: any) => (
+                      <div key={t._id} className="p-3 bg-brand-card/80 border border-brand-border rounded-xl flex items-center justify-between text-xs">
+                        <div>
+                          <div className="font-bold text-slate-200">{t.productName} (x{t.quantity})</div>
+                          <div className="text-[10px] text-slate-400">Trade ID: {t.tradeId} • ₹{t.totalAmount}</div>
+                        </div>
+
+                        <div>
+                          {t.outcome === 'WIN' ? (
+                            <span className="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/40 rounded-lg font-black text-emerald-400 inline-flex items-center gap-1">
+                              <TrendingUp className="w-3.5 h-3.5" /> ▲ WIN (+{t.profitPercentage || 20}%)
+                            </span>
+                          ) : t.outcome === 'LOSE' ? (
+                            <span className="px-2.5 py-1 bg-rose-500/20 border border-rose-500/40 rounded-lg font-black text-rose-400 inline-flex items-center gap-1">
+                              <TrendingDown className="w-3.5 h-3.5" /> ▼ LOSE
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1 bg-amber-500/20 border border-amber-500/40 rounded-lg font-bold text-amber-400 inline-flex items-center gap-1">
+                              <Clock className="w-3 h-3" /> ⏳ IN PROGRESS
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Recharges & Withdrawals Summary */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-brand-border">
+                {/* Recharges */}
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-extrabold uppercase text-slate-400">Deposits ({clientRecharges.length})</h4>
+                  {clientRecharges.length === 0 ? (
+                    <p className="text-[11px] text-slate-500">No deposit records.</p>
+                  ) : (
+                    clientRecharges.map((r: any) => (
+                      <div key={r._id} className="p-2.5 bg-brand-card/50 rounded-xl text-xs flex justify-between items-center">
+                        <div>
+                          <div className="font-bold text-emerald-400">+₹{r.amount}</div>
+                          <div className="text-[10px] text-slate-500">{r.paymentMethod}</div>
+                        </div>
+                        <Badge variant={r.status === 'APPROVED' ? 'success' : r.status === 'REJECTED' ? 'danger' : 'warning'} size="sm">
+                          {r.status}
+                        </Badge>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Withdrawals */}
+                <div className="space-y-2">
+                  <h4 className="text-[11px] font-extrabold uppercase text-slate-400">Withdrawals ({clientWithdrawals.length})</h4>
+                  {clientWithdrawals.length === 0 ? (
+                    <p className="text-[11px] text-slate-500">No withdrawal records.</p>
+                  ) : (
+                    clientWithdrawals.map((w: any) => (
+                      <div key={w._id} className="p-2.5 bg-brand-card/50 rounded-xl text-xs flex justify-between items-center">
+                        <div>
+                          <div className="font-bold text-rose-400">-₹{w.amount}</div>
+                          <div className="text-[10px] text-slate-500">{w.bankName || 'Bank Transfer'}</div>
+                        </div>
+                        <Badge variant={w.status === 'COMPLETED' ? 'success' : w.status === 'REJECTED' ? 'danger' : 'warning'} size="sm">
+                          {w.status}
+                        </Badge>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end">
+                <Button variant="secondary" onClick={() => setSelectedClient(null)}>
+                  Close Summary
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        );
+      })()}
     </div>
   );
 };
