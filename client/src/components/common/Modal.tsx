@@ -7,7 +7,7 @@ interface ModalProps {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'full';
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -40,21 +40,27 @@ export const Modal: React.FC<ModalProps> = ({
     lg: 'max-w-lg',
     xl: 'max-w-xl',
     '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    '6xl': 'max-w-6xl',
+    '7xl': 'max-w-7xl',
+    full: 'max-w-[95vw]',
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className={`w-full ${maxWidths[maxWidth]} bg-brand-surface border border-brand-border rounded-2xl shadow-2xl shadow-black/80 overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200`}
+        className={`w-full ${maxWidths[maxWidth]} bg-brand-surface border border-amber-500/30 rounded-3xl shadow-2xl shadow-black/90 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200`}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border bg-brand-card">
+        <div className="flex items-center justify-between px-6 py-4.5 border-b border-brand-border bg-gradient-to-r from-brand-surface via-brand-card to-brand-surface">
           <div>
             <h3 className="text-lg font-bold text-slate-100">{title}</h3>
             {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
