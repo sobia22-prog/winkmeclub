@@ -203,23 +203,23 @@ export const ProfilePage: React.FC = () => {
             </span>
           </Link>
 
-          {/* Item 3: VIP Record */}
-          <Link to="/trades" className="flex flex-col items-center gap-2 group">
+          {/* Item 3: VIP Records */}
+          <Link to="/profile/vip-records" className="flex flex-col items-center gap-2 group">
             <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
               <CreditCard className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
-              VIP Record
+              VIP Records
             </span>
           </Link>
 
-          {/* Item 4: Finances History */}
-          <Link to="/wallet" className="flex flex-col items-center gap-2 group">
+          {/* Item 4: Finance History */}
+          <Link to="/profile/finance-history" className="flex flex-col items-center gap-2 group">
             <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-300 group-hover:scale-110 transition-transform">
               <History className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-200 group-hover:text-purple-300 transition-colors">
-              Finances History
+              Finance History
             </span>
           </Link>
 

@@ -22,6 +22,8 @@ import { ProfilePage } from './pages/user/ProfilePage';
 import { EssentialInformationPage } from './pages/user/EssentialInformationPage';
 import { AnnouncementsPage } from './pages/user/AnnouncementsPage';
 import { WithdrawalSecretPage } from './pages/user/WithdrawalSecretPage';
+import { VipRecordsPage } from './pages/user/VipRecordsPage';
+import { FinanceHistoryPage } from './pages/user/FinanceHistoryPage';
 import { VerificationPage } from './pages/user/VerificationPage';
 import { WalletPage } from './pages/user/WalletPage';
 import { TradesPage } from './pages/user/TradesPage';
@@ -83,6 +85,8 @@ export const App: React.FC = () => {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/essential-information" element={<EssentialInformationPage />} />
                 <Route path="/profile/withdrawal-secret" element={<WithdrawalSecretPage />} />
+                <Route path="/profile/vip-records" element={<VipRecordsPage />} />
+                <Route path="/profile/finance-history" element={<FinanceHistoryPage />} />
                 <Route path="/verification" element={<VerificationPage />} />
                 <Route path="/wallet" element={<WalletPage />} />
                 <Route path="/wallet/recharge" element={<WalletPage initialTab="recharge" />} />
