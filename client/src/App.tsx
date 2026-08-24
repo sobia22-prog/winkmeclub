@@ -20,6 +20,7 @@ import { DashboardPage } from './pages/user/DashboardPage';
 import { MatchesPage } from './pages/user/MatchesPage';
 import { ProfilePage } from './pages/user/ProfilePage';
 import { EssentialInformationPage } from './pages/user/EssentialInformationPage';
+import { AnnouncementsPage } from './pages/user/AnnouncementsPage';
 import { VerificationPage } from './pages/user/VerificationPage';
 import { WalletPage } from './pages/user/WalletPage';
 import { TradesPage } from './pages/user/TradesPage';
@@ -87,6 +88,7 @@ export const App: React.FC = () => {
                 <Route path="/trades" element={<TradesPage />} />
                 <Route path="/transactions" element={<Navigate to="/wallet" replace />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/announcements" element={<AnnouncementsPage />} />
                 <Route path="/support" element={<SupportPage />} />
               </Route>
 
