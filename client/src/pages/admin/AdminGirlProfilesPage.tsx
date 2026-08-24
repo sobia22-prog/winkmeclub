@@ -15,7 +15,6 @@ import {
   Edit,
   Star,
   Sparkles,
-  Tag,
   MapPin,
   CheckCircle2,
   PlusCircle,
@@ -312,7 +311,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
         </Table>
       )}
 
-      {/* CREATE / EDIT GIRL PROFILE MODAL (Exact Matching Fields from Prompt & Screenshots) */}
+      {/* CREATE / EDIT GIRL PROFILE MODAL (100% SYMMETRICAL & ELEGANT UI) */}
       {isModalOpen && (
         <Modal
           isOpen={true}
@@ -327,7 +326,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               </div>
             )}
 
-            {/* Name & Rating */}
+            {/* Symmetrical Row 1: Name & Rating */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Name"
@@ -349,7 +348,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               />
             </div>
 
-            {/* Height, Weight, Chest Circumference, Initial Likes */}
+            {/* Symmetrical Row 2: 4 Symmetrical Columns (Height, Weight, Chest, Likes) */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Input
                 label="Height"
@@ -378,7 +377,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               />
             </div>
 
-            {/* Categories (Select Multiple & Add New Category) */}
+            {/* Symmetrical Row 3: Categories Select Bar */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold text-slate-300">
                 Categories (Select Multiple)
@@ -441,7 +440,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Location & Tags */}
+            {/* Symmetrical Row 4: Location & Tags */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Location"
@@ -457,7 +456,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               />
             </div>
 
-            {/* Verification Label & Short Bio */}
+            {/* Symmetrical Row 5: Verification Label & Short Bio (2 Symmetrical Single-Line Inputs) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Verification label"
@@ -465,16 +464,15 @@ export const AdminGirlProfilesPage: React.FC = () => {
                 value={verificationLabel}
                 onChange={(e) => setVerificationLabel(e.target.value)}
               />
-              <Textarea
+              <Input
                 label="Short bio"
                 placeholder="Short bio sentence..."
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                rows={2}
               />
             </div>
 
-            {/* Details */}
+            {/* Symmetrical Row 6: Details (Full Width Textarea) */}
             <Textarea
               label="Details"
               placeholder="Write something about her..."
@@ -483,7 +481,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               rows={3}
             />
 
-            {/* Profile Image Upload Picker */}
+            {/* Symmetrical Row 7: Profile Image Upload Picker */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-300">Profile Image</label>
               <ImageUploadPicker
@@ -501,6 +499,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
                 variant="secondary"
                 type="button"
                 onClick={() => setIsModalOpen(false)}
+                className="bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 font-bold px-5"
               >
                 Cancel
               </Button>
