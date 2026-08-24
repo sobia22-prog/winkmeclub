@@ -26,8 +26,7 @@ export const AdminLoginPage: React.FC = () => {
       const res = await authService.adminLogin({ email, password });
       if (res.data.success) {
         loginSession(res.data.token, res.data.user);
-        const redirectPath = res.data.user.role === 'STAFF' ? '/admin/users' : '/admin/dashboard';
-        navigate(redirectPath);
+        navigate('/admin/dashboard');
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Admin authentication failed.');

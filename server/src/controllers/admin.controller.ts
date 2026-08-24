@@ -10,6 +10,7 @@ import { Product } from '../models/product.model';
 import { Announcement } from '../models/announcement.model';
 import { SupportTicket, SupportMessage } from '../models/support.model';
 import { Transaction } from '../models/transaction.model';
+import { GirlProfile } from '../models/girlProfile.model';
 import { WalletService } from '../services/wallet.service';
 import { TradeSettlementService } from '../services/tradeSettlement.service';
 import { VerificationService } from '../services/verification.service';
@@ -57,6 +58,7 @@ export class AdminController {
       const totalUsers = await User.countDocuments(userQuery);
       const activeUsers = await User.countDocuments({ ...userQuery, status: 'ACTIVE' });
       const vipUsers = await User.countDocuments({ ...userQuery, isVIP: true });
+      const girlsProfiles = await GirlProfile.countDocuments();
 
       let wallets;
       if (isStaff && scopedClientIds) {
@@ -81,45 +83,38 @@ export class AdminController {
         .sort({ createdAt: -1 })
         .limit(8);
 
-      // 7-day Revenue & Trade Volume Activity Growth Trends
-      const last7Days = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        d.setHours(0, 0, 0, 0);
-        return d;
-      });
+      // Monthly Revenue & New Users Data for the Year (Jan - Dec)
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const currentYear = new Date().getFullYear();
 
-      const revenueGrowth = await Promise.all(
-        last7Days.map(async (date) => {
-          const nextDay = new Date(date);
-          nextDay.setDate(nextDay.getDate() + 1);
+      const monthlyData = await Promise.all(
+        months.map(async (monthName, index) => {
+          const startDate = new Date(currentYear, index, 1);
+          const endDate = new Date(currentYear, index + 1, 0, 23, 59, 59);
 
-          const dayRechargeQuery: any = {
+          const mRechargeQuery: any = {
             status: 'APPROVED',
-            createdAt: { $gte: date, $lt: nextDay },
+            createdAt: { $gte: startDate, $lte: endDate },
           };
 
-          const dayTradeQuery: any = {
-            createdAt: { $gte: date, $lt: nextDay },
+          const mUserQuery: any = {
+            role: 'USER',
+            createdAt: { $gte: startDate, $lte: endDate },
           };
 
           if (isStaff && scopedClientIds) {
-            dayRechargeQuery.userId = { $in: scopedClientIds };
-            dayTradeQuery.userId = { $in: scopedClientIds };
+            mRechargeQuery.userId = { $in: scopedClientIds };
+            mUserQuery.assignedStaff = req.user!._id;
           }
 
-          const dayRecharges = await RechargeRequest.find(dayRechargeQuery);
-          const dayRevenue = dayRecharges.reduce((sum, r) => sum + (r.amount || 0), 0);
-
-          const dayTrades = await Trade.find(dayTradeQuery);
-          const dayTradeVolume = dayTrades.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
-
-          const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+          const mRecharges = await RechargeRequest.find(mRechargeQuery);
+          const revenue = mRecharges.reduce((sum, r) => sum + (r.amount || 0), 0);
+          const newUsers = await User.countDocuments(mUserQuery);
 
           return {
-            name: dayName,
-            Revenue: dayRevenue,
-            TradeVolume: dayTradeVolume,
+            name: monthName,
+            Revenue: revenue,
+            NewUsers: newUsers,
           };
         })
       );
@@ -129,6 +124,7 @@ export class AdminController {
         stats: {
           totalUsers,
           activeUsers,
+          girlsProfiles,
           vipUsers,
           totalRevenue,
           totalAvailableFunds,
@@ -138,7 +134,8 @@ export class AdminController {
           pendingWithdrawalsCount,
           pendingVerificationsCount,
         },
-        revenueGrowth,
+        monthlyData,
+        revenueGrowth: monthlyData,
         recentTransactions,
       });
     } catch (error: any) {

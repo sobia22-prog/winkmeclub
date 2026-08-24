@@ -25,6 +25,7 @@ export const AdminSidebar: React.FC = () => {
 
   const adminNavItems = isStaff
     ? [
+        { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
         { label: 'Girls Profiles', path: '/admin/girls', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
         { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
         { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
