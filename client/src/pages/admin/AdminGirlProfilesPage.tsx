@@ -489,7 +489,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
                 onChange={(url) => setProfileImage(url)}
                 label=""
                 helperText="Click to upload profile image"
-                aspectRatio="square"
+                aspectRatio="banner"
               />
             </div>
 
