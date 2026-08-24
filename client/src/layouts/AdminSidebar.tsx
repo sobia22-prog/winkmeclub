@@ -15,6 +15,7 @@ import {
   Settings,
   LogOut,
   UserCheck,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -24,6 +25,7 @@ export const AdminSidebar: React.FC = () => {
 
   const adminNavItems = isStaff
     ? [
+        { label: 'Girls Profiles', path: '/admin/girls', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
         { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
         { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
         { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },
@@ -35,6 +37,7 @@ export const AdminSidebar: React.FC = () => {
       ]
     : [
         { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+        { label: 'Girls Profiles', path: '/admin/girls', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
         { label: 'Staff Members', path: '/admin/staff', icon: <UserCheck className="w-4 h-4" /> },
         { label: 'Users', path: '/admin/users', icon: <Users className="w-4 h-4" /> },
         { label: 'Trade Requests', path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },

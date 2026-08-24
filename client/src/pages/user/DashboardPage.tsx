@@ -5,11 +5,8 @@ import { brandConfig } from '../../config/brand.config';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
-import { Modal } from '../../components/common/Modal';
 import { MultiSelectCity } from '../../components/common/MultiSelectCity';
-import { profileService } from '../../services/profile.service';
-import { announcementService } from '../../services/announcement.service';
-import { Profile } from '../../types';
+import { girlProfileService } from '../../services/girlProfile.service';
 import {
   Sparkles,
   Calendar,
@@ -22,19 +19,18 @@ import {
   ShoppingBag,
   ShieldCheck,
   Zap,
+  Star,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [activeFilter, setActiveFilter] = useState<'all' | 'vip' | 'popular' | 'city'>('all');
   const [loading, setLoading] = useState(true);
 
-
-
-  // Fetch profiles from backend MongoDB Atlas
+  // Fetch admin-curated Girl Profiles from backend
   const loadProfiles = useCallback(async () => {
     setLoading(true);
     try {
@@ -43,22 +39,21 @@ export const DashboardPage: React.FC = () => {
         cityQuery = user?.city || 'Mumbai';
       }
 
-      const vipQuery = activeFilter === 'vip' ? true : undefined;
-
-      const res = await profileService.getMatches({
+      const res = await girlProfileService.getPublicProfiles({
         city: cityQuery,
-        vipOnly: vipQuery,
       });
 
       if (res.data.success) {
-        let list = res.data.profiles;
-        if (activeFilter === 'popular') {
-          list = list.filter((p: Profile) => p.age <= 25);
+        let list = res.data.profiles || [];
+        if (activeFilter === 'vip') {
+          list = list.filter((p: any) => p.verificationLabel?.includes('VIP') || p.tags?.includes('VIP'));
+        } else if (activeFilter === 'popular') {
+          list = list.filter((p: any) => (p.initialLikes ?? 0) > 400);
         }
         setProfiles(list);
       }
     } catch (err) {
-      console.error('Failed to load profiles:', err);
+      console.error('Failed to load girl profiles:', err);
     } finally {
       setLoading(false);
     }
@@ -68,22 +63,20 @@ export const DashboardPage: React.FC = () => {
     loadProfiles();
   }, [loadProfiles]);
 
-  // Taglines generator for attractive attributes per prompt
-  const getAttributesTag = (index: number) => {
+  const getAttributesTag = (index: number, p: any) => {
+    if (p.categories && p.categories.length > 0) {
+      return { text: p.categories[0], color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
+    }
     const tags = [
-      { text: 'Sexy & Horny', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' },
-      { text: 'Gorgeous & Entertainer', color: 'bg-pink-500/20 text-pink-300 border-pink-500/40' },
+      { text: 'Sexy & Hot', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' },
+      { text: 'Gorgeous & VIP', color: 'bg-pink-500/20 text-pink-300 border-pink-500/40' },
       { text: 'Charming & Exotic', color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' },
-      { text: 'Stunning & Passionate', color: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40' },
-      { text: 'Elegance & Glamour', color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' },
     ];
     return tags[index % tags.length];
   };
 
   return (
     <div className="space-y-6 w-full">
-
-
       {/* Hero Banner Card 1 */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-rose-600 to-brand-wine border border-rose-400/30 p-6 md:p-8 text-white shadow-2xl">
         <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none" />
@@ -173,10 +166,10 @@ export const DashboardPage: React.FC = () => {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h2 className="text-base md:text-lg font-extrabold text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-400" /> Popularity Recommended Profiles (Top 5)
+            <Sparkles className="w-5 h-5 text-amber-400" /> Recommended Girl Profiles
           </h2>
           <Link to="/matches" className="text-xs text-brand-wine hover:underline font-bold flex items-center gap-1">
-            View All <ArrowRight className="w-3.5 h-3.5" />
+            View All Encounters <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
@@ -234,7 +227,7 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Recommended Profiles Grid (Strictly Limited to 5 Profiles) */}
+      {/* Recommended Girl Profiles Grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -245,25 +238,25 @@ export const DashboardPage: React.FC = () => {
         </div>
       ) : profiles.length === 0 ? (
         <Card className="p-8 text-center text-xs text-slate-400 space-y-2">
-          <p className="font-semibold">No recommended profiles found for selected cities.</p>
+          <p className="font-semibold">No girl profiles found for selected cities.</p>
           <p className="text-[11px] text-slate-500">Try selecting additional cities in the dropdown above.</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {profiles.slice(0, 5).map((profile, index) => {
-            const attrTag = getAttributesTag(index);
+          {profiles.slice(0, 6).map((profile, index) => {
+            const attrTag = getAttributesTag(index, profile);
             return (
               <Card key={profile._id} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group">
                 <div className="relative h-64 overflow-hidden">
                   <img
                     src={profile.profileImage}
-                    alt={profile.fullName}
+                    alt={profile.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-transparent to-transparent opacity-95" />
 
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                    {profile.isVIP && <Badge variant="vip" size="sm" />}
+                    <Badge variant="verified" size="sm">{profile.verificationLabel || 'ID Verified'}</Badge>
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-black/40" title="Online now" />
                   </div>
 
@@ -274,17 +267,22 @@ export const DashboardPage: React.FC = () => {
                   </div>
 
                   <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="text-lg font-extrabold text-white flex items-center gap-2">
-                      {profile.fullName}, {profile.age}
-                    </h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-extrabold text-white">
+                        {profile.name}
+                      </h3>
+                      <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-md">
+                        <Star className="w-3.5 h-3.5 fill-amber-400" /> {profile.rating || 5.0}
+                      </div>
+                    </div>
                     <p className="text-xs text-slate-300 flex items-center gap-1 mt-0.5 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-brand-wine" /> {profile.city} • {profile.gender}
+                      <MapPin className="w-3.5 h-3.5 text-amber-400" /> {profile.location} • {profile.height} • {profile.weight}
                     </p>
                   </div>
                 </div>
 
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                  <p className="text-xs text-slate-300 line-clamp-2 italic font-medium">"{profile.bio}"</p>
+                  <p className="text-xs text-slate-300 line-clamp-2 italic font-medium">"{profile.bio || profile.details}"</p>
 
                   <div className="flex items-center gap-2 pt-2 border-t border-brand-border">
                     <Link to="/matches" className="flex-1">
@@ -292,7 +290,6 @@ export const DashboardPage: React.FC = () => {
                         View Detail
                       </Button>
                     </Link>
-                    {/* Apply for Date button redirects directly to VIP Benefits Page (/verification) */}
                     <Link to="/verification" className="flex-1">
                       <Button
                         variant="primary"

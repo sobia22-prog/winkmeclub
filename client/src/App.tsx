@@ -26,6 +26,7 @@ import { SupportPage } from './pages/user/SupportPage';
 
 // Admin Pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { AdminGirlProfilesPage } from './pages/admin/AdminGirlProfilesPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { AdminUserDetailPage } from './pages/admin/AdminUserDetailPage';
 import { AdminTradesPage } from './pages/admin/AdminTradesPage';
@@ -84,6 +85,7 @@ export const App: React.FC = () => {
             {/* Protected Admin Routes */}
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin/girls" element={<AdminGirlProfilesPage />} />
               <Route path="/admin/staff" element={<AdminStaffPage />} />
               <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />

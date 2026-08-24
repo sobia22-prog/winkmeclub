@@ -18,6 +18,7 @@ import { Notification } from '../models/notification.model';
 import { Announcement } from '../models/announcement.model';
 import { SupportTicket, SupportMessage } from '../models/support.model';
 import { AuditLog } from '../models/auditLog.model';
+import { GirlProfile } from '../models/girlProfile.model';
 
 const seedData = async () => {
   try {
@@ -39,6 +40,71 @@ const seedData = async () => {
       SupportTicket.deleteMany({}),
       SupportMessage.deleteMany({}),
       AuditLog.deleteMany({}),
+      GirlProfile.deleteMany({}),
+    ]);
+
+    // Seed Initial Girl Profiles
+    await GirlProfile.create([
+      {
+        name: 'Priya Sharma',
+        rating: 4.9,
+        height: "5'6\"",
+        weight: '52 kg',
+        chestCircumference: '34B',
+        initialLikes: 850,
+        categories: ['Sexy', 'Hot'],
+        location: 'Mumbai',
+        bio: 'Fashion model & coffee enthusiast living in Bandra. Passionate about art, fine dining, and weekend getaways.',
+        tags: ['VIP', 'Featured', 'Hot'],
+        verificationLabel: 'ID Verified',
+        details: 'Passionate about life, luxury travel, and long conversations over wine.',
+        profileImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=80',
+      },
+      {
+        name: 'Aria Malhotra',
+        rating: 5.0,
+        height: "5'7\"",
+        weight: '50 kg',
+        chestCircumference: '36C',
+        initialLikes: 1240,
+        categories: ['Big Boobs', 'Hot'],
+        location: 'Delhi',
+        bio: 'Architect and jazz enthusiast. Love rooftop cocktail lounges and spontaneous road trips.',
+        tags: ['VIP', 'Featured'],
+        verificationLabel: 'ID Verified',
+        details: 'Architectural designer based in South Delhi with a taste for luxury aesthetics.',
+        profileImage: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500&auto=format&fit=crop&q=80',
+      },
+      {
+        name: 'Sophia Roy',
+        rating: 4.8,
+        height: "5'5\"",
+        weight: '49 kg',
+        chestCircumference: '34C',
+        initialLikes: 960,
+        categories: ['Sexy', 'Big Ass'],
+        location: 'Bangalore',
+        bio: 'AI Product Specialist & salsa dancer. Always curious and open to new experiences.',
+        tags: ['Featured', 'Hot'],
+        verificationLabel: 'ID Verified',
+        details: 'Creative mind exploring technology, indie concerts, and rooftop dining.',
+        profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop&q=80',
+      },
+      {
+        name: 'Natasha Fernandez',
+        rating: 4.9,
+        height: "5'8\"",
+        weight: '54 kg',
+        chestCircumference: '36B',
+        initialLikes: 1100,
+        categories: ['Sexy', 'Hot'],
+        location: 'Goa',
+        bio: 'Sailing captain & marine enthusiast living coastal dreams.',
+        tags: ['VIP', 'Hot'],
+        verificationLabel: 'ID Verified',
+        details: 'Beach lover, scuba diver, and sunset cocktail enthusiast.',
+        profileImage: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=500&auto=format&fit=crop&q=80',
+      },
     ]);
 
     console.log('[Seed] Database cleaned. Seeding fresh realistic demo data...');
