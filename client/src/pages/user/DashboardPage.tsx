@@ -5,6 +5,7 @@ import { brandConfig } from '../../config/brand.config';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
+import { Modal } from '../../components/common/Modal';
 import { MultiSelectCity } from '../../components/common/MultiSelectCity';
 import { girlProfileService } from '../../services/girlProfile.service';
 import {
@@ -20,6 +21,7 @@ import {
   ShieldCheck,
   Zap,
   Star,
+  Headphones,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -29,6 +31,9 @@ export const DashboardPage: React.FC = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [activeFilter, setActiveFilter] = useState<'all' | 'vip' | 'popular' | 'city'>('all');
   const [loading, setLoading] = useState(true);
+
+  // Apply for Date Modal State
+  const [applyDateProfile, setApplyDateProfile] = useState<any | null>(null);
 
   // Fetch admin-curated Girl Profiles from backend
   const loadProfiles = useCallback(async () => {
@@ -290,22 +295,60 @@ export const DashboardPage: React.FC = () => {
                         View Detail
                       </Button>
                     </Link>
-                    <Link to="/verification" className="flex-1">
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="w-full"
-                        leftIcon={<Calendar className="w-3.5 h-3.5" />}
-                      >
-                        Apply for Date
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="gold"
+                      size="sm"
+                      className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                      leftIcon={<Calendar className="w-3.5 h-3.5" />}
+                      onClick={() => setApplyDateProfile(profile)}
+                    >
+                      Apply for a date
+                    </Button>
                   </div>
                 </div>
               </Card>
             );
           })}
         </div>
+      )}
+
+      {/* APPLY FOR A DATE POPUP MODAL (Matching Screenshot 1) */}
+      {applyDateProfile && (
+        <Modal
+          isOpen={true}
+          onClose={() => setApplyDateProfile(null)}
+          title="Apply for a date"
+          subtitle={`Profile: ${applyDateProfile.name}`}
+          maxWidth="sm"
+        >
+          <div className="space-y-6 pt-1 text-center">
+            <p className="text-xs text-slate-300 font-medium leading-relaxed">
+              Please contact customer service to apply for this date.
+            </p>
+
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setApplyDateProfile(null)}
+                className="bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 font-bold px-5"
+              >
+                Close
+              </Button>
+              <Button
+                variant="gold"
+                size="md"
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                onClick={() => {
+                  setApplyDateProfile(null);
+                  navigate('/support');
+                }}
+              >
+                Contact Customer Service
+              </Button>
+            </div>
+          </div>
+        </Modal>
       )}
     </div>
   );

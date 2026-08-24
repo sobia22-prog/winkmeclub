@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { systemSettingsService } from '../../services/systemSettings.service';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
-import { Headphones, Send, MessageCircle, ExternalLink, QrCode, ShieldCheck } from 'lucide-react';
+import { Headphones, Send, Copy, Check, ExternalLink, QrCode } from 'lucide-react';
 
 export const SupportPage: React.FC = () => {
   const [telegramSupportUrl, setTelegramSupportUrl] = useState('https://t.me/winkmedatingclub_support');
   const [telegramSupportQrCode, setTelegramSupportQrCode] = useState(
     'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support'
   );
-  const [telegramSupportMessage, setTelegramSupportMessage] = useState(
-    'Need help or have questions? Reach out to our dedicated 24/7 customer service team directly on Telegram.'
-  );
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     systemSettingsService
@@ -20,80 +18,75 @@ export const SupportPage: React.FC = () => {
         if (res.data.success && res.data.settings) {
           if (res.data.settings.telegramSupportLink) setTelegramSupportUrl(res.data.settings.telegramSupportLink);
           if (res.data.settings.telegramSupportQrCode) setTelegramSupportQrCode(res.data.settings.telegramSupportQrCode);
-          if (res.data.settings.telegramSupportMessage) setTelegramSupportMessage(res.data.settings.telegramSupportMessage);
         }
       })
       .catch(() => {});
   }, []);
 
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(telegramSupportUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
   return (
-    <div className="max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2.5">
-          <Headphones className="w-6 h-6 text-amber-400" /> Customer Service
+    <div className="max-w-xl mx-auto space-y-6 pt-4 text-center">
+      {/* Header matching Screenshot 3 */}
+      <div className="space-y-1">
+        <h1 className="text-xl md:text-2xl font-black text-slate-100 flex items-center justify-center gap-2">
+          <Headphones className="w-5 h-5 text-amber-400" /> Customer Service
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Connect directly with our 24/7 official Telegram Customer Service team for instant assistance.
+        <p className="text-xs text-slate-400">
+          Scan the QR or contact us on Telegram for support.
         </p>
       </div>
 
-      {/* Main Telegram Customer Service Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/40 via-brand-surface to-brand-surface border border-amber-500/30 p-6 md:p-8 space-y-6 shadow-2xl">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-          {/* Left Description */}
-          <div className="space-y-4 text-center md:text-left flex-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
-              <MessageCircle className="w-4 h-4 text-amber-400" /> 24/7 TELEGRAM SERVICE
-            </div>
-            
-            <h2 className="text-2xl font-black text-slate-100 leading-tight">
-              VIP Customer Service Desk
-            </h2>
-
-            <p className="text-xs text-slate-300 leading-relaxed font-medium">
-              {telegramSupportMessage}
-            </p>
-
-            <div className="pt-2 flex flex-wrap items-center justify-center md:justify-start gap-3">
-              <a
-                href={telegramSupportUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block"
-              >
-                <Button
-                  variant="gold"
-                  size="md"
-                  leftIcon={<Send className="w-4 h-4" />}
-                  rightIcon={<ExternalLink className="w-4 h-4" />}
-                >
-                  Contact Us on Telegram
-                </Button>
-              </a>
-            </div>
+      {/* Center White Card matching Screenshot 3 */}
+      <Card className="p-6 md:p-8 space-y-6 bg-brand-surface border border-amber-500/30 rounded-3xl shadow-2xl flex flex-col items-center">
+        {/* QR Code Container */}
+        <div className="relative p-3 bg-slate-950 border border-amber-500/40 rounded-2xl shadow-xl flex flex-col items-center max-w-[260px]">
+          <div className="bg-white p-2.5 rounded-xl shadow-md">
+            <img
+              src={telegramSupportQrCode}
+              alt="Telegram Customer Service QR Code"
+              className="w-48 h-48 object-contain rounded-lg"
+            />
           </div>
 
-          {/* Right QR Code Card */}
-          <div className="flex flex-col items-center bg-brand-card/90 border border-amber-500/30 p-5 rounded-2xl shadow-xl shrink-0 space-y-3">
-            <div className="bg-white p-2.5 rounded-2xl shadow-lg border border-slate-200">
-              <img
-                src={telegramSupportQrCode}
-                alt="Telegram Customer Service QR Code"
-                className="w-36 h-36 object-contain rounded-xl"
-              />
-            </div>
-
-            <div className="text-center space-y-1">
-              <span className="text-xs font-bold text-amber-400 flex items-center justify-center gap-1">
-                <QrCode className="w-3.5 h-3.5 text-amber-400" /> Scan QR to Chat
-              </span>
-              <p className="text-[10px] text-slate-400 max-w-[140px]">
-                Scan with phone camera to open Telegram chat instantly.
-              </p>
-            </div>
+          <div className="text-[11px] font-bold text-amber-400 font-mono mt-2 flex items-center justify-center gap-1">
+            <QrCode className="w-3.5 h-3.5 text-amber-400" /> @CUSTOMER_SUPPORT
           </div>
         </div>
-      </div>
+
+        {/* Buttons Row matching Screenshot 3 */}
+        <div className="flex items-center justify-center gap-3 w-full max-w-xs pt-2">
+          <Button
+            variant="secondary"
+            size="md"
+            className="flex-1 border-slate-700 hover:border-slate-500"
+            leftIcon={copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            onClick={handleCopyLink}
+          >
+            {copied ? 'Copied!' : 'Copy Link'}
+          </Button>
+
+          <a
+            href={telegramSupportUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex-1"
+          >
+            <Button
+              variant="gold"
+              size="md"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white border-0 shadow-lg shadow-purple-600/30"
+              leftIcon={<Send className="w-4 h-4" />}
+            >
+              Open Telegram
+            </Button>
+          </a>
+        </div>
+      </Card>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { girlProfileService } from '../../services/girlProfile.service';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
@@ -9,9 +9,13 @@ import { Modal } from '../../components/common/Modal';
 import { Sparkles, Calendar, MapPin, Heart, Flame, Star, Tag, CheckCircle2 } from 'lucide-react';
 
 export const MatchesPage: React.FC = () => {
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<any[]>([]);
   const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Apply for Date Modal State
+  const [applyDateProfile, setApplyDateProfile] = useState<any | null>(null);
 
   // Fetch admin curated girl profiles
   const loadProfiles = useCallback(async () => {
@@ -131,16 +135,15 @@ export const MatchesPage: React.FC = () => {
                     >
                       View Details
                     </Button>
-                    <Link to="/verification" className="flex-1">
-                      <Button
-                        variant="gold"
-                        size="sm"
-                        className="w-full"
-                        leftIcon={<Calendar className="w-3.5 h-3.5" />}
-                      >
-                        Apply Date
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="gold"
+                      size="sm"
+                      className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                      leftIcon={<Calendar className="w-3.5 h-3.5" />}
+                      onClick={() => setApplyDateProfile(profile)}
+                    >
+                      Apply for a date
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -230,11 +233,56 @@ export const MatchesPage: React.FC = () => {
               <Button variant="secondary" onClick={() => setSelectedProfile(null)}>
                 Close
               </Button>
-              <Link to="/verification">
-                <Button variant="gold" leftIcon={<Calendar className="w-4 h-4" />}>
-                  Apply for Date (VIP Access)
-                </Button>
-              </Link>
+              <Button
+                variant="gold"
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                leftIcon={<Calendar className="w-4 h-4" />}
+                onClick={() => {
+                  setApplyDateProfile(selectedProfile);
+                  setSelectedProfile(null);
+                }}
+              >
+                Apply for a date
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* APPLY FOR A DATE POPUP MODAL (Matching Screenshot 1) */}
+      {applyDateProfile && (
+        <Modal
+          isOpen={true}
+          onClose={() => setApplyDateProfile(null)}
+          title="Apply for a date"
+          subtitle={`Profile: ${applyDateProfile.name}`}
+          maxWidth="sm"
+        >
+          <div className="space-y-6 pt-1 text-center">
+            <p className="text-xs text-slate-300 font-medium leading-relaxed">
+              Please contact customer service to apply for this date.
+            </p>
+
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setApplyDateProfile(null)}
+                className="bg-white hover:bg-slate-100 text-slate-900 border border-slate-300 font-bold px-5"
+              >
+                Close
+              </Button>
+              <Button
+                variant="gold"
+                size="md"
+                className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                onClick={() => {
+                  setApplyDateProfile(null);
+                  navigate('/support');
+                }}
+              >
+                Contact Customer Service
+              </Button>
             </div>
           </div>
         </Modal>
