@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSystemSettings } from '../contexts/SystemSettingsContext';
 import { brandConfig } from '../config/brand.config';
 import { Badge } from '../components/common/Badge';
-import { Bell, Wallet as WalletIcon, LogOut, ShieldCheck, User as UserIcon } from 'lucide-react';
+import { Bell, Wallet as WalletIcon, LogOut } from 'lucide-react';
 import { notificationService } from '../services/notification.service';
 import { Notification } from '../types';
 
 export const Navbar: React.FC = () => {
   const { user, wallet, logout, isAdmin } = useAuth();
+  const { settings } = useSystemSettings();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
@@ -34,17 +36,31 @@ export const Navbar: React.FC = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
+  const currentAppName = settings.appName || brandConfig.name;
+  const currencySymbol = settings.currencySymbol || '₹';
+
   return (
     <header className="h-16 bg-brand-surface/90 backdrop-blur-md border-b border-brand-border sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
-      {/* Brand Logo */}
+      {/* Brand Logo & App Name */}
       <div className="flex items-center gap-3">
         <Link to={isAdmin ? '/admin/dashboard' : '/dashboard'} className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-wine to-purple-600 flex items-center justify-center shadow-lg shadow-brand-wine/30 group-hover:scale-105 transition-transform">
-            <span className="font-extrabold text-lg text-white tracking-wider">W</span>
-          </div>
+          {settings.projectImage ? (
+            <img
+              src={settings.projectImage}
+              alt={currentAppName}
+              className="w-10 h-10 rounded-xl object-cover border border-amber-500/40 shadow-lg group-hover:scale-105 transition-transform"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-wine to-purple-600 flex items-center justify-center shadow-lg shadow-brand-wine/30 group-hover:scale-105 transition-transform">
+              <span className="font-extrabold text-lg text-white tracking-wider">
+                {currentAppName.charAt(0)}
+              </span>
+            </div>
+          )}
+
           <div>
-            <h1 className="font-bold text-base tracking-tight text-slate-100 group-hover:text-brand-wine transition-colors">
-              {brandConfig.name}
+            <h1 className="font-extrabold text-base tracking-tight text-slate-100 group-hover:text-amber-400 transition-colors">
+              {currentAppName}
             </h1>
             <p className="text-[10px] text-slate-400 font-medium -mt-0.5 uppercase tracking-widest">VIP Club</p>
           </div>
@@ -62,7 +78,7 @@ export const Navbar: React.FC = () => {
             <WalletIcon className="w-4 h-4 text-emerald-400" />
             <span className="text-slate-400">Available:</span>
             <span className="text-emerald-400 font-bold">
-              ₹{wallet.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              {currencySymbol}{wallet.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
             </span>
           </Link>
         )}

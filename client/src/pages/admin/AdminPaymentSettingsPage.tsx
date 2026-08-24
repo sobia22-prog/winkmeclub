@@ -114,7 +114,7 @@ export const AdminPaymentSettingsPage: React.FC = () => {
 
             <ImageUploadPicker
               label="Telegram Support Account QR Code Image (Upload or Paste URL)"
-              value={form.telegramSupportQrCode}
+              value={form.telegramSupportQrCode || ''}
               onChange={(url) => setForm({ ...form, telegramSupportQrCode: url })}
               helperText="Upload your custom Telegram account QR Code image. Users will scan this on /support page."
             />

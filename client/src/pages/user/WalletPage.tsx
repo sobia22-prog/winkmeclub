@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { walletService } from '../../services/wallet.service';
 import { systemSettingsService } from '../../services/systemSettings.service';
 import { RechargeRequest, WithdrawalRequest } from '../../types';
@@ -11,7 +12,6 @@ import { Select } from '../../components/common/Select';
 import { Badge } from '../../components/common/Badge';
 import { Table } from '../../components/common/Table';
 import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
-import { brandConfig } from '../../config/brand.config';
 import {
   Wallet,
   PlusCircle,
@@ -32,6 +32,7 @@ import {
 
 export const WalletPage: React.FC = () => {
   const { wallet, refreshSession } = useAuth();
+  const { settings } = useSystemSettings();
   const [recharges, setRecharges] = useState<RechargeRequest[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [showRechargeModal, setShowRechargeModal] = useState(false);
@@ -44,6 +45,8 @@ export const WalletPage: React.FC = () => {
   const [usdtRateINR, setUsdtRateINR] = useState(92.0);
   const [cryptoDepositAddress, setCryptoDepositAddress] = useState('TXYZ987654321WinkMeClubUSDTDepositAddr');
   const [telegramFinanceUrl, setTelegramFinanceUrl] = useState('https://t.me/winkmedatingclub_finance');
+
+  const currencySymbol = settings.currencySymbol || '₹';
 
   useEffect(() => {
     systemSettingsService
@@ -191,12 +194,12 @@ export const WalletPage: React.FC = () => {
         </div>
       )}
 
-      {/* Balance Summary Cards (Available Balance & Frozen Balance only per client directive) */}
+      {/* Balance Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Card className="border-t-4 border-t-emerald-500 space-y-2">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Available Balance</p>
           <h2 className="text-3xl font-extrabold text-slate-100">
-            ₹{wallet?.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
+            {currencySymbol}{wallet?.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
           </h2>
           <p className="text-[11px] text-slate-500">Unlocked and available for instant trades & withdrawals.</p>
         </Card>
@@ -204,7 +207,7 @@ export const WalletPage: React.FC = () => {
         <Card className="border-t-4 border-t-amber-500 space-y-2">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Frozen Balance</p>
           <h2 className="text-3xl font-extrabold text-slate-100">
-            ₹{wallet?.frozenBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
+            {currencySymbol}{wallet?.frozenBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
           </h2>
           <p className="text-[11px] text-slate-500">Held during active trades or pending withdrawal requests.</p>
         </Card>
@@ -219,12 +222,12 @@ export const WalletPage: React.FC = () => {
         {recharges.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-6">No add-funds deposit requests found.</p>
         ) : (
-          <Table headers={['Request ID', 'Amount (₹)', 'Payment Method', 'Ref / TxHash', 'Status', 'Receipt']}>
+          <Table headers={[`Request ID`, `Amount (${currencySymbol})`, 'Payment Method', 'Ref / TxHash', 'Status', 'Receipt']}>
             {recharges.map((r) => (
               <tr key={r._id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3 font-mono font-bold text-slate-200">{r.requestId}</td>
                 <td className="px-5 py-3 font-bold text-emerald-400">
-                  +₹{r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  +{currencySymbol}{r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-5 py-3 text-xs text-slate-300">{r.paymentMethod}</td>
                 <td className="px-5 py-3 font-mono text-xs text-slate-400">{r.referenceNumber}</td>
@@ -265,12 +268,12 @@ export const WalletPage: React.FC = () => {
         {withdrawals.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-6">No payout withdrawal requests submitted.</p>
         ) : (
-          <Table headers={['Request ID', 'Amount (₹)', 'Method & Details', 'Holder Name', 'Status']}>
+          <Table headers={[`Request ID`, `Amount (${currencySymbol})`, 'Method & Details', 'Holder Name', 'Status']}>
             {withdrawals.map((w: any) => (
               <tr key={w._id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3 font-mono font-bold text-slate-200">{w.requestId}</td>
                 <td className="px-5 py-3 font-bold text-rose-400">
-                  -₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  -{currencySymbol}{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-5 py-3 text-xs text-slate-300">
                   <div className="font-semibold text-slate-200">{w.paymentMethod || 'Bank Account'}</div>
@@ -340,7 +343,7 @@ export const WalletPage: React.FC = () => {
               <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl space-y-3 text-xs">
                 <div className="flex items-center justify-between font-bold text-amber-300">
                   <span className="flex items-center gap-1.5"><Coins className="w-4 h-4 text-amber-400" /> USDT Crypto Deposit Rate</span>
-                  <span className="px-2 py-0.5 bg-amber-500/20 rounded-md text-[11px]">1 USDT = ₹{usdtRateINR.toFixed(2)}</span>
+                  <span className="px-2 py-0.5 bg-amber-500/20 rounded-md text-[11px]">1 USDT = {currencySymbol}{usdtRateINR.toFixed(2)}</span>
                 </div>
 
                 <div className="space-y-1">
@@ -358,13 +361,13 @@ export const WalletPage: React.FC = () => {
                 </div>
 
                 <div className="text-[11px] text-slate-300 font-medium">
-                  Amount in USDT: <span className="font-bold text-emerald-400">~{usdtEquivalent} USDT</span> (calculated at ₹{usdtRateINR}/USDT)
+                  Amount in USDT: <span className="font-bold text-emerald-400">~{usdtEquivalent} USDT</span> (calculated at {currencySymbol}{usdtRateINR}/USDT)
                 </div>
               </div>
             )}
 
             <Input
-              label="Deposit Amount (₹)"
+              label={`Deposit Amount (${currencySymbol})`}
               type="number"
               value={rechargeForm.amount}
               onChange={(e) => setRechargeForm({ ...rechargeForm, amount: Number(e.target.value) })}
@@ -428,7 +431,7 @@ export const WalletPage: React.FC = () => {
             />
 
             <Input
-              label="Withdrawal Amount (₹)"
+              label={`Withdrawal Amount (${currencySymbol})`}
               type="number"
               value={withdrawForm.amount}
               onChange={(e) => setWithdrawForm({ ...withdrawForm, amount: Number(e.target.value) })}
@@ -518,7 +521,7 @@ export const WalletPage: React.FC = () => {
             )}
 
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="secondary" onClick={() => setShowWithdrawModal(false)} type="button">
+              <Button variant="secondary" onClick={() => setShowRechargeModal(false)} type="button">
                 Cancel
               </Button>
               <Button variant="gold" type="submit" isLoading={loading}>

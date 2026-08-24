@@ -1,17 +1,24 @@
 import api from './api';
 
 export interface SystemSettingsData {
-  telegramFinanceLink: string;
-  telegramSupportLink: string;
-  telegramSupportQrCode: string;
+  appName?: string;
+  defaultCurrency?: 'INR' | 'EUR' | 'USD';
+  currencySymbol?: string;
+  projectImage?: string;
+  maintenanceMode?: boolean;
+  supportEmail?: string;
+  defaultLanguage?: 'English' | 'Hindi' | 'Tamil' | 'Telugu' | 'Bengali';
+  telegramFinanceLink?: string;
+  telegramSupportLink?: string;
+  telegramSupportQrCode?: string;
   telegramSupportMessage?: string;
-  usdtWalletAddress: string;
-  usdtExchangeRate: number;
-  adminUpiId: string;
-  bankName: string;
-  accountHolder: string;
-  accountNumber: string;
-  ifscCode: string;
+  usdtWalletAddress?: string;
+  usdtExchangeRate?: number;
+  adminUpiId?: string;
+  bankName?: string;
+  accountHolder?: string;
+  accountNumber?: string;
+  ifscCode?: string;
 }
 
 export const systemSettingsService = {

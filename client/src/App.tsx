@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { SystemSettingsProvider } from './contexts/SystemSettingsContext';
 
 // Layouts
 import { UserLayout } from './layouts/UserLayout';
@@ -61,50 +62,52 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            {/* Public Auth Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/verify-otp" element={<VerifyOTPPage />} />
-            <Route path="/admin/login" element={<AdminLoginPage />} />
+          <SystemSettingsProvider>
+            <Routes>
+              {/* Public Auth Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/verify-otp" element={<VerifyOTPPage />} />
+              <Route path="/admin/login" element={<AdminLoginPage />} />
 
-            {/* Protected User Routes */}
-            <Route element={<UserLayout />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/matches" element={<MatchesPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/verification" element={<VerificationPage />} />
-              <Route path="/wallet" element={<WalletPage />} />
-              <Route path="/trades" element={<TradesPage />} />
-              <Route path="/transactions" element={<Navigate to="/wallet" replace />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/support" element={<SupportPage />} />
-            </Route>
+              {/* Protected User Routes */}
+              <Route element={<UserLayout />}>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/matches" element={<MatchesPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/verification" element={<VerificationPage />} />
+                <Route path="/wallet" element={<WalletPage />} />
+                <Route path="/trades" element={<TradesPage />} />
+                <Route path="/transactions" element={<Navigate to="/wallet" replace />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/support" element={<SupportPage />} />
+              </Route>
 
-            {/* Protected Admin Routes */}
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-              <Route path="/admin/girls" element={<AdminGirlProfilesPage />} />
-              <Route path="/admin/staff" element={<AdminStaffPage />} />
-              <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
-              <Route path="/admin/trades" element={<AdminTradesPage />} />
-              <Route path="/admin/recharges" element={<AdminRechargesPage />} />
-              <Route path="/admin/withdrawals" element={<AdminWithdrawalsPage />} />
-              <Route path="/admin/verifications" element={<AdminVerificationsPage />} />
-              <Route path="/admin/products" element={<AdminProductsPage />} />
-              <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
-              <Route path="/admin/announcements" element={<AdminAnnouncementsPage />} />
-              <Route path="/admin/support" element={<AdminSupportPage />} />
-              <Route path="/admin/settings" element={<AdminPaymentSettingsPage />} />
-              <Route path="/admin/profile" element={<AdminProfilePage />} />
-            </Route>
+              {/* Protected Admin Routes */}
+              <Route element={<AdminLayout />}>
+                <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                <Route path="/admin/girls" element={<AdminGirlProfilesPage />} />
+                <Route path="/admin/staff" element={<AdminStaffPage />} />
+                <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
+                <Route path="/admin/users" element={<AdminUsersPage />} />
+                <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
+                <Route path="/admin/trades" element={<AdminTradesPage />} />
+                <Route path="/admin/recharges" element={<AdminRechargesPage />} />
+                <Route path="/admin/withdrawals" element={<AdminWithdrawalsPage />} />
+                <Route path="/admin/verifications" element={<AdminVerificationsPage />} />
+                <Route path="/admin/products" element={<AdminProductsPage />} />
+                <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
+                <Route path="/admin/announcements" element={<AdminAnnouncementsPage />} />
+                <Route path="/admin/support" element={<AdminSupportPage />} />
+                <Route path="/admin/settings" element={<AdminPaymentSettingsPage />} />
+                <Route path="/admin/profile" element={<AdminProfilePage />} />
+              </Route>
 
-            {/* Fallback 404 */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+              {/* Fallback 404 */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </SystemSettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

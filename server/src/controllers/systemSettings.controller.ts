@@ -26,6 +26,12 @@ export class SystemSettingsController {
       }
 
       const {
+        appName,
+        defaultCurrency,
+        projectImage,
+        maintenanceMode,
+        supportEmail,
+        defaultLanguage,
         telegramFinanceLink,
         telegramSupportLink,
         telegramSupportQrCode,
@@ -43,6 +49,18 @@ export class SystemSettingsController {
       if (!settings) {
         settings = new SystemSettings({});
       }
+
+      if (appName !== undefined) settings.appName = appName;
+      if (defaultCurrency !== undefined) {
+        settings.defaultCurrency = defaultCurrency;
+        if (defaultCurrency === 'EUR') settings.currencySymbol = '€';
+        else if (defaultCurrency === 'USD') settings.currencySymbol = '$';
+        else settings.currencySymbol = '₹';
+      }
+      if (projectImage !== undefined) settings.projectImage = projectImage;
+      if (maintenanceMode !== undefined) settings.maintenanceMode = Boolean(maintenanceMode);
+      if (supportEmail !== undefined) settings.supportEmail = supportEmail;
+      if (defaultLanguage !== undefined) settings.defaultLanguage = defaultLanguage;
 
       if (telegramFinanceLink !== undefined) settings.telegramFinanceLink = telegramFinanceLink;
       if (telegramSupportLink !== undefined) settings.telegramSupportLink = telegramSupportLink;
@@ -62,7 +80,7 @@ export class SystemSettingsController {
 
       return res.status(200).json({
         success: true,
-        message: 'System settings updated successfully!',
+        message: 'System general & payment settings updated successfully!',
         settings,
       });
     } catch (error: any) {

@@ -1,6 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ISystemSettings extends Document {
+  appName: string;
+  defaultCurrency: 'INR' | 'EUR' | 'USD';
+  currencySymbol: string;
+  projectImage: string;
+  maintenanceMode: boolean;
+  supportEmail: string;
+  defaultLanguage: 'English' | 'Hindi' | 'Tamil' | 'Telugu' | 'Bengali';
   telegramFinanceLink: string;
   telegramSupportLink: string;
   telegramSupportQrCode: string;
@@ -17,6 +24,13 @@ export interface ISystemSettings extends Document {
 
 const SystemSettingsSchema: Schema = new Schema(
   {
+    appName: { type: String, default: 'Wink Me Club' },
+    defaultCurrency: { type: String, default: 'INR' },
+    currencySymbol: { type: String, default: '₹' },
+    projectImage: { type: String, default: '' },
+    maintenanceMode: { type: Boolean, default: false },
+    supportEmail: { type: String, default: 'support@winkmeclub.com' },
+    defaultLanguage: { type: String, default: 'English' },
     telegramFinanceLink: { type: String, default: 'https://t.me/winkmedatingclub_finance' },
     telegramSupportLink: { type: String, default: 'https://t.me/winkmedatingclub_support' },
     telegramSupportQrCode: {

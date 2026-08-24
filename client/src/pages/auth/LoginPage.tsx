@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { authService } from '../../services/auth.service';
 import { brandConfig } from '../../config/brand.config';
 import { Input } from '../../components/common/Input';
@@ -13,6 +14,7 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { loginSession } = useAuth();
+  const { settings } = useSystemSettings();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,14 +35,27 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const currentAppName = settings.appName || brandConfig.name;
+
   return (
     <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-brand-surface border border-brand-border rounded-3xl p-8 shadow-2xl shadow-black/80 space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-wine to-purple-600 mx-auto flex items-center justify-center shadow-xl shadow-brand-wine/30">
-            <span className="font-extrabold text-2xl text-white">W</span>
-          </div>
-          <h2 className="text-2xl font-bold text-slate-100">{brandConfig.name}</h2>
+          {settings.projectImage ? (
+            <img
+              src={settings.projectImage}
+              alt={currentAppName}
+              className="w-16 h-16 rounded-2xl mx-auto object-cover border-2 border-amber-500/40 shadow-xl"
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-wine to-purple-600 mx-auto flex items-center justify-center shadow-xl shadow-brand-wine/30">
+              <span className="font-extrabold text-2xl text-white">
+                {currentAppName.charAt(0)}
+              </span>
+            </div>
+          )}
+
+          <h2 className="text-2xl font-bold text-slate-100">{currentAppName}</h2>
           <p className="text-xs text-slate-400">Sign in to access your VIP club dashboard</p>
         </div>
 
