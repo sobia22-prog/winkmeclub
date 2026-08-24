@@ -24,6 +24,16 @@ export interface IUser extends Document {
   dob?: Date;
   age?: number;
   interests?: string[];
+  bankDetails?: {
+    bankName?: string;
+    accountHolder?: string;
+    accountNumber?: string;
+    ifscCode?: string;
+  };
+  upiId?: string;
+  phonePe?: string;
+  paytm?: string;
+  googlePay?: string;
   lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -54,6 +64,16 @@ const UserSchema: Schema = new Schema(
     dob: { type: Date },
     age: { type: Number, default: 24 },
     interests: [{ type: String }],
+    bankDetails: {
+      bankName: { type: String, default: '' },
+      accountHolder: { type: String, default: '' },
+      accountNumber: { type: String, default: '' },
+      ifscCode: { type: String, default: '' },
+    },
+    upiId: { type: String, default: '' },
+    phonePe: { type: String, default: '' },
+    paytm: { type: String, default: '' },
+    googlePay: { type: String, default: '' },
     lastLoginAt: { type: Date },
   },
   { timestamps: true }

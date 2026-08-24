@@ -25,7 +25,16 @@ export interface User {
   bio?: string;
   age?: number;
   dob?: string;
-  interests?: string[];
+  bankDetails?: {
+    bankName?: string;
+    accountHolder?: string;
+    accountNumber?: string;
+    ifscCode?: string;
+  };
+  upiId?: string;
+  phonePe?: string;
+  paytm?: string;
+  googlePay?: string;
   lastLoginAt?: string;
   createdAt?: string;
   wallet?: Wallet;

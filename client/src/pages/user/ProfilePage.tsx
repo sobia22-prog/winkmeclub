@@ -183,18 +183,15 @@ export const ProfilePage: React.FC = () => {
       {/* 4. GRID OF 7 MENU OPTION ITEMS (Matching SS 1 & SS 2 layout) */}
       <div className="bg-brand-surface border border-brand-border rounded-3xl p-5 shadow-xl space-y-6">
         <div className="grid grid-cols-2 gap-6 text-center">
-          {/* Item 1: Personal Information */}
-          <div
-            onClick={() => setIsEditModalOpen(true)}
-            className="flex flex-col items-center gap-2 cursor-pointer group"
-          >
+          {/* Item 1: Essential Information */}
+          <Link to="/profile/essential-information" className="flex flex-col items-center gap-2 group">
             <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
               <FileText className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-200 group-hover:text-purple-400 transition-colors">
-              Personal Information
+              Essential Information
             </span>
-          </div>
+          </Link>
 
           {/* Item 2: Announcements */}
           <Link to="/announcements" className="flex flex-col items-center gap-2 group">

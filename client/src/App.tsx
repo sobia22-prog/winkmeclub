@@ -19,6 +19,7 @@ import { StaffLoginPage } from './pages/auth/StaffLoginPage';
 import { DashboardPage } from './pages/user/DashboardPage';
 import { MatchesPage } from './pages/user/MatchesPage';
 import { ProfilePage } from './pages/user/ProfilePage';
+import { EssentialInformationPage } from './pages/user/EssentialInformationPage';
 import { VerificationPage } from './pages/user/VerificationPage';
 import { WalletPage } from './pages/user/WalletPage';
 import { TradesPage } from './pages/user/TradesPage';
@@ -78,6 +79,7 @@ export const App: React.FC = () => {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/matches" element={<MatchesPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/profile/essential-information" element={<EssentialInformationPage />} />
                 <Route path="/verification" element={<VerificationPage />} />
                 <Route path="/wallet" element={<WalletPage />} />
                 <Route path="/wallet/recharge" element={<WalletPage initialTab="recharge" />} />

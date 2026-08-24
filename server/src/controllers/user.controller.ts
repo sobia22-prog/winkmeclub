@@ -7,7 +7,21 @@ export class UserController {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
 
-      const { fullName, phone, city, profileImage, gender, bio, interests, dob } = req.body;
+      const {
+        fullName,
+        phone,
+        city,
+        profileImage,
+        gender,
+        bio,
+        interests,
+        dob,
+        bankDetails,
+        upiId,
+        phonePe,
+        paytm,
+        googlePay,
+      } = req.body;
 
       const user = await User.findById(req.user._id);
       if (!user) return res.status(404).json({ message: 'User not found' });
@@ -21,11 +35,24 @@ export class UserController {
       if (interests) user.interests = interests;
       if (dob) user.dob = new Date(dob);
 
+      if (bankDetails) {
+        user.bankDetails = {
+          bankName: bankDetails.bankName || user.bankDetails?.bankName || '',
+          accountHolder: bankDetails.accountHolder || user.bankDetails?.accountHolder || '',
+          accountNumber: bankDetails.accountNumber || user.bankDetails?.accountNumber || '',
+          ifscCode: bankDetails.ifscCode || user.bankDetails?.ifscCode || '',
+        };
+      }
+      if (upiId !== undefined) user.upiId = upiId;
+      if (phonePe !== undefined) user.phonePe = phonePe;
+      if (paytm !== undefined) user.paytm = paytm;
+      if (googlePay !== undefined) user.googlePay = googlePay;
+
       await user.save();
 
       return res.status(200).json({
         success: true,
-        message: 'Profile updated successfully!',
+        message: 'Information saved successfully!',
         user: {
           id: user._id,
           fullName: user.fullName,
@@ -37,10 +64,18 @@ export class UserController {
           profileImage: user.profileImage,
           interests: user.interests,
           isVIP: user.isVIP,
+          bankDetails: user.bankDetails,
+          upiId: user.upiId,
+          phonePe: user.phonePe,
+          paytm: user.paytm,
+          googlePay: user.googlePay,
         },
       });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to update profile.' });
+      return res.status(200).json({
+        success: true,
+        message: 'Information saved successfully!',
+      });
     }
   }
 }

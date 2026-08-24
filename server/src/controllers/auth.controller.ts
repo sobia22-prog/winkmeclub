@@ -316,6 +316,11 @@ export class AuthController {
           bio: req.user.bio,
           age: req.user.age,
           interests: req.user.interests,
+          bankDetails: req.user.bankDetails,
+          upiId: req.user.upiId,
+          phonePe: req.user.phonePe,
+          paytm: req.user.paytm,
+          googlePay: req.user.googlePay,
         },
         wallet: {
           availableBalance: wallet.availableBalance,
