@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { Trade, ITrade, TradeOutcome } from '../models/trade.model';
 import { WalletService } from './wallet.service';
 import { NotificationService } from './notification.service';
-import { Wallet } from '../models/wallet.model';
 
 export class TradeSettlementService {
   static async executeTrade(
@@ -10,10 +9,11 @@ export class TradeSettlementService {
     productId: string,
     productName: string,
     productImage: string,
-    quantity: number,
-    price: number
+    quantityMoney: number,
+    itemPrice: number
   ): Promise<ITrade> {
-    const totalAmount = Number((price * quantity).toFixed(2));
+    // Quantity passed is the trading money balance amount!
+    const totalAmount = Number(Number(quantityMoney).toFixed(2));
     const tradeId = `TRD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
 
     // Ensure user has enough available balance
@@ -28,8 +28,8 @@ export class TradeSettlementService {
       productId,
       productName,
       productImage,
-      quantity,
-      price,
+      quantity: totalAmount,
+      price: itemPrice || 1,
       totalAmount,
       status: 'PENDING',
       outcome: 'NONE',
@@ -38,7 +38,7 @@ export class TradeSettlementService {
     await NotificationService.createNotification(
       userId,
       'Airborne Trade Request Placed',
-      `Your trade request #${tradeId} for ${productName} (Qty: ${quantity}, Amount: ₹${totalAmount.toFixed(2)}) is now PENDING Admin review.`,
+      `Your trade request #${tradeId} for ${productName} (Trading Amount: ₹${totalAmount.toFixed(2)}) is now PENDING Admin review.`,
       'TRADE',
       '/trades'
     );

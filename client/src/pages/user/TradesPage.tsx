@@ -338,74 +338,76 @@ export const TradesPage: React.FC = () => {
         </div>
       )}
 
-      {/* TRADE CALCULATION BAR (Floating Bottom Sheet / Control Bar) */}
-      <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/98 backdrop-blur-2xl border-t border-brand-border p-4 md:p-6 shadow-2xl">
-        <div className="max-w-4xl mx-auto space-y-3 text-xs">
-          {/* Top Row: Current Selection & Total Items Non-Editable Badges */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-brand-border/60">
-            <div className="flex items-center gap-2 bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
-              <span className="text-slate-400 font-semibold shrink-0">Current Selection:</span>
-              <span className="font-bold text-fuchsia-400 truncate">{selectedProductNames}</span>
-            </div>
+      {/* TRADE CALCULATION BAR (Floating Bottom Sheet - ONLY SHOWN IF ITEMS SELECTED FOR TRADE) */}
+      {selectedProducts.length > 0 && (
+        <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/98 backdrop-blur-2xl border-t border-brand-border p-4 md:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+          <div className="max-w-4xl mx-auto space-y-3 text-xs">
+            {/* Top Row: Current Selection & Total Items Non-Editable Badges */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-brand-border/60">
+              <div className="flex items-center gap-2 bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
+                <span className="text-slate-400 font-semibold shrink-0">Current Selection:</span>
+                <span className="font-bold text-fuchsia-400 truncate">{selectedProductNames}</span>
+              </div>
 
-            <div className="flex items-center justify-between bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
-              <span className="text-slate-400 font-semibold">Total Items:</span>
-              <span className="font-mono font-bold text-amber-400">{totalItemsCount} item{totalItemsCount === 1 ? '' : 's'} selected</span>
-            </div>
-          </div>
-
-          {/* Middle Row: Quantity (Balance Trading Money Input) & Available Balance */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-            {/* Quantity Input (Money Quantity) */}
-            <div className="space-y-1">
-              <label className="block text-[11px] font-semibold text-slate-300">
-                Quantity (Balance Trading)
-              </label>
-              <input
-                type="number"
-                step="100"
-                min="100"
-                value={tradeQuantityMoney}
-                onChange={(e) => setTradeQuantityMoney(Number(e.target.value))}
-                className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-slate-100 font-mono font-bold focus:outline-none focus:border-fuchsia-500"
-              />
-            </div>
-
-            {/* Available Balance (Non-Editable) */}
-            <div className="space-y-1">
-              <label className="block text-[11px] font-semibold text-slate-400">
-                Available Balance
-              </label>
-              <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-emerald-400 font-mono font-bold">
-                ₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              <div className="flex items-center justify-between bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
+                <span className="text-slate-400 font-semibold">Total Items:</span>
+                <span className="font-mono font-bold text-amber-400">{totalItemsCount} item{totalItemsCount === 1 ? '' : 's'} selected</span>
               </div>
             </div>
 
-            {/* Tickets (Non-Editable = Quantity) */}
-            <div className="space-y-1">
-              <label className="block text-[11px] font-semibold text-slate-400">
-                Tickets (Trading Balance)
-              </label>
-              <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-amber-400 font-mono font-bold">
-                ₹{tradeQuantityMoney.toLocaleString('en-IN')}
+            {/* Middle Row: Quantity (Balance Trading Money Input) & Available Balance */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+              {/* Quantity Input (Money Quantity) */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-slate-300">
+                  Quantity (Balance Trading)
+                </label>
+                <input
+                  type="number"
+                  step="100"
+                  min="100"
+                  value={tradeQuantityMoney}
+                  onChange={(e) => setTradeQuantityMoney(Number(e.target.value))}
+                  className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-slate-100 font-mono font-bold focus:outline-none focus:border-fuchsia-500"
+                />
+              </div>
+
+              {/* Available Balance (Non-Editable) */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-slate-400">
+                  Available Balance
+                </label>
+                <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-emerald-400 font-mono font-bold">
+                  ₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </div>
+              </div>
+
+              {/* Tickets (Non-Editable = Quantity) */}
+              <div className="space-y-1">
+                <label className="block text-[11px] font-semibold text-slate-400">
+                  Tickets (Trading Balance)
+                </label>
+                <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-amber-400 font-mono font-bold">
+                  ₹{tradeQuantityMoney.toLocaleString('en-IN')}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Bottom Row: Execute Trade Action Button */}
-          <div className="pt-1">
-            <button
-              type="button"
-              onClick={handleExecuteTrade}
-              disabled={loading || selectedProducts.length === 0}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-xl shadow-pink-500/30 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <ShoppingBag className="w-4 h-4" />
-              {loading ? 'Processing Trade...' : selectedProducts.length === 0 ? 'Select Item(s) Above to Trade' : 'Confirm Airborne Trade'}
-            </button>
+            {/* Bottom Row: Execute Trade Action Button */}
+            <div className="pt-1">
+              <button
+                type="button"
+                onClick={handleExecuteTrade}
+                disabled={loading}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-xl shadow-pink-500/30 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                {loading ? 'Processing Trade...' : 'Confirm Airborne Trade'}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Insufficient Balance Popup Modal */}
       {showInsufficientBalanceModal && (
