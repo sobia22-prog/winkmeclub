@@ -13,6 +13,7 @@ router.get('/dashboard', AdminController.getDashboardStats);
 
 // Staff Members Management (Super Admin Only)
 router.get('/staff', requireSuperAdmin, AdminController.getStaffMembers);
+router.get('/staff/:id', requireSuperAdmin, AdminController.getStaffDetail);
 router.post('/staff', requireSuperAdmin, AdminController.createStaffMember);
 router.put('/staff/:id', requireSuperAdmin, AdminController.updateStaffMember);
 router.delete('/staff/:id', requireSuperAdmin, AdminController.deleteStaffMember);

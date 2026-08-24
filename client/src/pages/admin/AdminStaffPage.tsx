@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { adminService } from '../../services/admin.service';
 import { User } from '../../types';
 import { Card } from '../../components/common/Card';
@@ -20,6 +21,7 @@ import {
   Key,
   ShieldAlert,
   UserCheck,
+  Eye,
 } from 'lucide-react';
 
 export const AdminStaffPage: React.FC = () => {
@@ -230,6 +232,11 @@ export const AdminStaffPage: React.FC = () => {
                 </td>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
+                    <Link to={`/admin/staff/${s._id || s.id}`}>
+                      <Button variant="gold" size="sm" leftIcon={<Eye className="w-3.5 h-3.5" />}>
+                        View Profile
+                      </Button>
+                    </Link>
                     <button
                       onClick={() => handleOpenEdit(s)}
                       className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"

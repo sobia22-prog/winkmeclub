@@ -39,6 +39,7 @@ import { AdminSupportPage } from './pages/admin/AdminSupportPage';
 import { AdminProfilePage } from './pages/admin/AdminProfilePage';
 import { AdminPaymentSettingsPage } from './pages/admin/AdminPaymentSettingsPage';
 import { AdminStaffPage } from './pages/admin/AdminStaffPage';
+import { AdminStaffDetailPage } from './pages/admin/AdminStaffDetailPage';
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ export const App: React.FC = () => {
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
               <Route path="/admin/staff" element={<AdminStaffPage />} />
+              <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
               <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
               <Route path="/admin/trades" element={<AdminTradesPage />} />

@@ -809,6 +809,87 @@ export class AdminController {
     }
   }
 
+  static async getStaffDetail(req: AuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const staff = await User.findById(id).select('-passwordHash');
+      if (!staff || staff.role !== 'STAFF') {
+        return res.status(404).json({ message: 'Staff member profile not found.' });
+      }
+
+      // Fetch all assigned clients
+      const clients = await User.find({ assignedStaff: staff._id }).select('-passwordHash').sort({ createdAt: -1 });
+      const clientIds = clients.map((c) => c._id);
+
+      // Fetch wallets for assigned clients
+      const wallets = await Wallet.find({ userId: { $in: clientIds } });
+
+      const clientsWithWallets = clients.map((client) => {
+        const clientWallet = wallets.find((w) => w.userId.toString() === client._id.toString());
+        return {
+          ...client.toObject(),
+          wallet: {
+            availableBalance: clientWallet?.availableBalance || 0,
+            frozenBalance: clientWallet?.frozenBalance || 0,
+            totalBalance: clientWallet?.totalBalance || 0,
+          },
+        };
+      });
+
+      // Fetch trades, recharges, withdrawals, verifications, and transactions for assigned clients
+      const trades = await Trade.find({ userId: { $in: clientIds } })
+        .populate('userId', 'fullName email')
+        .populate('productId')
+        .sort({ createdAt: -1 });
+
+      const recharges = await RechargeRequest.find({ userId: { $in: clientIds } })
+        .populate('userId', 'fullName email')
+        .sort({ createdAt: -1 });
+
+      const withdrawals = await WithdrawalRequest.find({ userId: { $in: clientIds } })
+        .populate('userId', 'fullName email')
+        .sort({ createdAt: -1 });
+
+      const verifications = await Verification.find({ userId: { $in: clientIds } })
+        .populate('userId', 'fullName email')
+        .sort({ createdAt: -1 });
+
+      const transactions = await Transaction.find({ userId: { $in: clientIds } })
+        .populate('userId', 'fullName email')
+        .sort({ createdAt: -1 });
+
+      // Performance stats
+      const totalApprovedRevenue = recharges
+        .filter((r) => r.status === 'APPROVED')
+        .reduce((sum, r) => sum + (r.amount || 0), 0);
+
+      const totalTradeVolume = trades.reduce((sum, t) => sum + (t.totalAmount || 0), 0);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          staff,
+          stats: {
+            clientCount: clients.length,
+            totalApprovedRevenue,
+            totalTradeVolume,
+            tradesCount: trades.length,
+            rechargesCount: recharges.length,
+            withdrawalsCount: withdrawals.length,
+          },
+          clients: clientsWithWallets,
+          trades,
+          recharges,
+          withdrawals,
+          verifications,
+          transactions,
+        },
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to fetch staff member details.' });
+    }
+  }
+
   static async assignClientStaff(req: AuthRequest, res: Response) {
     try {
       const { userId } = req.params;

@@ -13,6 +13,7 @@ export const adminService = {
     api.patch(`/admin/users/${id}/status`, data),
   
   getStaffMembers: () => api.get('/admin/staff'),
+  getStaffDetail: (id: string) => api.get(`/admin/staff/${id}`),
   createStaffMember: (data: any) => api.post('/admin/staff', data),
   updateStaffMember: (id: string, data: any) => api.put(`/admin/staff/${id}`, data),
   deleteStaffMember: (id: string) => api.delete(`/admin/staff/${id}`),
