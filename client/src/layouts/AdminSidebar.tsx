@@ -32,9 +32,6 @@ export const AdminSidebar: React.FC = () => {
         { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-4 h-4" /> },
         { label: 'Withdrawal Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
         { label: 'Verifications', path: '/admin/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
-        { label: 'Transactions', path: '/admin/transactions', icon: <History className="w-4 h-4" /> },
-        { label: 'Customer Service', path: '/admin/support', icon: <Headphones className="w-4 h-4" /> },
-        { label: 'Profile', path: '/admin/profile', icon: <User className="w-4 h-4" /> },
       ]
     : [
         { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },

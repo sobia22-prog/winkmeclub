@@ -21,12 +21,15 @@ export const AdminLayout: React.FC = () => {
     return <Navigate to="/admin/login" replace />;
   }
 
-  // Restrict Staff from accessing platform settings, products, announcements, and staff management pages
+  // Restrict Staff from accessing platform settings, products, announcements, staff, transactions, support, and profile pages
   const forbiddenStaffPaths = [
     '/admin/products',
     '/admin/announcements',
     '/admin/settings',
     '/admin/staff',
+    '/admin/transactions',
+    '/admin/support',
+    '/admin/profile',
   ];
 
   if (user.role === 'STAFF' && forbiddenStaffPaths.includes(location.pathname)) {
