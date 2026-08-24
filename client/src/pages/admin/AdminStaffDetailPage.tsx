@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Activity,
   UserCheck,
+  X,
   Clock,
   ExternalLink,
   Lock,
@@ -472,12 +473,12 @@ export const AdminStaffDetailPage: React.FC = () => {
           <Modal
             isOpen={true}
             onClose={() => setSelectedClient(null)}
-            title={`Client Operations — ${selectedClient.fullName}`}
             maxWidth="6xl"
+            hideHeader={true}
           >
             <div className="space-y-6">
-              {/* Top Profile Card */}
-              <div className="p-4 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-surface border border-amber-500/30 rounded-2xl flex items-center justify-between gap-4 shadow-lg">
+              {/* Top Profile Card Container */}
+              <div className="relative p-4 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-surface border border-amber-500/30 rounded-2xl flex items-center justify-between gap-4 shadow-lg">
                 <div className="flex items-center gap-4">
                   <img
                     src={selectedClient.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
@@ -494,6 +495,15 @@ export const AdminStaffDetailPage: React.FC = () => {
                     <p className="text-[11px] text-slate-500 mt-0.5">📍 {selectedClient.city || 'Mumbai'} • {selectedClient.gender || 'Female'}</p>
                   </div>
                 </div>
+
+                {/* Close Icon Inside Profile Container */}
+                <button
+                  onClick={() => setSelectedClient(null)}
+                  className="p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors shrink-0"
+                  title="Close Modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
               {/* 2-Column Layout */}

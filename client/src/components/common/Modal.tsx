@@ -4,19 +4,21 @@ import { X } from 'lucide-react';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   subtitle?: string;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'full';
+  hideHeader?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
-  title,
+  title = '',
   subtitle,
   children,
   maxWidth = 'md',
+  hideHeader = false,
 }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,18 +55,20 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         className={`w-full ${maxWidths[maxWidth]} bg-brand-surface border border-amber-500/30 rounded-3xl shadow-2xl shadow-black/90 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200`}
       >
-        <div className="flex items-center justify-between px-6 py-4.5 border-b border-brand-border bg-gradient-to-r from-brand-surface via-brand-card to-brand-surface">
-          <div>
-            <h3 className="text-lg font-bold text-slate-100">{title}</h3>
-            {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+        {!hideHeader && title && (
+          <div className="flex items-center justify-between px-6 py-4.5 border-b border-brand-border bg-gradient-to-r from-brand-surface via-brand-card to-brand-surface">
+            <div>
+              <h3 className="text-lg font-bold text-slate-100">{title}</h3>
+              {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+            </div>
+            <button
+              onClick={onClose}
+              className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        )}
         <div className="p-6 overflow-y-auto">{children}</div>
       </div>
     </div>
