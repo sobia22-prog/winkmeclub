@@ -73,7 +73,7 @@ export const AdminStaffDetailPage: React.FC = () => {
     );
   }
 
-  const { staff, stats, clients, trades, recharges, withdrawals, transactions } = data;
+  const { staff = {}, stats = {}, clients = [], trades = [], recharges = [], withdrawals = [], transactions = [] } = data || {};
 
   return (
     <div className="space-y-6 w-full">
@@ -93,18 +93,18 @@ export const AdminStaffDetailPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border-2 border-amber-500/40 text-amber-400 flex items-center justify-center font-black text-2xl shadow-xl shrink-0">
-              {staff.fullName.charAt(0).toUpperCase()}
+              {staff.fullName?.charAt(0).toUpperCase() || 'S'}
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-black text-slate-100">{staff.fullName}</h1>
+                <h1 className="text-2xl font-black text-slate-100">{staff.fullName || 'Staff Member'}</h1>
                 {staff.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE STAFF</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
               </div>
               <p className="text-xs text-slate-400 mt-1">
                 {staff.email} {staff.phone ? `• ${staff.phone}` : ''}
               </p>
               <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
-                Joined: {new Date(staff.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                Joined: {staff.createdAt ? new Date(staff.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}
               </p>
             </div>
           </div>

@@ -312,7 +312,9 @@ export const AdminUsersPage: React.FC = () => {
                 <td className="px-5 py-3 text-xs">
                   {u.assignedStaff ? (
                     <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-bold text-[11px]">
-                      {u.assignedStaff.invitationCode || u.assignedStaff.fullName}
+                      {typeof u.assignedStaff === 'object'
+                        ? (u.assignedStaff.invitationCode || u.assignedStaff.fullName || 'Staff')
+                        : u.assignedStaff}
                     </span>
                   ) : (
                     <span className="text-slate-500 text-[11px] italic">Unassigned</span>

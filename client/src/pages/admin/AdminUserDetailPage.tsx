@@ -17,7 +17,7 @@ export const AdminUserDetailPage: React.FC = () => {
         .getUserDetail(id)
         .then((res) => {
           if (res.data.success) {
-            setData(res.data);
+            setData(res.data.data || res.data);
           }
         })
         .catch((err) => console.error(err))
@@ -26,9 +26,9 @@ export const AdminUserDetailPage: React.FC = () => {
   }, [id]);
 
   if (loading) return <Card className="p-8 text-center text-xs text-slate-500">Loading user details...</Card>;
-  if (!data) return <Card className="p-8 text-center text-xs text-slate-500">User not found.</Card>;
+  if (!data || !data.user) return <Card className="p-8 text-center text-xs text-slate-500">User not found.</Card>;
 
-  const { user, wallet, transactions, recharges, withdrawals, trades, verification } = data;
+  const { user, wallet = { availableBalance: 0, frozenBalance: 0 }, transactions = [], recharges = [], withdrawals = [], trades = [], verification } = data;
 
   return (
     <div className="space-y-6">
