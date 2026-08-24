@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { systemSettingsService } from '../../services/systemSettings.service';
-import { Card } from '../../components/common/Card';
 import { Input } from '../../components/common/Input';
 import { Textarea } from '../../components/common/Textarea';
 import { Button } from '../../components/common/Button';
 import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
-import { Headphones, CheckCircle2, Save, Send, QrCode } from 'lucide-react';
+import { Headphones, CheckCircle2, Save } from 'lucide-react';
 
 export const AdminSupportPage: React.FC = () => {
   const [telegramSupportLink, setTelegramSupportLink] = useState('https://t.me/winkmedatingclub_support');
@@ -74,7 +73,7 @@ export const AdminSupportPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2.5">
@@ -100,72 +99,52 @@ export const AdminSupportPage: React.FC = () => {
         </div>
       )}
 
-      {/* Main Settings Form */}
-      <Card className="p-6 md:p-8 space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Telegram Link */}
-          <Input
-            label="Telegram link"
-            placeholder="https://t.me/your_handle"
-            value={telegramSupportLink}
-            onChange={(e) => setTelegramSupportLink(e.target.value)}
-            helperText="Direct Telegram handle or channel URL for member customer support"
-            required
+      {/* Direct Form without extra Card wrapper (Full Width) */}
+      <form onSubmit={handleSubmit} className="w-full space-y-6">
+        {/* Telegram Link */}
+        <Input
+          label="Telegram link"
+          placeholder="https://t.me/your_handle"
+          value={telegramSupportLink}
+          onChange={(e) => setTelegramSupportLink(e.target.value)}
+          helperText="Direct Telegram handle or channel URL for member customer support"
+          required
+        />
+
+        {/* Support Message */}
+        <Textarea
+          label="Support message"
+          placeholder="Support message shown on member Customer Service page..."
+          value={telegramSupportMessage}
+          onChange={(e) => setTelegramSupportMessage(e.target.value)}
+          rows={4}
+          required
+        />
+
+        {/* Telegram QR Image */}
+        <div className="space-y-2">
+          <label className="block text-xs font-semibold text-slate-300">Telegram QR Image</label>
+          <ImageUploadPicker
+            value={telegramSupportQrCode}
+            onChange={(url) => setTelegramSupportQrCode(url)}
+            label=""
+            helperText="Upload your custom Telegram Customer Service QR Code image"
+            aspectRatio="square"
           />
+        </div>
 
-          <Textarea
-            label="Support message"
-            placeholder="Support message shown on member Customer Service page..."
-            value={telegramSupportMessage}
-            onChange={(e) => setTelegramSupportMessage(e.target.value)}
-            rows={3}
-            required
-          />
-
-          {/* Telegram QR Image */}
-          <div className="space-y-3">
-            <label className="block text-xs font-semibold text-slate-300">Telegram QR Image</label>
-            <ImageUploadPicker
-              value={telegramSupportQrCode}
-              onChange={(url) => setTelegramSupportQrCode(url)}
-              label=""
-              helperText="Upload your custom Telegram Customer Service QR Code image"
-              aspectRatio="square"
-            />
-
-            {/* Preview Box */}
-            {telegramSupportQrCode && (
-              <div className="pt-2">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Live Member Screen Preview</span>
-                <div className="inline-block p-4 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-xl text-center space-y-2">
-                  <div className="bg-white p-2 rounded-xl inline-block shadow-md">
-                    <img
-                      src={telegramSupportQrCode}
-                      alt="Telegram QR Code"
-                      className="w-36 h-36 object-contain rounded-lg"
-                    />
-                  </div>
-                  <div className="text-[10px] font-bold text-amber-400 font-mono flex items-center justify-center gap-1">
-                    <QrCode className="w-3 h-3 text-amber-400" /> @CUSTOMER_SUPPORT
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Submit Button */}
-          <div className="pt-4 border-t border-brand-border flex justify-end">
-            <Button
-              type="submit"
-              variant="gold"
-              isLoading={saving}
-              leftIcon={<Save className="w-4 h-4" />}
-            >
-              Save Customer Service Settings
-            </Button>
-          </div>
-        </form>
-      </Card>
+        {/* Submit Button */}
+        <div className="pt-4 flex justify-end">
+          <Button
+            type="submit"
+            variant="gold"
+            isLoading={saving}
+            leftIcon={<Save className="w-4 h-4" />}
+          >
+            Save Customer Service Settings
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

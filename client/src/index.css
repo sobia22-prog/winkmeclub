@@ -8,18 +8,11 @@
   }
 }
 
-/* Custom scrollbar for dark UI */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Hide scrollbars globally per user request */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
-::-webkit-scrollbar-track {
-  background: #0b0d14;
-}
-::-webkit-scrollbar-thumb {
-  background: #2a3142;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #be123c;
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
 }
