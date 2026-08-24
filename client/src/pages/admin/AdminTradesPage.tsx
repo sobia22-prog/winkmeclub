@@ -7,12 +7,26 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { Select } from '../../components/common/Select';
-import { TrendingUp, Trophy, XCircle, CheckCircle2, Edit3, RefreshCw } from 'lucide-react';
+import {
+  TrendingUp,
+  TrendingDown,
+  Trophy,
+  XCircle,
+  CheckCircle2,
+  Edit3,
+  RefreshCw,
+  Eye,
+  Clock,
+  UserCheck,
+} from 'lucide-react';
 
 export const AdminTradesPage: React.FC = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'WIN' | 'LOSE' | 'ALL'>('PENDING');
   const [loading, setLoading] = useState(true);
+
+  // Viewing Trade Modal State
+  const [viewingTrade, setViewingTrade] = useState<Trade | null>(null);
 
   // Settlement Modal State
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
@@ -82,7 +96,7 @@ export const AdminTradesPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <TrendingUp className="w-6 h-6 text-amber-400" /> Airborne Trade Request Management
           </h1>
-          <p className="text-xs text-slate-400">Review pending trades, assign Win Profit percentages (20%-100%), or modify previous trade results.</p>
+          <p className="text-xs text-slate-400">Review pending trades, view full trade details, assign Win Profit percentages (20%-100%), or modify results.</p>
         </div>
       </div>
 
@@ -174,51 +188,203 @@ export const AdminTradesPage: React.FC = () => {
                 {t.outcome === 'NONE' && <Badge variant="warning">NONE</Badge>}
               </td>
               <td className="px-5 py-3">
-                {t.status === 'PENDING' ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setViewingTrade(t)}
+                    className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                    title="View Full Trade Details"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+
+                  {t.status === 'PENDING' ? (
+                    <>
+                      <Button
+                        variant="gold"
+                        size="sm"
+                        leftIcon={<Trophy className="w-3.5 h-3.5" />}
+                        onClick={() => {
+                          setSelectedTrade(t);
+                          setSettlementOutcome('WIN');
+                          setProfitPercentage(20);
+                        }}
+                      >
+                        WIN
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        leftIcon={<XCircle className="w-3.5 h-3.5" />}
+                        onClick={() => {
+                          setSelectedTrade(t);
+                          setSettlementOutcome('LOSE');
+                        }}
+                      >
+                        LOSE
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      leftIcon={<Edit3 className="w-3.5 h-3.5" />}
+                      onClick={() => {
+                        setSelectedTrade(t);
+                        setSettlementOutcome(t.outcome === 'WIN' ? 'LOSE' : 'WIN');
+                        setProfitPercentage(t.profitPercentage || 20);
+                      }}
+                    >
+                      Change Result
+                    </Button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </Table>
+      )}
+
+      {/* VIEW TRADE REQUEST DETAILS POPUP MODAL (Matching Reference Image) */}
+      {viewingTrade && (() => {
+        const userObj = typeof viewingTrade.userId === 'object' ? (viewingTrade.userId as any) : null;
+        const staffObj = userObj?.assignedStaff && typeof userObj.assignedStaff === 'object' ? userObj.assignedStaff : null;
+        const isWin = viewingTrade.outcome === 'WIN';
+        const isLose = viewingTrade.outcome === 'LOSE';
+        const profitPct = (viewingTrade as any).profitPercentage || 20;
+
+        return (
+          <Modal
+            isOpen={true}
+            onClose={() => setViewingTrade(null)}
+            title="Trade Request Details"
+            subtitle={`Round #${viewingTrade.tradeId}`}
+            maxWidth="2xl"
+          >
+            <div className="space-y-6">
+              {/* Top Summary Banner: PICK / SELECTION, QUANTITY, TOTAL AMOUNT */}
+              <div className="grid grid-cols-3 gap-4 p-5 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-surface border border-amber-500/30 rounded-2xl text-center shadow-lg">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">PICK / ITEM</span>
+                  <span className="text-sm font-black text-amber-400 truncate block mt-0.5">{viewingTrade.productName}</span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">QUANTITY</span>
+                  <span className="text-base font-black text-slate-100 block mt-0.5">{viewingTrade.quantity}.00</span>
+                </div>
+
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">TOTAL AMOUNT</span>
+                  <span className="text-base font-black text-emerald-400 block mt-0.5">
+                    ₹{viewingTrade.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Customer Profile Card */}
+              <div className="p-4 bg-brand-card border border-brand-border rounded-2xl flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center font-black text-lg shrink-0">
+                  {userObj?.fullName?.charAt(0).toUpperCase() || 'C'}
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">CUSTOMER</span>
+                  <span className="text-base font-extrabold text-slate-100">{userObj?.fullName || 'User / Deleted Account'}</span>
+                </div>
+              </div>
+
+              {/* TRADE INFORMATION Section */}
+              <div className="p-5 bg-brand-card/60 border border-brand-border rounded-2xl space-y-3 text-xs">
+                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-wider border-b border-brand-border pb-2">
+                  TRADE INFORMATION
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-slate-400 block font-semibold text-[11px]">Customer Email</span>
+                    <span className="text-slate-200 font-bold">{userObj?.email || 'N/A'}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block font-semibold text-[11px]">Products</span>
+                    <span className="text-slate-200 font-bold">{viewingTrade.productName}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block font-semibold text-[11px]">Referral / Staff Code</span>
+                    <span className="text-amber-400 font-mono font-bold">
+                      {staffObj?.invitationCode ? `${staffObj.invitationCode} (${staffObj.fullName})` : 'Unassigned'}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block font-semibold text-[11px]">Trade Status</span>
+                    <span className="font-bold">
+                      {viewingTrade.status === 'SETTLED' ? <Badge variant="verified">SETTLED</Badge> : <Badge variant="warning">PENDING</Badge>}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block font-semibold text-[11px]">Bird-Eye Outcome</span>
+                    <div className="mt-0.5">
+                      {isWin ? (
+                        <Badge variant="success">▲ WIN (+{profitPct}%)</Badge>
+                      ) : isLose ? (
+                        <Badge variant="danger">▼ LOSE (-100%)</Badge>
+                      ) : (
+                        <Badge variant="warning">⏳ IN PROGRESS</Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block font-semibold text-[11px]">Created Date</span>
+                    <span className="text-slate-300 font-medium">{new Date(viewingTrade.createdAt).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Action Buttons */}
+              <div className="flex items-center justify-between pt-2">
+                {viewingTrade.status === 'PENDING' ? (
                   <div className="flex items-center gap-2">
                     <Button
                       variant="gold"
                       size="sm"
                       leftIcon={<Trophy className="w-3.5 h-3.5" />}
                       onClick={() => {
-                        setSelectedTrade(t);
+                        setSelectedTrade(viewingTrade);
+                        setViewingTrade(null);
                         setSettlementOutcome('WIN');
                         setProfitPercentage(20);
                       }}
                     >
-                      WIN (+Profit)
+                      Settle as WIN
                     </Button>
                     <Button
                       variant="danger"
                       size="sm"
                       leftIcon={<XCircle className="w-3.5 h-3.5" />}
                       onClick={() => {
-                        setSelectedTrade(t);
+                        setSelectedTrade(viewingTrade);
+                        setViewingTrade(null);
                         setSettlementOutcome('LOSE');
                       }}
                     >
-                      LOSE (Freeze)
+                      Settle as LOSE
                     </Button>
                   </div>
                 ) : (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    leftIcon={<Edit3 className="w-3.5 h-3.5" />}
-                    onClick={() => {
-                      setSelectedTrade(t);
-                      setSettlementOutcome(t.outcome === 'WIN' ? 'LOSE' : 'WIN');
-                      setProfitPercentage(t.profitPercentage || 20);
-                    }}
-                  >
-                    Change Result
-                  </Button>
+                  <div />
                 )}
-              </td>
-            </tr>
-          ))}
-        </Table>
-      )}
+
+                <Button variant="secondary" onClick={() => setViewingTrade(null)}>
+                  Close Details
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        );
+      })()}
 
       {/* Settlement Confirmation Popup Modal */}
       {selectedTrade && (
@@ -229,7 +395,7 @@ export const AdminTradesPage: React.FC = () => {
         >
           <form onSubmit={handleSettleSubmit} className="space-y-4">
             <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1.5 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{selectedTrade.userId && typeof selectedTrade.userId === 'object' ? selectedTrade.userId.fullName : 'User'}</span></div>
+              <div>User: <span className="font-bold text-slate-100">{selectedTrade.userId && typeof selectedTrade.userId === 'object' ? (selectedTrade.userId as any).fullName : 'User'}</span></div>
               <div>Product: <span className="font-bold text-slate-100">{selectedTrade.productName} (Qty: {selectedTrade.quantity})</span></div>
               <div>Trade Amount: <span className="font-bold text-emerald-400">₹{selectedTrade.totalAmount.toFixed(2)}</span></div>
               <div>Decided Outcome: <span className={`font-bold ${settlementOutcome === 'WIN' ? 'text-emerald-400' : 'text-rose-400'}`}>{settlementOutcome}</span></div>

@@ -527,7 +527,11 @@ export class AdminController {
       }
 
       const trades = await Trade.find(query)
-        .populate('userId', 'fullName email')
+        .populate({
+          path: 'userId',
+          select: 'fullName email assignedStaff phone city profileImage',
+          populate: { path: 'assignedStaff', select: 'fullName invitationCode' },
+        })
         .populate('productId')
         .sort({ createdAt: -1 });
 
