@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { adminService } from '../../services/admin.service';
 import { User } from '../../types';
 import { Card } from '../../components/common/Card';
@@ -12,14 +13,10 @@ import { Textarea } from '../../components/common/Textarea';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
-import { brandConfig } from '../../config/brand.config';
 import {
   Users,
   Search,
-  DollarSign,
   Eye,
-  UserCheck,
-  UserX,
   PlusCircle,
   Edit,
   Trash2,
@@ -28,19 +25,14 @@ import {
 } from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
+
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('ALL');
   const [isVIP, setIsVIP] = useState('ALL');
   const [loading, setLoading] = useState(true);
-
-  // Balance Adjustment Modal State
-  const [selectedUserForBalance, setSelectedUserForBalance] = useState<User | null>(null);
-  const [balanceForm, setBalanceForm] = useState({
-    action: 'ADD' as 'ADD' | 'FREEZE' | 'UNFREEZE' | 'DEDUCT',
-    amount: 1000,
-    reason: 'Admin operational credit adjustment',
-  });
 
   // Create / Edit Profile Modal State
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -55,13 +47,14 @@ export const AdminUsersPage: React.FC = () => {
     bio: '',
     status: 'ACTIVE',
     isVIP: true,
+    availableBalance: 0,
   });
 
   const [actionLoading, setActionLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  // Custom Styled Confirmation Popup Modal State
+  // Styled Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -94,26 +87,6 @@ export const AdminUsersPage: React.FC = () => {
     fetchUsers();
   }, [search, status, isVIP]);
 
-  const handleBalanceSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedUserForBalance) return;
-    setActionLoading(true);
-    setError('');
-
-    try {
-      const res = await adminService.adjustUserBalance(selectedUserForBalance.id || selectedUserForBalance._id!, balanceForm);
-      if (res.data.success) {
-        setMessage(`Balance updated successfully for ${selectedUserForBalance.fullName}!`);
-        setSelectedUserForBalance(null);
-        fetchUsers();
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to adjust user balance.');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const handleOpenAddProfile = () => {
     setEditProfileUser(null);
     setProfileForm({
@@ -126,6 +99,7 @@ export const AdminUsersPage: React.FC = () => {
       bio: '',
       status: 'ACTIVE',
       isVIP: true,
+      availableBalance: 0,
     });
     setShowProfileModal(true);
   };
@@ -142,6 +116,7 @@ export const AdminUsersPage: React.FC = () => {
       bio: user.bio || '',
       status: user.status || 'ACTIVE',
       isVIP: user.isVIP ?? true,
+      availableBalance: user.wallet?.availableBalance ?? 0,
     });
     setShowProfileModal(true);
   };
@@ -153,22 +128,46 @@ export const AdminUsersPage: React.FC = () => {
 
     try {
       if (editProfileUser) {
-        const res = await adminService.updateUserProfile(editProfileUser.id || editProfileUser._id!, profileForm);
+        const userId = editProfileUser.id || editProfileUser._id!;
+        const res = await adminService.updateUserProfile(userId, {
+          fullName: profileForm.fullName,
+          email: profileForm.email,
+          phone: profileForm.phone,
+          city: profileForm.city,
+          gender: profileForm.gender,
+          profileImage: profileForm.profileImage,
+          bio: profileForm.bio,
+          status: profileForm.status,
+          isVIP: profileForm.isVIP,
+        });
+
+        // Update balance if changed
+        const currentAvail = editProfileUser.wallet?.availableBalance ?? 0;
+        if (profileForm.availableBalance !== currentAvail) {
+          const diff = profileForm.availableBalance - currentAvail;
+          const action = diff >= 0 ? 'ADD' : 'DEDUCT';
+          await adminService.adjustUserBalance(userId, {
+            action,
+            amount: Math.abs(diff),
+            reason: 'Balance adjustment from user profile editor',
+          });
+        }
+
         if (res.data.success) {
-          setMessage(`Profile ${profileForm.fullName} updated successfully!`);
+          setMessage(`User profile for "${profileForm.fullName}" updated successfully!`);
           setShowProfileModal(false);
           fetchUsers();
         }
       } else {
         const res = await adminService.createMatchProfile(profileForm);
         if (res.data.success) {
-          setMessage(`Match Profile ${profileForm.fullName} created successfully!`);
+          setMessage(`User profile for "${profileForm.fullName}" created successfully!`);
           setShowProfileModal(false);
           fetchUsers();
         }
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Profile operation failed.');
+      setError(err.response?.data?.message || 'Profile save operation failed.');
     } finally {
       setActionLoading(false);
     }
@@ -184,44 +183,13 @@ export const AdminUsersPage: React.FC = () => {
         setConfirmModal((prev) => ({ ...prev, isOpen: false }));
         try {
           await adminService.deleteUserProfile(user.id || user._id!);
-          setMessage(`Profile for ${user.fullName} deleted successfully.`);
+          setMessage(`Profile for "${user.fullName}" deleted successfully.`);
           fetchUsers();
         } catch (err: any) {
           setError(err.response?.data?.message || 'Failed to delete profile.');
         }
       },
     });
-  };
-
-  const handleToggleStatus = (user: User) => {
-    const newStatus = user.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    setConfirmModal({
-      isOpen: true,
-      title: `${newStatus === 'ACTIVE' ? 'Activate' : 'Suspend'} Account Status`,
-      message: `Are you sure you want to change "${user.fullName}"'s status to ${newStatus}?`,
-      variant: newStatus === 'SUSPENDED' ? 'danger' : 'gold',
-      onConfirm: async () => {
-        setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-        try {
-          await adminService.toggleUserStatus(user.id || user._id!, { status: newStatus });
-          setMessage(`Status for ${user.fullName} changed to ${newStatus}.`);
-          fetchUsers();
-        } catch (err: any) {
-          setError(err.response?.data?.message || 'Failed to update account status.');
-        }
-      },
-    });
-  };
-
-  const handleToggleVIP = async (user: User) => {
-    const newVIP = !user.isVIP;
-    try {
-      await adminService.toggleUserStatus(user.id || user._id!, { isVIP: newVIP });
-      setMessage(`VIP status updated for ${user.fullName}.`);
-      fetchUsers();
-    } catch (err: any) {
-      setError('Failed to update VIP status.');
-    }
   };
 
   return (
@@ -232,11 +200,11 @@ export const AdminUsersPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <Users className="w-6 h-6 text-amber-400" /> User Directory & Accounts
           </h1>
-          <p className="text-xs text-slate-400">Manage registered members, VIP statuses, balances, & profile cards.</p>
+          <p className="text-xs text-slate-400">Manage registered client members, VIP statuses, balances, and profiles.</p>
         </div>
 
         <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
-          Add New Profile Card
+          Add New User Profile
         </Button>
       </div>
 
@@ -289,11 +257,11 @@ export const AdminUsersPage: React.FC = () => {
       {/* Users Table */}
       <div className="w-full overflow-x-auto">
         {loading ? (
-          <p className="text-center text-xs text-slate-500 py-10">Loading user catalog...</p>
+          <p className="text-center text-xs text-slate-500 py-10">Loading user directory...</p>
         ) : users.length === 0 ? (
-          <p className="text-center text-xs text-slate-500 py-10">No users found matching query.</p>
+          <p className="text-center text-xs text-slate-500 py-10">No users found matching search query.</p>
         ) : (
-          <Table headers={['Profile Photo & Name', 'Assigned Staff', 'City', 'Status', 'VIP', 'Available', 'Frozen', 'Actions']}>
+          <Table headers={['Profile Photo & Name', 'Assigned Staff', 'City', 'Status', 'VIP', `Available (${currencySymbol})`, `Frozen (${currencySymbol})`, 'Actions']}>
             {users.map((u: any) => (
               <tr key={u._id || u.id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
@@ -325,60 +293,42 @@ export const AdminUsersPage: React.FC = () => {
                   {u.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
                 </td>
                 <td className="px-5 py-3">
-                  <button onClick={() => handleToggleVIP(u)} className="cursor-pointer" title="Click to toggle VIP status">
-                    {u.isVIP ? <Badge variant="vip">VIP CLUB</Badge> : <Badge variant="neutral">TOGGLE VIP</Badge>}
-                  </button>
+                  {u.isVIP ? <Badge variant="vip">VIP CLUB</Badge> : <Badge variant="neutral">NORMAL</Badge>}
                 </td>
                 <td className="px-5 py-3 font-bold text-emerald-400 text-xs">
-                  ₹{(u.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  {currencySymbol}{(u.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
                 <td className="px-5 py-3 font-bold text-amber-400 text-xs">
-                  ₹{(u.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  {currencySymbol}{(u.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
+                {/* EXACTLY 3 ACTION BUTTONS (View, Edit, Delete) PER USER REQUEST */}
                 <td className="px-5 py-3">
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => handleOpenEditProfile(u)}
-                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
-                      title="Edit Profile"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                    </button>
-
+                  <div className="flex items-center gap-2">
+                    {/* 1. View Button (Eye Icon) */}
                     <Link
                       to={`/admin/users/${u._id || u.id}`}
-                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
-                      title="View Full User Details & History"
+                      className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
+                      title="View Full Profile & Detailed History"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-4 h-4" />
                     </Link>
 
+                    {/* 2. Edit Button (Pencil Icon) */}
                     <button
-                      onClick={() => setSelectedUserForBalance(u)}
-                      className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                      title="Adjust Vault Balance"
+                      onClick={() => handleOpenEditProfile(u)}
+                      className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
+                      title="Edit Everything for this User"
                     >
-                      <DollarSign className="w-3.5 h-3.5" />
+                      <Edit className="w-4 h-4" />
                     </button>
 
-                    <button
-                      onClick={() => handleToggleStatus(u)}
-                      className={`p-1.5 rounded-lg border transition-colors ${
-                        u.status === 'ACTIVE'
-                          ? 'bg-rose-500/10 border-rose-500/30 text-rose-400 hover:bg-rose-500/20'
-                          : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
-                      }`}
-                      title={u.status === 'ACTIVE' ? 'Suspend Account' : 'Activate Account'}
-                    >
-                      {u.status === 'ACTIVE' ? <UserX className="w-3.5 h-3.5" /> : <UserCheck className="w-3.5 h-3.5" />}
-                    </button>
-
+                    {/* 3. Delete Button (Trash Icon) */}
                     <button
                       onClick={() => handleDeleteProfile(u)}
-                      className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
-                      title="Delete Profile Card"
+                      className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors shadow-sm"
+                      title="Delete User Profile"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </td>
@@ -399,42 +349,45 @@ export const AdminUsersPage: React.FC = () => {
         confirmText="Confirm Action"
       />
 
-      {/* Create / Edit Profile Card Modal */}
+      {/* ALL-INCLUSIVE EDIT PROFILE MODAL (Edits Name, Email, Phone, City, Gender, Status, VIP, Balance) */}
       {showProfileModal && (
         <Modal
           isOpen={true}
           onClose={() => setShowProfileModal(false)}
-          title={editProfileUser ? 'Edit Member Profile Card' : 'Add New Member Profile Card'}
+          title={editProfileUser ? `Edit User Profile — ${editProfileUser.fullName}` : 'Add New User Profile'}
+          maxWidth="lg"
         >
-          <form onSubmit={handleSaveProfile} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+          <form onSubmit={handleSaveProfile} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1 text-xs">
             <ImageUploadPicker
-              label="Profile Photo (Upload or Paste URL)"
+              label="Profile Photo"
               value={profileForm.profileImage}
               onChange={(url) => setProfileForm({ ...profileForm, profileImage: url })}
             />
 
-            <Input
-              label="Full Name"
-              value={profileForm.fullName}
-              onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
-              required
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Full Name"
+                value={profileForm.fullName}
+                onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
+                required
+              />
 
-            <Input
-              label="Email Address"
-              type="email"
-              value={profileForm.email}
-              onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-              required
-            />
+              <Input
+                label="Email Address"
+                type="email"
+                value={profileForm.email}
+                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                required
+              />
+            </div>
 
-            <Input
-              label="Phone Number"
-              value={profileForm.phone}
-              onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Input
+                label="Phone Number"
+                value={profileForm.phone}
+                onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+              />
 
-            <div className="grid grid-cols-2 gap-3">
               <Select
                 label="City"
                 options={[
@@ -460,13 +413,7 @@ export const AdminUsersPage: React.FC = () => {
               />
             </div>
 
-            <Textarea
-              label="Short Bio / Description"
-              value={profileForm.bio}
-              onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Select
                 label="Account Status"
                 options={[
@@ -486,66 +433,29 @@ export const AdminUsersPage: React.FC = () => {
                 value={String(profileForm.isVIP)}
                 onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
               />
+
+              <Input
+                label={`Available Balance (${currencySymbol})`}
+                type="number"
+                step="1"
+                value={profileForm.availableBalance.toString()}
+                onChange={(e) => setProfileForm({ ...profileForm, availableBalance: Number(e.target.value) })}
+              />
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
+            <Textarea
+              label="Bio / Profile Description"
+              value={profileForm.bio}
+              onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+              rows={2}
+            />
+
+            <div className="flex justify-end gap-3 pt-3 border-t border-brand-border">
               <Button variant="secondary" onClick={() => setShowProfileModal(false)} type="button">
                 Cancel
               </Button>
               <Button variant="gold" type="submit" isLoading={actionLoading}>
                 {editProfileUser ? 'Update Profile' : 'Create Profile'}
-              </Button>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* Adjust User Vault Balance Modal */}
-      {selectedUserForBalance && (
-        <Modal
-          isOpen={true}
-          onClose={() => setSelectedUserForBalance(null)}
-          title={`Adjust Vault Balance for ${selectedUserForBalance.fullName}`}
-        >
-          <form onSubmit={handleBalanceSubmit} className="space-y-4">
-            <div className="p-3 bg-brand-card border border-brand-border rounded-xl text-xs space-y-1">
-              <div>Available Balance: <strong className="text-emerald-400">₹{(selectedUserForBalance.wallet?.availableBalance ?? 0).toFixed(2)}</strong></div>
-              <div>Frozen Balance: <strong className="text-amber-400">₹{(selectedUserForBalance.wallet?.frozenBalance ?? 0).toFixed(2)}</strong></div>
-            </div>
-
-            <Select
-              label="Adjustment Action"
-              options={[
-                { label: '➕ Add Funds (Increase Available)', value: 'ADD' },
-                { label: '🔒 Freeze Funds (Move Available -> Frozen)', value: 'FREEZE' },
-                { label: '🔓 Unfreeze Funds (Move Frozen -> Available)', value: 'UNFREEZE' },
-                { label: '➖ Deduct Funds (Decrease Available)', value: 'DEDUCT' },
-              ]}
-              value={balanceForm.action}
-              onChange={(e) => setBalanceForm({ ...balanceForm, action: e.target.value as any })}
-            />
-
-            <Input
-              label="Adjustment Amount (₹)"
-              type="number"
-              value={balanceForm.amount}
-              onChange={(e) => setBalanceForm({ ...balanceForm, amount: Number(e.target.value) })}
-              required
-            />
-
-            <Input
-              label="Administrative Reason / Audit Note"
-              value={balanceForm.reason}
-              onChange={(e) => setBalanceForm({ ...balanceForm, reason: e.target.value })}
-              required
-            />
-
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="secondary" onClick={() => setSelectedUserForBalance(null)} type="button">
-                Cancel
-              </Button>
-              <Button variant="gold" type="submit" isLoading={actionLoading}>
-                Execute Adjustment
               </Button>
             </div>
           </form>

@@ -188,6 +188,7 @@ export class AuthController {
     }
   }
 
+  // Admin Login Endpoint (Strictly for ADMIN role only)
   static async adminLogin(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
@@ -195,20 +196,27 @@ export class AuthController {
         return res.status(400).json({ message: 'Email and password are required.' });
       }
 
-      // Allow ADMIN and STAFF role to log into admin portal
-      const user = await User.findOne({ email: email.toLowerCase(), role: { $in: ['ADMIN', 'STAFF'] } });
+      const user = await User.findOne({ email: email.toLowerCase() });
 
       if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials or unauthorized staff account.' });
+        return res.status(401).json({ message: 'Invalid admin credentials.' });
+      }
+
+      if (user.role === 'STAFF') {
+        return res.status(403).json({ message: 'Staff members must log in via the Staff Portal at /staff/login.' });
+      }
+
+      if (user.role !== 'ADMIN') {
+        return res.status(401).json({ message: 'Invalid admin credentials.' });
       }
 
       if (user.status === 'SUSPENDED') {
-        return res.status(403).json({ message: 'Your staff account is suspended. Contact Super Admin.' });
+        return res.status(403).json({ message: 'Your admin account is suspended.' });
       }
 
       const isMatch = await bcrypt.compare(password, user.passwordHash);
       if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid admin or staff credentials.' });
+        return res.status(401).json({ message: 'Invalid admin credentials.' });
       }
 
       user.lastLoginAt = new Date();
@@ -217,7 +225,7 @@ export class AuthController {
       const token = generateToken(user._id.toString());
       return res.status(200).json({
         success: true,
-        message: `Welcome to Administrative Command Center (${user.role}).`,
+        message: 'Welcome to Administrative Command Center.',
         token,
         user: {
           id: user._id,
@@ -229,6 +237,58 @@ export class AuthController {
       });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Admin login failed.' });
+    }
+  }
+
+  // Staff Login Endpoint (Strictly for STAFF role only)
+  static async staffLogin(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+      if (!email || typeof email !== 'string' || !password) {
+        return res.status(400).json({ message: 'Email and password are required.' });
+      }
+
+      const user = await User.findOne({ email: email.toLowerCase() });
+
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid staff member credentials.' });
+      }
+
+      if (user.role === 'ADMIN') {
+        return res.status(403).json({ message: 'Administrators must log in via the Admin Command Center at /admin/login.' });
+      }
+
+      if (user.role !== 'STAFF') {
+        return res.status(401).json({ message: 'Invalid staff member credentials.' });
+      }
+
+      if (user.status === 'SUSPENDED') {
+        return res.status(403).json({ message: 'Your staff member account is suspended.' });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.passwordHash);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Invalid staff member credentials.' });
+      }
+
+      user.lastLoginAt = new Date();
+      await user.save();
+
+      const token = generateToken(user._id.toString());
+      return res.status(200).json({
+        success: true,
+        message: 'Welcome to Staff Member Portal.',
+        token,
+        user: {
+          id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          invitationCode: user.invitationCode,
+        },
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Staff login failed.' });
     }
   }
 

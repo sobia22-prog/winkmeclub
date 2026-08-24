@@ -13,6 +13,7 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
 import { VerifyOTPPage } from './pages/auth/VerifyOTPPage';
 import { AdminLoginPage } from './pages/auth/AdminLoginPage';
+import { StaffLoginPage } from './pages/auth/StaffLoginPage';
 
 // User Pages
 import { DashboardPage } from './pages/user/DashboardPage';
@@ -69,6 +70,7 @@ export const App: React.FC = () => {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/verify-otp" element={<VerifyOTPPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/staff/login" element={<StaffLoginPage />} />
 
               {/* Protected User Routes */}
               <Route element={<UserLayout />}>

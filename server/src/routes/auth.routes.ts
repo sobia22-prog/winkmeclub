@@ -11,6 +11,7 @@ router.post('/verify-otp', validateRequest(otpSchema), AuthController.verifyOTP)
 router.post('/resend-otp', AuthController.resendOTP);
 router.post('/login', validateRequest(loginSchema), AuthController.login);
 router.post('/admin-login', validateRequest(loginSchema), AuthController.adminLogin);
+router.post('/staff-login', validateRequest(loginSchema), AuthController.staffLogin);
 router.get('/me', authenticate, AuthController.getMe);
 
 export default router;
