@@ -223,18 +223,15 @@ export const ProfilePage: React.FC = () => {
             </span>
           </Link>
 
-          {/* Item 5: Withdrawal Secret */}
-          <div
-            onClick={() => setIsPinModalOpen(true)}
-            className="flex flex-col items-center gap-2 cursor-pointer group"
-          >
+          {/* Item 5: Withdrawal Secrets */}
+          <Link to="/profile/withdrawal-secret" className="flex flex-col items-center gap-2 group">
             <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-300 group-hover:scale-110 transition-transform">
               <Lock className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-200 group-hover:text-purple-300 transition-colors">
-              Withdrawal Secret
+              Withdrawal Secrets
             </span>
-          </div>
+          </Link>
 
           {/* Item 6: Login Password */}
           <div
