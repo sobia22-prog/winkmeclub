@@ -80,6 +80,8 @@ export const App: React.FC = () => {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/verification" element={<VerificationPage />} />
                 <Route path="/wallet" element={<WalletPage />} />
+                <Route path="/wallet/recharge" element={<WalletPage initialTab="recharge" />} />
+                <Route path="/wallet/withdraw" element={<WalletPage initialTab="withdraw" />} />
                 <Route path="/trades" element={<TradesPage />} />
                 <Route path="/transactions" element={<Navigate to="/wallet" replace />} />
                 <Route path="/notifications" element={<NotificationsPage />} />

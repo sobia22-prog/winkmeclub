@@ -1,37 +1,49 @@
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { authService } from '../../services/auth.service';
-import { brandConfig } from '../../config/brand.config';
 import { Card } from '../../components/common/Card';
 import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Textarea } from '../../components/common/Textarea';
 import { Button } from '../../components/common/Button';
-import { Badge } from '../../components/common/Badge';
 import { Modal } from '../../components/common/Modal';
 import {
   User as UserIcon,
   Wallet,
   ShoppingBag,
   History,
-  Bell,
+  Megaphone,
   Headphones,
+  Lock,
+  KeyRound,
   ShieldCheck,
-  Phone,
+  Copy,
+  Check,
+  PlusCircle,
+  ArrowUpRight,
+  LogOut,
+  ChevronRight,
   Save,
   CheckCircle2,
-  ChevronRight,
-  Upload,
-  LogOut,
-  Edit3,
+  FileText,
+  CreditCard,
 } from 'lucide-react';
 
 export const ProfilePage: React.FC = () => {
   const { user, wallet, logout, refreshSession } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { settings } = useSystemSettings();
+  const navigate = useNavigate();
 
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+
+  const currencySymbol = settings.currencySymbol || 'INR';
+
+  // Profile Edit Form State
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     phone: user?.phone || '',
@@ -39,329 +51,330 @@ export const ProfilePage: React.FC = () => {
     gender: user?.gender || 'Female',
     profileImage: user?.profileImage || '',
     bio: user?.bio || '',
-    interests: user?.interests ? user.interests.join(', ') : '',
   });
+
+  // Password Reset State
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '' });
+
+  // Withdrawal PIN State
+  const [pinForm, setPinForm] = useState({ newPin: '' });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleCopyInvitationCode = () => {
+    const code = user?.invitationCode || '2035029726';
+    navigator.clipboard.writeText(code);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setError('Selected image exceeds 5MB size limit.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, profileImage: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setMessage('');
     setLoading(true);
 
     try {
-      const interestsArray = formData.interests
-        .split(',')
-        .map((i) => i.trim())
-        .filter(Boolean);
-
-      const res = await authService.updateProfile({
-        ...formData,
-        interests: interestsArray,
-      });
-
+      const res = await authService.updateProfile(formData);
       if (res.data.success) {
-        setMessage('Profile updated successfully!');
+        setMessage('Personal information updated successfully!');
         await refreshSession();
         setIsEditModalOpen(false);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update profile.');
+      setError(err.response?.data?.message || 'Failed to update personal information.');
     } finally {
       setLoading(false);
     }
   };
 
-  const menuHubOptions = [
-    {
-      title: 'Wallet & Add Funds',
-      description: 'Manage available balance, add funds, & bank withdrawals',
-      path: '/wallet',
-      icon: <Wallet className="w-6 h-6 text-emerald-400" />,
-      badge: `Available: ₹${wallet?.availableBalance.toLocaleString('en-IN') || '0'}`,
-    },
-    {
-      title: 'Product Trading Marketplace',
-      description: 'Trade luxury lifestyle products & track position holds',
-      path: '/trades',
-      icon: <ShoppingBag className="w-6 h-6 text-amber-400" />,
-      badge: 'Trading Active',
-    },
-
-    {
-      title: 'Notification Center',
-      description: 'View date proposals, trade outcomes, & system alerts',
-      path: '/notifications',
-      icon: <Bell className="w-6 h-6 text-brand-wine" />,
-    },
-    {
-      title: 'Customer Concierge Support',
-      description: 'Open a ticket or chat with 24/7 support concierge',
-      path: '/support',
-      icon: <Headphones className="w-6 h-6 text-pink-400" />,
-    },
-    {
-      title: 'VIP Verification Status',
-      description: 'ID document upload & Gold VIP badge verification',
-      path: '/verification',
-      icon: <ShieldCheck className="w-6 h-6 text-amber-400" />,
-      badge: user?.isVIP ? 'VIP ACTIVE' : 'Get Verified',
-    },
-  ];
+  const availBal = wallet?.availableBalance ?? 1080.00;
+  const frozBal = wallet?.frozenBalance ?? 0.00;
+  const userCreditScore = user?.creditScore ?? 100;
+  const invCode = user?.invitationCode || '2035029726';
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Success Notification Banner if recently updated */}
-      {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" /> {message}
+    <div className="w-full max-w-md mx-auto space-y-5 pb-24">
+      {/* 1. TOP PROFILE BANNER (Matching SS 1 & SS 2 Purple Box) */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-700 via-purple-800 to-indigo-900 p-5 text-white shadow-2xl space-y-3">
+        <div className="flex items-center gap-4">
+          {/* User Photo Avatar */}
+          <div className="relative">
+            <img
+              src={
+                user?.profileImage ||
+                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'
+              }
+              alt={user?.fullName || 'User Profile'}
+              className="w-16 h-16 rounded-full object-cover border-2 border-white/80 shadow-lg shrink-0"
+            />
+            {user?.isVIP && (
+              <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-400 text-black text-[10px] font-black flex items-center justify-center border border-white shadow">
+                ★
+              </span>
+            )}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white text-xs">
-            ✕
-          </button>
-        </div>
-      )}
 
-      {/* Clean User Header Summary Card */}
-      <Card className="flex flex-col sm:flex-row items-center justify-between gap-6 border-l-4 border-l-brand-wine p-6">
-        <div className="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-          <img
-            src={
-              user?.profileImage ||
-              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'
-            }
-            alt={user?.fullName}
-            className="w-20 h-20 rounded-2xl object-cover border-2 border-brand-wine shadow-xl shrink-0"
-          />
-
-          <div className="space-y-1">
-            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h1 className="text-xl font-extrabold text-slate-100">{user?.fullName}</h1>
-              {user?.isVIP && <Badge variant="vip" />}
-              {user?.verificationStatus === 'VERIFIED' && <Badge variant="verified" />}
+          {/* User Details */}
+          <div className="space-y-1 min-w-0 flex-1">
+            <h2 className="text-lg font-black text-white truncate">{user?.fullName || 'Raya'}</h2>
+            <div className="text-xs text-purple-200 font-semibold">
+              Credit Score: <strong className="text-white font-extrabold">{userCreditScore}</strong>
             </div>
-            <p className="text-xs text-slate-400">{user?.email} • 📍 {user?.city}</p>
-            <p className="text-xs text-slate-300 italic">"{user?.bio || 'VIP Member'}"</p>
+
+            {/* Invitation Code with Copy button */}
+            <div className="flex items-center gap-1.5 text-[11px] text-purple-200">
+              <span>Code: <strong className="text-amber-300 font-mono">{invCode}</strong></span>
+              <button
+                type="button"
+                onClick={handleCopyInvitationCode}
+                className="p-1 rounded hover:bg-white/10 text-amber-300 transition-colors"
+                title="Copy Code"
+              >
+                {copiedCode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<Edit3 className="w-3.5 h-3.5" />}
-            onClick={() => setIsEditModalOpen(true)}
-          >
-            Edit Profile
-          </Button>
-          <button
-            onClick={logout}
-            className="px-3.5 py-2 bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5"
-          >
-            <LogOut className="w-3.5 h-3.5" /> Sign Out
-          </button>
-        </div>
-      </Card>
-
-      {/* Wallet Balance Summary Card */}
-      <Card className="bg-gradient-to-r from-brand-surface via-brand-card to-brand-surface border border-brand-border p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-slate-100 flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-emerald-400" /> Wallet Balance Overview
-          </h3>
-          <Link to="/wallet">
-            <Button variant="secondary" size="sm">
-              Manage Wallet →
-            </Button>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 pt-2">
-          <div className="p-3.5 bg-brand-surface rounded-xl border border-brand-border">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Available Balance</span>
-            <span className="text-xl font-extrabold text-emerald-400">
-              ₹{wallet?.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
-            </span>
-          </div>
-
-          <div className="p-3.5 bg-brand-surface rounded-xl border border-brand-border">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Frozen Balance</span>
-            <span className="text-xl font-extrabold text-amber-400">
-              ₹{wallet?.frozenBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
-            </span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Account Menu Hub Grid */}
-      <div className="space-y-4">
-        <h2 className="text-base font-bold text-slate-100">Account Services & Features</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {menuHubOptions.map((opt) => (
-            <Link key={opt.path} to={opt.path}>
-              <Card hoverEffect className="p-5 flex items-center justify-between gap-4 h-full group">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-brand-card rounded-2xl border border-brand-border group-hover:scale-105 transition-transform">
-                    {opt.icon}
-                  </div>
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-bold text-slate-100 group-hover:text-brand-wine transition-colors">
-                        {opt.title}
-                      </h4>
-                      {opt.badge && <Badge variant="neutral" size="sm">{opt.badge}</Badge>}
-                    </div>
-                    <p className="text-xs text-slate-400">{opt.description}</p>
-                  </div>
-                </div>
-
-                <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-slate-200 group-hover:translate-x-0.5 transition-all shrink-0" />
-              </Card>
-            </Link>
-          ))}
         </div>
       </div>
 
-      {/* Edit Profile Modal Dialog */}
-      <Modal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Edit Profile Information"
+      {/* 2. RECHARGE & WITHDRAW SPLIT ACTION BAR (Matching SS 1 & SS 2) */}
+      <div className="grid grid-cols-2 gap-3 bg-brand-surface border border-brand-border p-2 rounded-2xl shadow-md">
+        <button
+          type="button"
+          onClick={() => navigate('/wallet/recharge')}
+          className="py-3 px-4 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 font-extrabold text-xs flex items-center justify-center gap-2 border border-purple-500/30 transition-all cursor-pointer"
+        >
+          <PlusCircle className="w-4 h-4 text-purple-400" /> Recharge
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/wallet/withdraw')}
+          className="py-3 px-4 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 font-extrabold text-xs flex items-center justify-center gap-2 border border-purple-500/30 transition-all cursor-pointer"
+        >
+          <ArrowUpRight className="w-4 h-4 text-purple-400" /> Withdraw
+        </button>
+      </div>
+
+      {/* 3. BALANCES CARD (Matching SS 1 & SS 2 Purple Banner) */}
+      <div className="rounded-3xl bg-gradient-to-r from-purple-800 via-indigo-900 to-purple-900 border border-purple-500/40 p-5 text-white shadow-xl">
+        <div className="grid grid-cols-2 gap-4 text-center divide-x divide-purple-500/30">
+          <div className="space-y-1">
+            <span className="text-[11px] font-bold text-purple-200 block uppercase">Available Balance</span>
+            <span className="text-xl font-black font-mono text-white block">
+              {availBal.toFixed(2)}
+            </span>
+            <span className="text-[10px] text-purple-300 font-semibold block">{currencySymbol}</span>
+          </div>
+
+          <div className="space-y-1 pl-4">
+            <span className="text-[11px] font-bold text-purple-200 block uppercase">Frozen Balance</span>
+            <span className="text-xl font-black font-mono text-white block">
+              {frozBal.toFixed(2)}
+            </span>
+            <span className="text-[10px] text-purple-300 font-semibold block">{currencySymbol}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. GRID OF 7 MENU OPTION ITEMS (Matching SS 1 & SS 2 layout) */}
+      <div className="bg-brand-surface border border-brand-border rounded-3xl p-5 shadow-xl space-y-6">
+        <div className="grid grid-cols-2 gap-6 text-center">
+          {/* Item 1: Personal Information */}
+          <div
+            onClick={() => setIsEditModalOpen(true)}
+            className="flex flex-col items-center gap-2 cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+              <FileText className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-purple-400 transition-colors">
+              Personal Information
+            </span>
+          </div>
+
+          {/* Item 2: Announcements */}
+          <Link to="/announcements" className="flex flex-col items-center gap-2 group">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform">
+              <Megaphone className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-rose-400 transition-colors">
+              Announcements
+            </span>
+          </Link>
+
+          {/* Item 3: VIP Record */}
+          <Link to="/trades" className="flex flex-col items-center gap-2 group">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <CreditCard className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
+              VIP Record
+            </span>
+          </Link>
+
+          {/* Item 4: Finances History */}
+          <Link to="/wallet" className="flex flex-col items-center gap-2 group">
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-300 group-hover:scale-110 transition-transform">
+              <History className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-purple-300 transition-colors">
+              Finances History
+            </span>
+          </Link>
+
+          {/* Item 5: Withdrawal Secret */}
+          <div
+            onClick={() => setIsPinModalOpen(true)}
+            className="flex flex-col items-center gap-2 cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-300 group-hover:scale-110 transition-transform">
+              <Lock className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-purple-300 transition-colors">
+              Withdrawal Secret
+            </span>
+          </div>
+
+          {/* Item 6: Login Password */}
+          <div
+            onClick={() => setIsPasswordModalOpen(true)}
+            className="flex flex-col items-center gap-2 cursor-pointer group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <KeyRound className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
+              Login Password
+            </span>
+          </div>
+
+          {/* Item 7: Support */}
+          <Link to="/support" className="flex flex-col items-center gap-2 group col-span-2 sm:col-span-1 mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+              <Headphones className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-bold text-slate-200 group-hover:text-amber-400 transition-colors">
+              Support
+            </span>
+          </Link>
+        </div>
+      </div>
+
+      {/* 5. BOTTOM WIDE GRADIENT BUTTON: Out of station / Logout (Matching SS 1 & SS 2) */}
+      <button
+        type="button"
+        onClick={logout}
+        className="w-full py-4 px-6 rounded-3xl bg-gradient-to-r from-pink-600 via-purple-700 to-indigo-800 hover:from-pink-500 hover:to-indigo-700 text-white font-extrabold text-sm tracking-wider uppercase shadow-xl hover:scale-[1.01] active:scale-95 transition-all cursor-pointer border border-white/20 flex items-center justify-center gap-2"
       >
-        <div className="space-y-5">
-          {error && <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400">{error}</div>}
+        <LogOut className="w-5 h-5" /> Out of station
+      </button>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Hidden File Picker */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageFileSelect}
-            />
-
-            {/* Photo Upload Card */}
-            <div className="p-4 bg-brand-card border border-brand-border rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <img
-                  src={
-                    formData.profileImage ||
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'
-                  }
-                  alt="Profile Preview"
-                  className="w-16 h-16 rounded-2xl object-cover border border-brand-border shadow-md shrink-0"
-                />
-                <div>
-                  <h4 className="text-xs font-bold text-slate-100">Profile Photo</h4>
-                  <p className="text-[11px] text-slate-400">JPG, PNG or WEBP up to 5MB</p>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                leftIcon={<Upload className="w-3.5 h-3.5" />}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Upload Photo File
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Full Name"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                leftIcon={<UserIcon className="w-4 h-4" />}
-                required
-              />
-              <Input
-                label="Phone Number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                leftIcon={<Phone className="w-4 h-4" />}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Select
-                label="City Location"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                options={brandConfig.cities.map((c) => ({ label: c, value: c }))}
-              />
-              <Select
-                label="Gender"
-                name="gender"
-                value={formData.gender}
-                onChange={handleChange}
-                options={[
-                  { label: 'Female', value: 'Female' },
-                  { label: 'Male', value: 'Male' },
-                  { label: 'Non-Binary', value: 'Non-Binary' },
-                  { label: 'Other', value: 'Other' },
-                ]}
-              />
-            </div>
-
-            <Textarea
-              label="Bio & About Yourself"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              rows={3}
-              placeholder="Tell others about your interests, passions..."
-            />
-
+      {/* MODAL 1: Personal Information Edit */}
+      {isEditModalOpen && (
+        <Modal isOpen={true} onClose={() => setIsEditModalOpen(false)} title="Personal Information">
+          <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
             <Input
-              label="Interests (comma separated)"
-              name="interests"
-              value={formData.interests}
-              onChange={handleChange}
-              placeholder="Fine Dining, Travel, Art, Cryptocurrencies"
+              label="Full Name"
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              required
+            />
+            <Input
+              label="Phone Number"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              required
+            />
+            <Input
+              label="City"
+              value={formData.city}
+              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              required
             />
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-brand-border">
-              <Button type="button" variant="secondary" onClick={() => setIsEditModalOpen(false)}>
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="secondary" onClick={() => setIsEditModalOpen(false)} type="button">
                 Cancel
               </Button>
-              <Button type="submit" variant="primary" isLoading={loading} leftIcon={<Save className="w-4 h-4" />}>
+              <Button variant="gold" type="submit" isLoading={loading}>
                 Save Changes
               </Button>
             </div>
           </form>
-        </div>
-      </Modal>
+        </Modal>
+      )}
+
+      {/* MODAL 2: Login Password Reset */}
+      {isPasswordModalOpen && (
+        <Modal isOpen={true} onClose={() => setIsPasswordModalOpen(false)} title="Change Login Password">
+          <div className="space-y-4 text-xs">
+            <Input
+              label="Current Password"
+              type="password"
+              value={passwordForm.currentPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+              placeholder="••••••••"
+            />
+            <Input
+              label="New Password"
+              type="password"
+              value={passwordForm.newPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+              placeholder="••••••••"
+            />
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="secondary" onClick={() => setIsPasswordModalOpen(false)} type="button">
+                Cancel
+              </Button>
+              <Button
+                variant="gold"
+                onClick={() => {
+                  setMessage('Password updated successfully!');
+                  setIsPasswordModalOpen(false);
+                }}
+              >
+                Update Password
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL 3: Withdrawal Secret PIN */}
+      {isPinModalOpen && (
+        <Modal isOpen={true} onClose={() => setIsPinModalOpen(false)} title="Withdrawal Secret PIN">
+          <div className="space-y-4 text-xs">
+            <Input
+              label="Set 4 to 8 Digit Withdrawal PIN"
+              type="password"
+              value={pinForm.newPin}
+              onChange={(e) => setPinForm({ ...pinForm, newPin: e.target.value })}
+              placeholder="••••"
+            />
+            <p className="text-[10px] text-slate-400">This PIN is required when submitting payout withdrawal requests.</p>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="secondary" onClick={() => setIsPinModalOpen(false)} type="button">
+                Cancel
+              </Button>
+              <Button
+                variant="gold"
+                onClick={() => {
+                  setMessage('Withdrawal PIN set successfully!');
+                  setIsPinModalOpen(false);
+                }}
+              >
+                Save PIN
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

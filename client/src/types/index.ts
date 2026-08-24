@@ -11,11 +11,16 @@ export interface User {
   city: string;
   gender: string;
   role: Role;
+  invitationCode?: string;
+  creditScore?: number;
+  allowWithdraw?: boolean;
+  allowTrade?: boolean;
+  hasTransactionPin?: boolean;
   isVIP: boolean;
   vipExpiresAt?: string;
   isVerified?: boolean;
   verificationStatus: VerificationStatus;
-  status?: AccountStatus;
+  status?: AccountStatus | 'BLOCKED' | 'PENDING';
   profileImage?: string;
   bio?: string;
   age?: number;
