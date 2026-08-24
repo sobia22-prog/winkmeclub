@@ -31,7 +31,6 @@ import {
   Package,
   Award,
   BarChart3,
-  Sparkles,
 } from 'lucide-react';
 
 export const AdminStaffDetailPage: React.FC = () => {
@@ -461,62 +460,47 @@ export const AdminStaffDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* IN-PAGE CLIENT ULTRA-WIDE COMPLETE COMMAND POPUP MODAL */}
+      {/* IN-PAGE CLIENT CLEAN ULTRA-WIDE COMMAND POPUP MODAL (SINGLE SCROLLBAR, NO FLUFF TEXT) */}
       {selectedClient && (() => {
         const { clientTrades, clientRecharges, clientWithdrawals } = getClientData(selectedClient._id || selectedClient.id);
         const winTradesCount = clientTrades.filter((t: any) => t.outcome === 'WIN').length;
         const loseTradesCount = clientTrades.filter((t: any) => t.outcome === 'LOSE').length;
         const pendingTradesCount = clientTrades.filter((t: any) => t.status === 'PENDING').length;
         const totalTradesStaked = clientTrades.reduce((sum: number, t: any) => sum + (t.totalAmount || 0), 0);
-        const totalWinsAmount = clientTrades
-          .filter((t: any) => t.outcome === 'WIN')
-          .reduce((sum: number, t: any) => sum + (t.payoutAmount || t.totalAmount * 1.2), 0);
 
         return (
           <Modal
             isOpen={true}
             onClose={() => setSelectedClient(null)}
-            title={`Client Command Intelligence & Live Operations — ${selectedClient.fullName}`}
-            maxWidth="5xl"
+            title={`Client Operations — ${selectedClient.fullName}`}
+            maxWidth="6xl"
           >
-            <div className="space-y-6 max-h-[85vh] overflow-y-auto pr-1">
-              {/* Top Banner & Profile Bar */}
-              <div className="p-5 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-surface border border-amber-500/30 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
+            <div className="space-y-6">
+              {/* Top Profile Card */}
+              <div className="p-4 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-surface border border-amber-500/30 rounded-2xl flex items-center justify-between gap-4 shadow-lg">
                 <div className="flex items-center gap-4">
                   <img
                     src={selectedClient.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
                     alt={selectedClient.fullName}
-                    className="w-16 h-16 rounded-2xl object-cover border-2 border-amber-500/50 shadow-lg shrink-0"
+                    className="w-14 h-14 rounded-2xl object-cover border-2 border-amber-500/50 shadow-md shrink-0"
                   />
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <h2 className="text-xl font-black text-slate-100">{selectedClient.fullName}</h2>
+                      <h2 className="text-lg font-black text-slate-100">{selectedClient.fullName}</h2>
                       {selectedClient.isVIP && <Badge variant="vip">VIP CLUB</Badge>}
-                      {selectedClient.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE MEMBER</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
+                      {selectedClient.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">{selectedClient.email} • {selectedClient.phone || 'No Phone'}</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5 font-medium">📍 {selectedClient.city || 'Mumbai'} • {selectedClient.gender || 'Female'}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{selectedClient.email} • {selectedClient.phone || 'No Phone'}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">📍 {selectedClient.city || 'Mumbai'} • {selectedClient.gender || 'Female'}</p>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Link to={`/admin/users/${selectedClient._id || selectedClient.id}`} target="_blank">
-                    <Button variant="secondary" size="sm" leftIcon={<ExternalLink className="w-3.5 h-3.5" />}>
-                      Open Full User Page
-                    </Button>
-                  </Link>
                 </div>
               </div>
 
-              {/* 2-Column Grid: Left Vault & Stats, Right Trades Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Left Column: Financial Vault & Quick Indicators */}
+              {/* 2-Column Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                {/* Left Column: Vault Balances & Performance */}
                 <div className="space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                    <Wallet className="w-4 h-4 text-amber-400" /> Vault Balances & Metrics
-                  </h4>
-
-                  <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl shadow-lg shadow-emerald-500/5">
+                  <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl shadow-md">
                     <div className="flex items-center justify-between text-xs text-emerald-400 font-bold mb-1">
                       <span>Available Balance</span>
                       <Wallet className="w-4 h-4 text-emerald-400" />
@@ -524,10 +508,9 @@ export const AdminStaffDetailPage: React.FC = () => {
                     <div className="text-2xl font-black text-emerald-400">
                       ₹{(selectedClient.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </div>
-                    <p className="text-[10px] text-emerald-500/80 mt-1 font-medium">Ready for immediate trades & withdrawals</p>
                   </div>
 
-                  <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl shadow-lg shadow-amber-500/5">
+                  <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl shadow-md">
                     <div className="flex items-center justify-between text-xs text-amber-400 font-bold mb-1">
                       <span>Frozen Balance</span>
                       <Lock className="w-4 h-4 text-amber-400" />
@@ -535,21 +518,19 @@ export const AdminStaffDetailPage: React.FC = () => {
                     <div className="text-2xl font-black text-amber-400">
                       ₹{(selectedClient.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </div>
-                    <p className="text-[10px] text-amber-500/80 mt-1 font-medium">Locked in active trades or withdrawal processing</p>
                   </div>
 
-                  {/* Summary Indicators Box */}
                   <div className="p-4 bg-brand-card border border-brand-border rounded-2xl space-y-3">
                     <h5 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                       <BarChart3 className="w-3.5 h-3.5 text-cyan-400" /> Performance Summary
                     </h5>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 bg-brand-surface rounded-xl border border-brand-border">
-                        <span className="text-[10px] text-slate-400 block">Total Orders</span>
-                        <span className="font-extrabold text-slate-100">{clientTrades.length} Trades</span>
+                      <div className="p-2.5 bg-brand-surface rounded-xl border border-brand-border">
+                        <span className="text-[10px] text-slate-400 block">Total Trades</span>
+                        <span className="font-extrabold text-slate-100">{clientTrades.length} Orders</span>
                       </div>
-                      <div className="p-2 bg-brand-surface rounded-xl border border-brand-border">
+                      <div className="p-2.5 bg-brand-surface rounded-xl border border-brand-border">
                         <span className="text-[10px] text-slate-400 block">Total Staked</span>
                         <span className="font-extrabold text-purple-400">₹{totalTradesStaked.toLocaleString('en-IN')}</span>
                       </div>
@@ -569,24 +550,24 @@ export const AdminStaffDetailPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Right Column: Detailed Trade Intelligence Table */}
-                <div className="md:col-span-2 space-y-4">
+                {/* Right Column: Trade Orders Table */}
+                <div className="lg:col-span-2 space-y-3">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-purple-400" /> Client Trade Intelligence & Settlement History
+                      <TrendingUp className="w-4 h-4 text-purple-400" /> Trade Orders
                     </h4>
                     <span className="text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-full">
-                      {clientTrades.length} Total Trade Orders
+                      {clientTrades.length} Total Trades
                     </span>
                   </div>
 
                   {clientTrades.length === 0 ? (
-                    <div className="p-8 text-center text-xs text-slate-500 bg-brand-card/50 border border-brand-border rounded-2xl">
-                      No trade orders executed by {selectedClient.fullName} yet.
+                    <div className="p-6 text-center text-xs text-slate-500 bg-brand-card/50 border border-brand-border rounded-2xl">
+                      No trades placed by {selectedClient.fullName}.
                     </div>
                   ) : (
                     <div className="w-full overflow-x-auto border border-brand-border rounded-2xl">
-                      <Table headers={['Trade Info & Date', 'Product Item', 'Qty', 'Staked', 'Outcome & Profit', 'Payout']}>
+                      <Table headers={['Trade ID & Date', 'Product Item', 'Qty', 'Staked', 'Outcome', 'Net Payout / Profit']}>
                         {clientTrades.map((t: any) => {
                           const isWin = t.outcome === 'WIN';
                           const isLose = t.outcome === 'LOSE';
@@ -605,7 +586,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                                   {t.productImage && (
                                     <img src={t.productImage} alt={t.productName} className="w-7 h-7 rounded-lg object-cover border border-brand-border shrink-0" />
                                   )}
-                                  <span className="truncate max-w-[120px]">{t.productName}</span>
+                                  <span className="truncate max-w-[130px]">{t.productName}</span>
                                 </div>
                               </td>
                               <td className="px-4 py-3 text-xs font-bold text-slate-300">x{t.quantity}</td>
@@ -614,12 +595,12 @@ export const AdminStaffDetailPage: React.FC = () => {
                               </td>
                               <td className="px-4 py-3">
                                 {isWin ? (
-                                  <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-[11px] font-black text-emerald-400 shadow-sm">
+                                  <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-[11px] font-black text-emerald-400">
                                     <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
                                     <span>▲ WIN (+{profitPct}%)</span>
                                   </div>
                                 ) : isLose ? (
-                                  <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-500/20 border border-rose-500/50 rounded-xl text-[11px] font-black text-rose-400 shadow-sm">
+                                  <div className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-500/20 border border-rose-500/50 rounded-xl text-[11px] font-black text-rose-400">
                                     <TrendingDown className="w-3.5 h-3.5 text-rose-400" />
                                     <span>▼ LOSE (-100%)</span>
                                   </div>
@@ -648,22 +629,22 @@ export const AdminStaffDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Bottom Row: Deposits & Withdrawals Side-By-Side */}
+              {/* Bottom Financial History Rows */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-brand-border">
-                {/* Deposits */}
-                <div className="space-y-3">
+                {/* Recharges */}
+                <div className="space-y-2">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <ArrowDownRight className="w-4 h-4 text-emerald-400" /> Deposit Recharges ({clientRecharges.length})
+                    <ArrowDownRight className="w-4 h-4 text-emerald-400" /> Deposits ({clientRecharges.length})
                   </h4>
 
                   {clientRecharges.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-slate-500 bg-brand-card/40 rounded-xl border border-brand-border">
-                      No deposit records.
+                    <div className="p-3 text-center text-xs text-slate-500 bg-brand-card/40 rounded-xl border border-brand-border">
+                      No deposits.
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {clientRecharges.map((r: any) => (
-                        <div key={r._id} className="p-3 bg-brand-card/60 border border-brand-border rounded-xl flex items-center justify-between text-xs">
+                        <div key={r._id} className="p-2.5 bg-brand-card/60 border border-brand-border rounded-xl flex items-center justify-between text-xs">
                           <div>
                             <div className="font-bold text-emerald-400">+₹{r.amount.toLocaleString('en-IN')}</div>
                             <div className="text-[10px] text-slate-400">{r.paymentMethod} • Ref: {r.referenceNumber}</div>
@@ -678,19 +659,19 @@ export const AdminStaffDetailPage: React.FC = () => {
                 </div>
 
                 {/* Withdrawals */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <ArrowUpRight className="w-4 h-4 text-rose-400" /> Withdrawal Requests ({clientWithdrawals.length})
+                    <ArrowUpRight className="w-4 h-4 text-rose-400" /> Withdrawals ({clientWithdrawals.length})
                   </h4>
 
                   {clientWithdrawals.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-slate-500 bg-brand-card/40 rounded-xl border border-brand-border">
-                      No withdrawal records.
+                    <div className="p-3 text-center text-xs text-slate-500 bg-brand-card/40 rounded-xl border border-brand-border">
+                      No withdrawals.
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {clientWithdrawals.map((w: any) => (
-                        <div key={w._id} className="p-3 bg-brand-card/60 border border-brand-border rounded-xl flex items-center justify-between text-xs">
+                        <div key={w._id} className="p-2.5 bg-brand-card/60 border border-brand-border rounded-xl flex items-center justify-between text-xs">
                           <div>
                             <div className="font-bold text-rose-400">-₹{w.amount.toLocaleString('en-IN')}</div>
                             <div className="text-[10px] text-slate-400">{w.bankName || 'Bank Account'} ({w.accountNumber || 'N/A'})</div>
@@ -703,12 +684,6 @@ export const AdminStaffDetailPage: React.FC = () => {
                     </div>
                   )}
                 </div>
-              </div>
-
-              <div className="pt-2 flex justify-end">
-                <Button variant="secondary" onClick={() => setSelectedClient(null)}>
-                  Close Command Ledger
-                </Button>
               </div>
             </div>
           </Modal>
