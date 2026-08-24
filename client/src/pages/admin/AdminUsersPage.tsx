@@ -22,6 +22,9 @@ import {
   Trash2,
   CheckCircle2,
   AlertCircle,
+  KeyRound,
+  ShieldAlert,
+  Wallet,
 } from 'lucide-react';
 
 export const AdminUsersPage: React.FC = () => {
@@ -30,11 +33,11 @@ export const AdminUsersPage: React.FC = () => {
 
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [isVIP, setIsVIP] = useState('ALL');
   const [loading, setLoading] = useState(true);
 
-  // Create / Edit Profile Modal State
+  // Edit User Modal State
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [editProfileUser, setEditProfileUser] = useState<User | null>(null);
   const [profileForm, setProfileForm] = useState({
@@ -47,7 +50,15 @@ export const AdminUsersPage: React.FC = () => {
     bio: '',
     status: 'ACTIVE',
     isVIP: true,
-    availableBalance: 0,
+    creditScore: 100,
+    allowWithdraw: true,
+    allowTrade: true,
+    totalBalance: 0,
+    frozenBalance: 0,
+    loadAmount: '',
+    password: '',
+    transactionPin: '',
+    hasTransactionPin: false,
   });
 
   const [actionLoading, setActionLoading] = useState(false);
@@ -72,7 +83,7 @@ export const AdminUsersPage: React.FC = () => {
     try {
       const res = await adminService.getUsers({
         search,
-        status: status === 'ALL' ? undefined : status,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
         isVIP: isVIP === 'ALL' ? undefined : isVIP === 'VIP',
       });
       if (res.data.success) setUsers(res.data.users);
@@ -85,7 +96,7 @@ export const AdminUsersPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [search, status, isVIP]);
+  }, [search, statusFilter, isVIP]);
 
   const handleOpenAddProfile = () => {
     setEditProfileUser(null);
@@ -99,13 +110,27 @@ export const AdminUsersPage: React.FC = () => {
       bio: '',
       status: 'ACTIVE',
       isVIP: true,
-      availableBalance: 0,
+      creditScore: 100,
+      allowWithdraw: true,
+      allowTrade: true,
+      totalBalance: 0,
+      frozenBalance: 0,
+      loadAmount: '',
+      password: '',
+      transactionPin: '',
+      hasTransactionPin: false,
     });
     setShowProfileModal(true);
   };
 
-  const handleOpenEditProfile = (user: User) => {
+  const handleOpenEditProfile = (user: User | any) => {
     setEditProfileUser(user);
+    const tot = user.wallet?.totalBalance ?? ((user.wallet?.availableBalance ?? 0) + (user.wallet?.frozenBalance ?? 0));
+    const froz = user.wallet?.frozenBalance ?? 0;
+
+    let userStatus = user.status || 'ACTIVE';
+    if (userStatus === 'SUSPENDED') userStatus = 'BLOCKED';
+
     setProfileForm({
       fullName: user.fullName || '',
       email: user.email || '',
@@ -114,9 +139,17 @@ export const AdminUsersPage: React.FC = () => {
       gender: user.gender || 'Female',
       profileImage: user.profileImage || '',
       bio: user.bio || '',
-      status: user.status || 'ACTIVE',
+      status: userStatus,
       isVIP: user.isVIP ?? true,
-      availableBalance: user.wallet?.availableBalance ?? 0,
+      creditScore: user.creditScore ?? 100,
+      allowWithdraw: user.allowWithdraw ?? true,
+      allowTrade: user.allowTrade ?? true,
+      totalBalance: tot,
+      frozenBalance: froz,
+      loadAmount: '',
+      password: '',
+      transactionPin: '',
+      hasTransactionPin: Boolean(user.hasTransactionPin || user.transactionPinHash),
     });
     setShowProfileModal(true);
   };
@@ -127,39 +160,45 @@ export const AdminUsersPage: React.FC = () => {
     setError('');
 
     try {
+      const payload: any = {
+        fullName: profileForm.fullName,
+        email: profileForm.email,
+        phone: profileForm.phone,
+        city: profileForm.city,
+        gender: profileForm.gender,
+        profileImage: profileForm.profileImage,
+        bio: profileForm.bio,
+        status: profileForm.status === 'BLOCKED' ? 'SUSPENDED' : profileForm.status,
+        isVIP: profileForm.isVIP,
+        creditScore: Number(profileForm.creditScore),
+        allowWithdraw: profileForm.allowWithdraw,
+        allowTrade: profileForm.allowTrade,
+        totalBalance: Number(profileForm.totalBalance),
+        frozenBalance: Number(profileForm.frozenBalance),
+      };
+
+      if (profileForm.loadAmount && Number(profileForm.loadAmount) > 0) {
+        payload.loadAmount = Number(profileForm.loadAmount);
+      }
+
+      if (profileForm.password.trim()) {
+        payload.password = profileForm.password.trim();
+      }
+
+      if (profileForm.transactionPin.trim()) {
+        payload.transactionPin = profileForm.transactionPin.trim();
+      }
+
       if (editProfileUser) {
         const userId = editProfileUser.id || editProfileUser._id!;
-        const res = await adminService.updateUserProfile(userId, {
-          fullName: profileForm.fullName,
-          email: profileForm.email,
-          phone: profileForm.phone,
-          city: profileForm.city,
-          gender: profileForm.gender,
-          profileImage: profileForm.profileImage,
-          bio: profileForm.bio,
-          status: profileForm.status,
-          isVIP: profileForm.isVIP,
-        });
-
-        // Update balance if changed
-        const currentAvail = editProfileUser.wallet?.availableBalance ?? 0;
-        if (profileForm.availableBalance !== currentAvail) {
-          const diff = profileForm.availableBalance - currentAvail;
-          const action = diff >= 0 ? 'ADD' : 'DEDUCT';
-          await adminService.adjustUserBalance(userId, {
-            action,
-            amount: Math.abs(diff),
-            reason: 'Balance adjustment from user profile editor',
-          });
-        }
-
+        const res = await adminService.updateUserProfile(userId, payload);
         if (res.data.success) {
           setMessage(`User profile for "${profileForm.fullName}" updated successfully!`);
           setShowProfileModal(false);
           fetchUsers();
         }
       } else {
-        const res = await adminService.createMatchProfile(profileForm);
+        const res = await adminService.createMatchProfile(payload);
         if (res.data.success) {
           setMessage(`User profile for "${profileForm.fullName}" created successfully!`);
           setShowProfileModal(false);
@@ -192,20 +231,52 @@ export const AdminUsersPage: React.FC = () => {
     });
   };
 
+  // Live calculation of balances in modal
+  const loadedVal = Number(profileForm.loadAmount) || 0;
+  const currentTotal = Number(profileForm.totalBalance) || 0;
+  const currentFrozen = Number(profileForm.frozenBalance) || 0;
+  const newTotalBalance = currentTotal + loadedVal;
+  const availableBalanceAuto = Math.max(0, newTotalBalance - currentFrozen);
+
   return (
     <div className="space-y-6 w-full">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header with Top Right Status Filter Tabs */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <Users className="w-6 h-6 text-amber-400" /> User Directory & Accounts
           </h1>
-          <p className="text-xs text-slate-400">Manage registered client members, VIP statuses, balances, and profiles.</p>
+          <p className="text-xs text-slate-400">Manage registered client members, status, balances, and permissions.</p>
         </div>
 
-        <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
-          Add New User Profile
-        </Button>
+        <div className="flex items-center gap-3">
+          {/* Top-Right Status Filter Tabs (All, Active, Blocked, Pending) as shown in SS 4 */}
+          <div className="flex items-center gap-1 bg-brand-surface p-1.5 border border-brand-border rounded-2xl shadow-md">
+            {[
+              { label: 'All', value: 'ALL' },
+              { label: 'Active', value: 'ACTIVE' },
+              { label: 'Blocked', value: 'BLOCKED' },
+              { label: 'Pending', value: 'PENDING' },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => setStatusFilter(tab.value)}
+                className={`px-3.5 py-1.5 text-xs font-extrabold rounded-xl transition-all ${
+                  statusFilter === tab.value
+                    ? 'bg-rose-600 text-white shadow-lg scale-105'
+                    : 'text-slate-400 hover:text-slate-100 hover:bg-brand-card'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
+            Create User
+          </Button>
+        </div>
       </div>
 
       {message && (
@@ -226,22 +297,13 @@ export const AdminUsersPage: React.FC = () => {
         </div>
       )}
 
-      {/* Filters Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {/* Search & VIP Filters Bar */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input
           placeholder="Search name, email, or phone..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           leftIcon={<Search className="w-4 h-4" />}
-        />
-        <Select
-          options={[
-            { label: 'All Statuses', value: 'ALL' },
-            { label: 'Active Only', value: 'ACTIVE' },
-            { label: 'Suspended Only', value: 'SUSPENDED' },
-          ]}
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
         />
         <Select
           options={[
@@ -261,79 +323,84 @@ export const AdminUsersPage: React.FC = () => {
         ) : users.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No users found matching search query.</p>
         ) : (
-          <Table headers={['Profile Photo & Name', 'Assigned Staff', 'City', 'Status', 'VIP', `Available (${currencySymbol})`, `Frozen (${currencySymbol})`, 'Actions']}>
-            {users.map((u: any) => (
-              <tr key={u._id || u.id} className="hover:bg-brand-card/50 transition-colors">
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
-                      alt={u.fullName}
-                      className="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0"
-                    />
-                    <div>
-                      <div className="text-xs font-bold text-slate-100">{u.fullName}</div>
-                      <div className="text-[11px] text-slate-400">{u.email}</div>
+          <Table headers={['Profile Photo & Name', 'Assigned Staff', 'Credit Score', 'Status', 'VIP', `Available (${currencySymbol})`, `Frozen (${currencySymbol})`, 'Actions']}>
+            {users.map((u: any) => {
+              const userStatus = u.status === 'SUSPENDED' ? 'BLOCKED' : (u.status || 'ACTIVE');
+              return (
+                <tr key={u._id || u.id} className="hover:bg-brand-card/50 transition-colors">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
+                        alt={u.fullName}
+                        className="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0"
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-slate-100">{u.fullName}</div>
+                        <div className="text-[11px] text-slate-400">{u.email}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="px-5 py-3 text-xs">
-                  {u.assignedStaff ? (
-                    <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-bold text-[11px]">
-                      {typeof u.assignedStaff === 'object'
-                        ? (u.assignedStaff.invitationCode || u.assignedStaff.fullName || 'Staff')
-                        : u.assignedStaff}
-                    </span>
-                  ) : (
-                    <span className="text-slate-500 text-[11px] italic">Unassigned</span>
-                  )}
-                </td>
-                <td className="px-5 py-3 text-xs text-slate-300 font-semibold">{u.city || 'Mumbai'}</td>
-                <td className="px-5 py-3">
-                  {u.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
-                </td>
-                <td className="px-5 py-3">
-                  {u.isVIP ? <Badge variant="vip">VIP CLUB</Badge> : <Badge variant="neutral">NORMAL</Badge>}
-                </td>
-                <td className="px-5 py-3 font-bold text-emerald-400 text-xs">
-                  {currencySymbol}{(u.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </td>
-                <td className="px-5 py-3 font-bold text-amber-400 text-xs">
-                  {currencySymbol}{(u.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </td>
-                {/* EXACTLY 3 ACTION BUTTONS (View, Edit, Delete) PER USER REQUEST */}
-                <td className="px-5 py-3">
-                  <div className="flex items-center gap-2">
-                    {/* 1. View Button (Eye Icon) */}
-                    <Link
-                      to={`/admin/users/${u._id || u.id}`}
-                      className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
-                      title="View Full Profile & Detailed History"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Link>
+                  </td>
+                  <td className="px-5 py-3 text-xs">
+                    {u.assignedStaff ? (
+                      <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-bold text-[11px]">
+                        {typeof u.assignedStaff === 'object'
+                          ? (u.assignedStaff.invitationCode || u.assignedStaff.fullName || 'Staff')
+                          : u.assignedStaff}
+                      </span>
+                    ) : (
+                      <span className="text-slate-500 text-[11px] italic">Unassigned</span>
+                    )}
+                  </td>
+                  <td className="px-5 py-3 text-xs font-bold text-amber-400">{u.creditScore ?? 100} / 100</td>
+                  <td className="px-5 py-3">
+                    {userStatus === 'ACTIVE' && <Badge variant="verified">ACTIVE</Badge>}
+                    {userStatus === 'BLOCKED' && <Badge variant="danger">BLOCKED</Badge>}
+                    {userStatus === 'PENDING' && <Badge variant="warning">PENDING</Badge>}
+                  </td>
+                  <td className="px-5 py-3">
+                    {u.isVIP ? <Badge variant="vip">VIP</Badge> : <Badge variant="neutral">NONE</Badge>}
+                  </td>
+                  <td className="px-5 py-3 font-bold text-emerald-400 text-xs">
+                    {currencySymbol}{(u.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </td>
+                  <td className="px-5 py-3 font-bold text-amber-400 text-xs">
+                    {currencySymbol}{(u.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </td>
+                  {/* EXACTLY 3 ACTION BUTTONS (View, Edit, Delete) */}
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-2">
+                      {/* 1. Edit Button (Pencil Icon) */}
+                      <button
+                        onClick={() => handleOpenEditProfile(u)}
+                        className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
+                        title="Edit User Settings & Balances"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
 
-                    {/* 2. Edit Button (Pencil Icon) */}
-                    <button
-                      onClick={() => handleOpenEditProfile(u)}
-                      className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
-                      title="Edit Everything for this User"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
+                      {/* 2. View Button (Eye Icon) */}
+                      <Link
+                        to={`/admin/users/${u._id || u.id}`}
+                        className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
+                        title="View Full Profile & Detailed History"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Link>
 
-                    {/* 3. Delete Button (Trash Icon) */}
-                    <button
-                      onClick={() => handleDeleteProfile(u)}
-                      className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors shadow-sm"
-                      title="Delete User Profile"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      {/* 3. Delete Button (Trash Icon) */}
+                      <button
+                        onClick={() => handleDeleteProfile(u)}
+                        className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors shadow-sm"
+                        title="Delete User Profile"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </Table>
         )}
       </div>
@@ -349,113 +416,165 @@ export const AdminUsersPage: React.FC = () => {
         confirmText="Confirm Action"
       />
 
-      {/* ALL-INCLUSIVE EDIT PROFILE MODAL (Edits Name, Email, Phone, City, Gender, Status, VIP, Balance) */}
+      {/* EDIT USER MODAL WITH EXACT LAYOUT & FIELDS AS SHOWN IN SCREENSHOTS 1, 2, 3 */}
       {showProfileModal && (
         <Modal
           isOpen={true}
           onClose={() => setShowProfileModal(false)}
-          title={editProfileUser ? `Edit User Profile — ${editProfileUser.fullName}` : 'Add New User Profile'}
-          maxWidth="lg"
+          title={editProfileUser ? 'Edit User' : 'Add New User'}
+          maxWidth="md"
         >
           <form onSubmit={handleSaveProfile} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1 text-xs">
-            <ImageUploadPicker
-              label="Profile Photo"
-              value={profileForm.profileImage}
-              onChange={(url) => setProfileForm({ ...profileForm, profileImage: url })}
+            {/* Status (Active, Blocked, Pending) */}
+            <Select
+              label="Status"
+              options={[
+                { label: 'Active', value: 'ACTIVE' },
+                { label: 'Blocked', value: 'BLOCKED' },
+                { label: 'Pending', value: 'PENDING' },
+              ]}
+              value={profileForm.status}
+              onChange={(e) => setProfileForm({ ...profileForm, status: e.target.value })}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Input
-                label="Full Name"
-                value={profileForm.fullName}
-                onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
-                required
-              />
+            {/* VIP Status (VIP, None) */}
+            <Select
+              label="VIP Status"
+              options={[
+                { label: 'VIP', value: 'true' },
+                { label: 'None', value: 'false' },
+              ]}
+              value={String(profileForm.isVIP)}
+              onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
+            />
 
-              <Input
-                label="Email Address"
-                type="email"
-                value={profileForm.email}
-                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                required
+            {/* Total Balance */}
+            <Input
+              label="Total Balance"
+              type="number"
+              value={profileForm.totalBalance.toString()}
+              onChange={(e) => setProfileForm({ ...profileForm, totalBalance: Number(e.target.value) })}
+            />
+
+            {/* Frozen Balance */}
+            <Input
+              label="Frozen Balance"
+              type="number"
+              value={profileForm.frozenBalance.toString()}
+              onChange={(e) => setProfileForm({ ...profileForm, frozenBalance: Number(e.target.value) })}
+            />
+
+            {/* Credit Score */}
+            <Input
+              label="Credit Score"
+              type="number"
+              value={profileForm.creditScore.toString()}
+              onChange={(e) => setProfileForm({ ...profileForm, creditScore: Number(e.target.value) })}
+            />
+
+            {/* Allow Withdraw */}
+            <div className="space-y-1">
+              <Select
+                label="Allow Withdraw"
+                options={[
+                  { label: 'Yes', value: 'true' },
+                  { label: 'No', value: 'false' },
+                ]}
+                value={String(profileForm.allowWithdraw)}
+                onChange={(e) => setProfileForm({ ...profileForm, allowWithdraw: e.target.value === 'true' })}
               />
+              <p className="text-[10px] text-slate-500">When set to No, this customer cannot submit withdrawal requests.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Input
-                label="Phone Number"
-                value={profileForm.phone}
-                onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-              />
-
+            {/* Allow Trade */}
+            <div className="space-y-1">
               <Select
-                label="City"
+                label="Allow Trade"
                 options={[
-                  { label: 'Mumbai', value: 'Mumbai' },
-                  { label: 'Delhi', value: 'Delhi' },
-                  { label: 'Bangalore', value: 'Bangalore' },
-                  { label: 'Hyderabad', value: 'Hyderabad' },
-                  { label: 'Pune', value: 'Pune' },
-                  { label: 'Agra', value: 'Agra' },
+                  { label: 'Yes', value: 'true' },
+                  { label: 'No', value: 'false' },
                 ]}
-                value={profileForm.city}
-                onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+                value={String(profileForm.allowTrade)}
+                onChange={(e) => setProfileForm({ ...profileForm, allowTrade: e.target.value === 'true' })}
               />
-
-              <Select
-                label="Gender"
-                options={[
-                  { label: 'Female', value: 'Female' },
-                  { label: 'Male', value: 'Male' },
-                ]}
-                value={profileForm.gender}
-                onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
-              />
+              <p className="text-[10px] text-slate-500">When set to No, this customer cannot submit VIP trade (lottery) requests.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Select
-                label="Account Status"
-                options={[
-                  { label: 'Active', value: 'ACTIVE' },
-                  { label: 'Suspended', value: 'SUSPENDED' },
-                ]}
-                value={profileForm.status}
-                onChange={(e) => setProfileForm({ ...profileForm, status: e.target.value })}
-              />
-
-              <Select
-                label="VIP Status"
-                options={[
-                  { label: 'VIP Club Member', value: 'true' },
-                  { label: 'Normal Member', value: 'false' },
-                ]}
-                value={String(profileForm.isVIP)}
-                onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
-              />
-
+            {/* Load Amount (Total Balance) Box */}
+            <div className="p-3.5 bg-brand-dark/80 border border-brand-border rounded-2xl space-y-2">
               <Input
-                label={`Available Balance (${currencySymbol})`}
+                label={`Load Amount (${currencySymbol})`}
                 type="number"
-                step="1"
-                value={profileForm.availableBalance.toString()}
-                onChange={(e) => setProfileForm({ ...profileForm, availableBalance: Number(e.target.value) })}
+                placeholder="Enter amount to add..."
+                value={profileForm.loadAmount}
+                onChange={(e) => setProfileForm({ ...profileForm, loadAmount: e.target.value })}
               />
+              <div className="flex items-center justify-between text-xs font-bold pt-1">
+                <span className="text-slate-300">New Total Balance:</span>
+                <span className="text-emerald-400 font-mono">{currencySymbol}{newTotalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+              </div>
             </div>
 
-            <Textarea
-              label="Bio / Profile Description"
-              value={profileForm.bio}
-              onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-              rows={2}
+            {/* Available Balance (auto) - Read Only Non-Editable */}
+            <div className="p-3.5 bg-brand-surface border border-brand-border rounded-2xl flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-300">Available Balance (auto)</span>
+              <span className="text-xs font-bold text-amber-400 font-mono">
+                {currencySymbol}{availableBalanceAuto.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+
+            {/* Reset Username (Full Name) */}
+            <Input
+              label="Reset Username (Full Name)"
+              value={profileForm.fullName}
+              onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
+              required
             />
 
+            {/* Reset Password (optional) */}
+            <div className="space-y-1">
+              <Input
+                label="Reset Password (optional)"
+                type="password"
+                placeholder="Leave blank to keep unchanged"
+                value={profileForm.password}
+                onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+              />
+              <p className="text-[10px] text-slate-500">Leave blank to keep unchanged</p>
+            </div>
+
+            {/* Transaction PIN Display Status */}
+            <div className="p-3.5 bg-brand-dark/80 border border-brand-border rounded-2xl space-y-1">
+              <label className="block text-xs font-semibold text-slate-300">Transaction PIN</label>
+              <div className="flex items-center gap-2">
+                <Badge variant={profileForm.hasTransactionPin ? 'verified' : 'neutral'}>
+                  {profileForm.hasTransactionPin ? 'Set' : 'Not set'}
+                </Badge>
+              </div>
+              <p className="text-[10px] text-slate-500">
+                The PIN is stored securely and cannot be viewed. Enter a new PIN below to reset it for the user.
+              </p>
+            </div>
+
+            {/* Set New Transaction PIN (optional) */}
+            <div className="space-y-1">
+              <Input
+                label="Set New Transaction PIN (optional)"
+                type="password"
+                placeholder="4 to 8 digits"
+                value={profileForm.transactionPin}
+                onChange={(e) => setProfileForm({ ...profileForm, transactionPin: e.target.value })}
+              />
+              <p className="text-[10px] text-slate-500">4 to 8 digits</p>
+            </div>
+
+            {/* Save Buttons */}
             <div className="flex justify-end gap-3 pt-3 border-t border-brand-border">
               <Button variant="secondary" onClick={() => setShowProfileModal(false)} type="button">
                 Cancel
               </Button>
               <Button variant="gold" type="submit" isLoading={actionLoading}>
-                {editProfileUser ? 'Update Profile' : 'Create Profile'}
+                Save Changes
               </Button>
             </div>
           </form>

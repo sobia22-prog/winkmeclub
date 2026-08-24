@@ -153,7 +153,10 @@ export class AdminController {
         query.assignedStaff = req.user._id;
       }
 
-      if (status && status !== 'ALL') query.status = status;
+      if (status && status !== 'ALL') {
+        if (status === 'BLOCKED') query.status = 'SUSPENDED';
+        else query.status = status;
+      }
       if (isVIP === 'true') query.isVIP = true;
       if (isVIP === 'false') query.isVIP = false;
       if (search) {
@@ -181,6 +184,7 @@ export class AdminController {
         const userWallet = wallets.find((w) => w.userId.toString() === user._id.toString());
         return {
           ...user.toObject(),
+          hasTransactionPin: Boolean(user.transactionPinHash),
           wallet: {
             availableBalance: userWallet?.availableBalance || 0,
             frozenBalance: userWallet?.frozenBalance || 0,
@@ -221,7 +225,10 @@ export class AdminController {
       return res.status(200).json({
         success: true,
         data: {
-          user,
+          user: {
+            ...user.toObject(),
+            hasTransactionPin: Boolean(user.transactionPinHash),
+          },
           wallet,
           transactions,
           recharges,
@@ -275,7 +282,26 @@ export class AdminController {
 
   static async updateUserProfile(req: AuthRequest, res: Response) {
     try {
-      const { fullName, email, phone, city, gender, profileImage, bio, status, isVIP } = req.body;
+      const {
+        fullName,
+        email,
+        phone,
+        city,
+        gender,
+        profileImage,
+        bio,
+        status,
+        isVIP,
+        creditScore,
+        allowWithdraw,
+        allowTrade,
+        password,
+        transactionPin,
+        loadAmount,
+        totalBalance,
+        frozenBalance,
+      } = req.body;
+
       const user = await User.findById(req.params.id);
       if (!user) return res.status(404).json({ message: 'User not found.' });
 
@@ -290,15 +316,60 @@ export class AdminController {
       if (gender) user.gender = gender;
       if (profileImage !== undefined) user.profileImage = profileImage;
       if (bio !== undefined) user.bio = bio;
-      if (status) user.status = status;
-      if (isVIP !== undefined) user.isVIP = isVIP;
+
+      if (status) {
+        if (status === 'BLOCKED') user.status = 'SUSPENDED';
+        else user.status = status;
+      }
+
+      if (isVIP !== undefined) user.isVIP = Boolean(isVIP);
+      if (creditScore !== undefined && !isNaN(Number(creditScore))) user.creditScore = Number(creditScore);
+      if (allowWithdraw !== undefined) user.allowWithdraw = Boolean(allowWithdraw);
+      if (allowTrade !== undefined) user.allowTrade = Boolean(allowTrade);
+
+      if (password && typeof password === 'string' && password.trim().length > 0) {
+        user.passwordHash = await bcrypt.hash(password.trim(), 10);
+      }
+
+      if (transactionPin && typeof transactionPin === 'string' && transactionPin.trim().length >= 4) {
+        user.transactionPinHash = await bcrypt.hash(transactionPin.trim(), 10);
+      }
 
       await user.save();
+
+      // Handle Wallet Balance Adjustments (Load Amount, Total Balance, Frozen Balance)
+      const wallet = await WalletService.getOrCreateWallet(user._id.toString());
+
+      if (loadAmount !== undefined && !isNaN(Number(loadAmount)) && Number(loadAmount) > 0) {
+        const addAmount = Number(loadAmount);
+        wallet.availableBalance += addAmount;
+        wallet.totalBalance = wallet.availableBalance + wallet.frozenBalance;
+        await wallet.save();
+      } else if (totalBalance !== undefined && !isNaN(Number(totalBalance))) {
+        const newTotal = Number(totalBalance);
+        const newFrozen = frozenBalance !== undefined ? Number(frozenBalance) : wallet.frozenBalance;
+        wallet.frozenBalance = newFrozen;
+        wallet.totalBalance = newTotal;
+        wallet.availableBalance = Math.max(0, newTotal - newFrozen);
+        await wallet.save();
+      } else if (frozenBalance !== undefined && !isNaN(Number(frozenBalance))) {
+        wallet.frozenBalance = Number(frozenBalance);
+        wallet.totalBalance = wallet.availableBalance + wallet.frozenBalance;
+        await wallet.save();
+      }
 
       return res.status(200).json({
         success: true,
         message: 'Member profile updated successfully.',
-        user,
+        user: {
+          ...user.toObject(),
+          hasTransactionPin: Boolean(user.transactionPinHash),
+          wallet: {
+            availableBalance: wallet.availableBalance,
+            frozenBalance: wallet.frozenBalance,
+            totalBalance: wallet.totalBalance,
+          },
+        },
       });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to update user profile.' });

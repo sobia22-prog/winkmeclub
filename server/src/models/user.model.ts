@@ -12,9 +12,13 @@ export interface IUser extends Document {
   assignedStaff?: mongoose.Types.ObjectId;
   isVIP: boolean;
   vipExpiresAt?: Date;
-  isVerified: boolean; // Email OTP verified
+  isVerified: boolean;
   verificationStatus: 'NONE' | 'PENDING' | 'VERIFIED' | 'REJECTED';
-  status: 'ACTIVE' | 'SUSPENDED';
+  status: 'ACTIVE' | 'SUSPENDED' | 'PENDING';
+  creditScore: number;
+  allowWithdraw: boolean;
+  allowTrade: boolean;
+  transactionPinHash?: string;
   profileImage?: string;
   bio?: string;
   dob?: Date;
@@ -40,7 +44,11 @@ const UserSchema: Schema = new Schema(
     vipExpiresAt: { type: Date },
     isVerified: { type: Boolean, default: false },
     verificationStatus: { type: String, enum: ['NONE', 'PENDING', 'VERIFIED', 'REJECTED'], default: 'NONE' },
-    status: { type: String, enum: ['ACTIVE', 'SUSPENDED'], default: 'ACTIVE', index: true },
+    status: { type: String, enum: ['ACTIVE', 'SUSPENDED', 'PENDING'], default: 'ACTIVE', index: true },
+    creditScore: { type: Number, default: 100 },
+    allowWithdraw: { type: Boolean, default: true },
+    allowTrade: { type: Boolean, default: true },
+    transactionPinHash: { type: String, default: '' },
     profileImage: { type: String, default: '' },
     bio: { type: String, default: '' },
     dob: { type: Date },
