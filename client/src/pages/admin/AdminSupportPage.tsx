@@ -1,33 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { adminService } from '../../services/admin.service';
-import { supportService } from '../../services/support.service';
-import { SupportTicket, SupportMessage } from '../../types';
+import { systemSettingsService } from '../../services/systemSettings.service';
 import { Card } from '../../components/common/Card';
-import { Table } from '../../components/common/Table';
-import { Badge } from '../../components/common/Badge';
+import { Input } from '../../components/common/Input';
+import { Textarea } from '../../components/common/Textarea';
 import { Button } from '../../components/common/Button';
-import { Modal } from '../../components/common/Modal';
-import { Select } from '../../components/common/Select';
-import { Headphones, MessageSquare, Send } from 'lucide-react';
+import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
+import { Headphones, CheckCircle2, Save, Send, QrCode } from 'lucide-react';
 
 export const AdminSupportPage: React.FC = () => {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [status, setStatus] = useState('ALL');
-  const [loading, setLoading] = useState(true);
+  const [telegramSupportLink, setTelegramSupportLink] = useState('https://t.me/winkmedatingclub_support');
+  const [telegramSupportMessage, setTelegramSupportMessage] = useState(
+    'Need help or have questions? Reach out to our dedicated 24/7 customer service team directly on Telegram.'
+  );
+  const [telegramSupportQrCode, setTelegramSupportQrCode] = useState(
+    'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support'
+  );
 
-  // Chat Reply Modal
-  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
-  const [messages, setMessages] = useState<SupportMessage[]>([]);
-  const [replyMessage, setReplyMessage] = useState('');
-  const [replyLoading, setReplyLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const fetchTickets = async () => {
+  const fetchSettings = async () => {
     setLoading(true);
     try {
-      const res = await adminService.getTickets({ status });
-      if (res.data.success) {
-        setTickets(res.data.tickets);
+      const res = await systemSettingsService.getSettings();
+      if (res.data.success && res.data.settings) {
+        const s = res.data.settings;
+        if (s.telegramSupportLink) setTelegramSupportLink(s.telegramSupportLink);
+        if (s.telegramSupportMessage) setTelegramSupportMessage(s.telegramSupportMessage);
+        if (s.telegramSupportQrCode) setTelegramSupportQrCode(s.telegramSupportQrCode);
       }
     } catch (err) {
       console.error(err);
@@ -37,142 +39,133 @@ export const AdminSupportPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTickets();
-  }, [status]);
+    fetchSettings();
+  }, []);
 
-  const openTicketChat = async (ticket: SupportTicket) => {
-    setSelectedTicket(ticket);
-    try {
-      const res = await supportService.getTicketDetails(ticket._id);
-      if (res.data.success) {
-        setMessages(res.data.messages);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAdminReply = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedTicket || !replyMessage.trim()) return;
-    setReplyLoading(true);
+    setSaving(true);
+    setMessage('');
+    setError('');
 
     try {
-      const res = await adminService.replyTicket(selectedTicket._id, { message: replyMessage });
+      const res = await systemSettingsService.updateSettings({
+        telegramSupportLink,
+        telegramSupportMessage,
+        telegramSupportQrCode,
+      });
+
       if (res.data.success) {
-        setMessages((prev) => [...prev, res.data.msg]);
-        setReplyMessage('');
-        fetchTickets();
+        setMessage('Customer service Telegram settings updated successfully!');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Reply failed.');
+      setError(err.response?.data?.message || 'Failed to update customer service settings.');
     } finally {
-      setReplyLoading(false);
+      setSaving(false);
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Headphones className="w-6 h-6 text-brand-wine" /> Concierge Customer Ticket Inbox
-          </h1>
-          <p className="text-xs text-slate-400">Respond to incoming VIP user support requests and inquiries.</p>
-        </div>
+  if (loading) {
+    return (
+      <div className="p-8 text-center text-xs text-slate-500">
+        Loading Customer Service Settings...
+      </div>
+    );
+  }
 
-        <div className="w-full sm:w-48">
-          <Select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            options={[
-              { label: 'All Tickets', value: 'ALL' },
-              { label: 'Open Tickets', value: 'OPEN' },
-              { label: 'In Progress', value: 'IN_PROGRESS' },
-              { label: 'Resolved', value: 'RESOLVED' },
-            ]}
-          />
-        </div>
+  return (
+    <div className="max-w-3xl space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2.5">
+          <Headphones className="w-6 h-6 text-amber-400" /> Customer Service
+        </h1>
+        <p className="text-xs text-slate-400 mt-1">
+          Telegram QR, link, and message shown on the member Customer Service page
+        </p>
       </div>
 
-      {loading ? (
-        <Card className="p-8 text-center text-xs text-slate-500">Loading support inbox...</Card>
-      ) : tickets.length === 0 ? (
-        <Card className="p-12 text-center text-xs text-slate-500">No support tickets found for filter.</Card>
-      ) : (
-        <Table headers={['Ticket ID', 'User Name', 'Email', 'Category', 'Subject', 'Status', 'Action']}>
-          {tickets.map((t) => (
-            <tr key={t._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.ticketId}</td>
-              <td className="px-5 py-3 font-semibold text-slate-200">{t.userName}</td>
-              <td className="px-5 py-3 text-slate-400">{t.userEmail}</td>
-              <td className="px-5 py-3 text-slate-300">{t.category}</td>
-              <td className="px-5 py-3 text-slate-100 font-semibold max-w-xs truncate">{t.subject}</td>
-              <td className="px-5 py-3">
-                {t.status === 'OPEN' && <Badge variant="warning">OPEN</Badge>}
-                {t.status === 'IN_PROGRESS' && <Badge variant="pending">IN PROGRESS</Badge>}
-                {t.status === 'RESOLVED' && <Badge variant="success">RESOLVED</Badge>}
-              </td>
-              <td className="px-5 py-3">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  leftIcon={<MessageSquare className="w-3.5 h-3.5" />}
-                  onClick={() => openTicketChat(t)}
-                >
-                  Reply Chat
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </Table>
+      {message && (
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 font-semibold flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" /> {message}
+          </div>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white text-xs">✕</button>
+        </div>
       )}
 
-      {/* Admin Conversation Reply Modal */}
-      {selectedTicket && (
-        <Modal
-          isOpen={true}
-          onClose={() => setSelectedTicket(null)}
-          title={`Ticket Inbox #${selectedTicket.ticketId} — ${selectedTicket.subject}`}
-          maxWidth="lg"
-        >
-          <div className="space-y-4">
-            <div className="p-3 bg-brand-card border border-brand-border rounded-xl text-xs space-y-1">
-              <div>User: <span className="font-bold text-slate-100">{selectedTicket.userName}</span> ({selectedTicket.userEmail})</div>
-              <div>Category: <span className="text-slate-300">{selectedTicket.category}</span></div>
-            </div>
+      {error && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400 font-semibold">
+          {error}
+        </div>
+      )}
 
-            <div className="p-4 bg-brand-surface border border-brand-border rounded-xl space-y-3 max-h-72 overflow-y-auto">
-              {messages.map((m) => (
-                <div key={m._id} className={`flex flex-col ${m.senderRole === 'ADMIN' ? 'items-end' : 'items-start'}`}>
-                  <span className="text-[10px] text-slate-400 font-bold mb-1">{m.senderName} ({m.senderRole})</span>
-                  <div
-                    className={`max-w-md p-3 rounded-xl text-xs ${
-                      m.senderRole === 'ADMIN' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-200 border border-slate-700'
-                    }`}
-                  >
-                    {m.message}
+      {/* Main Settings Form */}
+      <Card className="p-6 md:p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Telegram Link */}
+          <Input
+            label="Telegram link"
+            placeholder="https://t.me/your_handle"
+            value={telegramSupportLink}
+            onChange={(e) => setTelegramSupportLink(e.target.value)}
+            helperText="Direct Telegram handle or channel URL for member customer support"
+            required
+          />
+
+          <Textarea
+            label="Support message"
+            placeholder="Support message shown on member Customer Service page..."
+            value={telegramSupportMessage}
+            onChange={(e) => setTelegramSupportMessage(e.target.value)}
+            rows={3}
+            required
+          />
+
+          {/* Telegram QR Image */}
+          <div className="space-y-3">
+            <label className="block text-xs font-semibold text-slate-300">Telegram QR Image</label>
+            <ImageUploadPicker
+              value={telegramSupportQrCode}
+              onChange={(url) => setTelegramSupportQrCode(url)}
+              label=""
+              helperText="Upload your custom Telegram Customer Service QR Code image"
+              aspectRatio="square"
+            />
+
+            {/* Preview Box */}
+            {telegramSupportQrCode && (
+              <div className="pt-2">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Live Member Screen Preview</span>
+                <div className="inline-block p-4 bg-slate-900 border border-amber-500/30 rounded-2xl shadow-xl text-center space-y-2">
+                  <div className="bg-white p-2 rounded-xl inline-block shadow-md">
+                    <img
+                      src={telegramSupportQrCode}
+                      alt="Telegram QR Code"
+                      className="w-36 h-36 object-contain rounded-lg"
+                    />
+                  </div>
+                  <div className="text-[10px] font-bold text-amber-400 font-mono flex items-center justify-center gap-1">
+                    <QrCode className="w-3 h-3 text-amber-400" /> @CUSTOMER_SUPPORT
                   </div>
                 </div>
-              ))}
-            </div>
-
-            <form onSubmit={handleAdminReply} className="flex gap-2 pt-2">
-              <input
-                type="text"
-                placeholder="Type official admin reply..."
-                value={replyMessage}
-                onChange={(e) => setReplyMessage(e.target.value)}
-                className="flex-1 bg-brand-surface border border-brand-border rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                required
-              />
-              <Button type="submit" variant="gold" size="sm" isLoading={replyLoading} leftIcon={<Send className="w-3.5 h-3.5" />}>
-                Send Reply
-              </Button>
-            </form>
+              </div>
+            )}
           </div>
-        </Modal>
-      )}
+
+          {/* Submit Button */}
+          <div className="pt-4 border-t border-brand-border flex justify-end">
+            <Button
+              type="submit"
+              variant="gold"
+              isLoading={saving}
+              leftIcon={<Save className="w-4 h-4" />}
+            >
+              Save Customer Service Settings
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 };

@@ -4,6 +4,7 @@ export interface ISystemSettings extends Document {
   telegramFinanceLink: string;
   telegramSupportLink: string;
   telegramSupportQrCode: string;
+  telegramSupportMessage: string;
   usdtWalletAddress: string;
   usdtExchangeRate: number;
   adminUpiId: string;
@@ -21,6 +22,10 @@ const SystemSettingsSchema: Schema = new Schema(
     telegramSupportQrCode: {
       type: String,
       default: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support',
+    },
+    telegramSupportMessage: {
+      type: String,
+      default: 'Need help or have questions? Reach out to our dedicated 24/7 customer service team directly on Telegram.',
     },
     usdtWalletAddress: { type: String, default: 'TXYZ987654321WinkMeClubUSDTDepositAddr' },
     usdtExchangeRate: { type: Number, default: 92 },

@@ -21,14 +21,15 @@ export class SystemSettingsController {
 
   static async updateSettings(req: AuthRequest, res: Response) {
     try {
-      if (!req.user || req.user.role !== 'ADMIN') {
-        return res.status(403).json({ message: 'Unauthorized. Admin access required.' });
+      if (!req.user || (req.user.role !== 'ADMIN' && req.user.role !== 'STAFF')) {
+        return res.status(403).json({ message: 'Unauthorized. Admin or Staff access required.' });
       }
 
       const {
         telegramFinanceLink,
         telegramSupportLink,
         telegramSupportQrCode,
+        telegramSupportMessage,
         usdtWalletAddress,
         usdtExchangeRate,
         adminUpiId,
@@ -46,6 +47,7 @@ export class SystemSettingsController {
       if (telegramFinanceLink !== undefined) settings.telegramFinanceLink = telegramFinanceLink;
       if (telegramSupportLink !== undefined) settings.telegramSupportLink = telegramSupportLink;
       if (telegramSupportQrCode !== undefined) settings.telegramSupportQrCode = telegramSupportQrCode;
+      if (telegramSupportMessage !== undefined) settings.telegramSupportMessage = telegramSupportMessage;
       if (usdtWalletAddress !== undefined) settings.usdtWalletAddress = usdtWalletAddress;
       if (usdtExchangeRate !== undefined && !isNaN(Number(usdtExchangeRate))) {
         settings.usdtExchangeRate = Number(usdtExchangeRate);
@@ -60,7 +62,7 @@ export class SystemSettingsController {
 
       return res.status(200).json({
         success: true,
-        message: 'System payment & Telegram settings updated successfully!',
+        message: 'System settings updated successfully!',
         settings,
       });
     } catch (error: any) {

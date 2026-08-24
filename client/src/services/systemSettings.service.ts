@@ -4,6 +4,7 @@ export interface SystemSettingsData {
   telegramFinanceLink: string;
   telegramSupportLink: string;
   telegramSupportQrCode: string;
+  telegramSupportMessage?: string;
   usdtWalletAddress: string;
   usdtExchangeRate: number;
   adminUpiId: string;
