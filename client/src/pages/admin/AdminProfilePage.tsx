@@ -176,7 +176,7 @@ export const AdminProfilePage: React.FC = () => {
               onChange={(url) => setProjectImage(url)}
               label=""
               helperText="Upload custom logo image"
-              aspectRatio="square"
+              showActionButtons={true}
             />
           </div>
 
