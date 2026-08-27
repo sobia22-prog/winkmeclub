@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { SystemSettingsProvider } from './contexts/SystemSettingsContext';
+import { LanguageTranslator } from './components/common/LanguageTranslator';
 
 // Layouts
 import { UserLayout } from './layouts/UserLayout';
@@ -71,6 +72,7 @@ export const App: React.FC = () => {
       <BrowserRouter>
         <AuthProvider>
           <SystemSettingsProvider>
+            <LanguageTranslator />
             <Routes>
               {/* Public Auth Routes */}
               <Route path="/login" element={<LoginPage />} />
