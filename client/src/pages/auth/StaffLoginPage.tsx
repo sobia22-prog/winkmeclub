@@ -33,7 +33,7 @@ export const StaffLoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await authService.staffLogin({ username, password });
+      const res = await authService.staffLogin({ username, email: username, password });
       if (res.data.success) {
         loginSession(res.data.token, res.data.user);
         navigate('/staff/dashboard');

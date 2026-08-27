@@ -253,10 +253,12 @@ export class AuthController {
       const escapedId = loginIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
       const user = await User.findOne({
+        role: 'STAFF',
         $or: [
           { email: cleanId },
           { email: `${cleanId.replace(/\s+/g, '')}@winkmeclub.com` },
-          { fullName: new RegExp('^' + escapedId + '$', 'i') }
+          { fullName: new RegExp('^' + escapedId + '$', 'i') },
+          { invitationCode: cleanId.toUpperCase() }
         ]
       });
 
