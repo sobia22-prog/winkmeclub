@@ -2,15 +2,17 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Users, ShieldCheck, User, LogOut } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useSystemSettings } from '../contexts/SystemSettingsContext';
 
 export const Sidebar: React.FC = () => {
   const { logout } = useAuth();
+  const { t } = useSystemSettings();
 
   const mainNavItems = [
-    { label: 'Home', path: '/dashboard', icon: <Home className="w-5 h-5" /> },
-    { label: 'Matches', path: '/matches', icon: <Users className="w-5 h-5" /> },
-    { label: 'Verification', path: '/verification', icon: <ShieldCheck className="w-5 h-5" /> },
-    { label: 'Profile', path: '/profile', icon: <User className="w-5 h-5" /> },
+    { label: t('home'), path: '/dashboard', icon: <Home className="w-5 h-5" /> },
+    { label: t('matches'), path: '/matches', icon: <Users className="w-5 h-5" /> },
+    { label: t('verification'), path: '/verification', icon: <ShieldCheck className="w-5 h-5" /> },
+    { label: t('profile'), path: '/profile', icon: <User className="w-5 h-5" /> },
   ];
 
   return (
@@ -40,7 +42,7 @@ export const Sidebar: React.FC = () => {
           className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors"
         >
           <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
+          <span>{t('logout')}</span>
         </button>
       </div>
     </aside>

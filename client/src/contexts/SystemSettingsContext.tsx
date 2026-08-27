@@ -3,10 +3,13 @@ import { systemSettingsService, SystemSettingsData } from '../services/systemSet
 import { useAuth } from './AuthContext';
 import { Wrench, RefreshCw } from 'lucide-react';
 
+import { getTranslation, SupportedLanguage } from '../utils/translations';
+
 interface SystemSettingsContextType {
   settings: SystemSettingsData;
   loading: boolean;
   refreshSettings: () => Promise<void>;
+  t: (key: string) => string;
 }
 
 const defaultSettings: SystemSettingsData = {
@@ -25,6 +28,7 @@ const SystemSettingsContext = createContext<SystemSettingsContextType>({
   settings: defaultSettings,
   loading: true,
   refreshSettings: async () => {},
+  t: (key: string) => key,
 });
 
 export const SystemSettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -93,8 +97,10 @@ export const SystemSettingsProvider: React.FC<{ children: ReactNode }> = ({ chil
     );
   }
 
+  const t = (key: string) => getTranslation((settings.defaultLanguage as SupportedLanguage) || 'English', key);
+
   return (
-    <SystemSettingsContext.Provider value={{ settings, loading, refreshSettings: fetchSettings }}>
+    <SystemSettingsContext.Provider value={{ settings, loading, refreshSettings: fetchSettings, t }}>
       {children}
     </SystemSettingsContext.Provider>
   );

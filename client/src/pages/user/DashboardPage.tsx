@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { brandConfig } from '../../config/brand.config';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
-import { MultiSelectCity } from '../../components/common/MultiSelectCity';
 import { girlProfileService } from '../../services/girlProfile.service';
 import {
   Sparkles,
   Calendar,
   MapPin,
-  Heart,
-  ArrowRight,
   Flame,
   Crown,
   Megaphone,
@@ -21,52 +19,128 @@ import {
   ShieldCheck,
   Zap,
   Star,
-  Headphones,
+  ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
+
+const mockFallbackProfiles = [
+  {
+    _id: 'mock1',
+    name: 'Aria Sharma',
+    location: 'Mumbai',
+    height: "5'6\"",
+    weight: '52kg',
+    rating: 4.9,
+    bio: 'Independent fashion model & VIP luxury escort.',
+    profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    verificationLabel: 'VIP Verified',
+  },
+  {
+    _id: 'mock2',
+    name: 'Ananya Verma',
+    location: 'Delhi',
+    height: "5'7\"",
+    weight: '54kg',
+    rating: 5.0,
+    bio: 'Charming, sweet & educated companion for luxury dinners and events.',
+    profileImage: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80',
+    verificationLabel: 'Super VIP',
+  },
+  {
+    _id: 'mock3',
+    name: 'Riya Sen',
+    location: 'Bangalore',
+    height: "5'5\"",
+    weight: '50kg',
+    rating: 4.8,
+    bio: 'Passionate dancer & elite club VIP escort in Bangalore.',
+    profileImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80',
+    verificationLabel: 'Verified Gold',
+  },
+  {
+    _id: 'mock4',
+    name: 'Sofia Khan',
+    location: 'Hyderabad',
+    height: "5'8\"",
+    weight: '55kg',
+    rating: 4.9,
+    bio: 'High-class companion available for exclusive VIP dates.',
+    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=80',
+    verificationLabel: 'VIP Elite',
+  },
+  {
+    _id: 'mock5',
+    name: 'Natasha Kapoor',
+    location: 'Goa',
+    height: "5'6\"",
+    weight: '51kg',
+    rating: 5.0,
+    bio: 'Beach lover & resort escort available for luxury weekend getaways.',
+    profileImage: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&auto=format&fit=crop&q=80',
+    verificationLabel: 'VIP Diamond',
+  },
+  {
+    _id: 'mock6',
+    name: 'Kiara Mehta',
+    location: 'Pune',
+    height: "5'7\"",
+    weight: '53kg',
+    rating: 4.9,
+    bio: 'Sophisticated corporate companion & private club escort.',
+    profileImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80',
+    verificationLabel: 'VIP Verified',
+  },
+];
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useSystemSettings();
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<any[]>([]);
-  const [selectedCities, setSelectedCities] = useState<string[]>([]);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'vip' | 'popular' | 'city'>('all');
   const [loading, setLoading] = useState(true);
-
-  // Apply for Date Modal State
   const [applyDateProfile, setApplyDateProfile] = useState<any | null>(null);
 
   // Fetch admin-curated Girl Profiles from backend
   const loadProfiles = useCallback(async () => {
     setLoading(true);
     try {
-      let cityQuery = selectedCities.length > 0 ? selectedCities.join(',') : 'All';
-      if (activeFilter === 'city' && selectedCities.length === 0) {
-        cityQuery = user?.city || 'Mumbai';
-      }
-
-      const res = await girlProfileService.getPublicProfiles({
-        city: cityQuery,
-      });
+      const res = await girlProfileService.getPublicProfiles({ city: 'All' });
 
       if (res.data.success) {
         let list = res.data.profiles || [];
-        if (activeFilter === 'vip') {
-          list = list.filter((p: any) => p.verificationLabel?.includes('VIP') || p.tags?.includes('VIP'));
-        } else if (activeFilter === 'popular') {
-          list = list.filter((p: any) => (p.initialLikes ?? 0) > 400);
+        if (list.length < 6) {
+          const missingCount = 6 - list.length;
+          list = [...list, ...mockFallbackProfiles.slice(0, missingCount)];
         }
         setProfiles(list);
+      } else {
+        setProfiles(mockFallbackProfiles);
       }
     } catch (err) {
       console.error('Failed to load girl profiles:', err);
+      setProfiles(mockFallbackProfiles);
     } finally {
       setLoading(false);
     }
-  }, [selectedCities, activeFilter, user?.city]);
+  }, []);
 
   useEffect(() => {
     loadProfiles();
   }, [loadProfiles]);
+
+  // Automatic Profile Rotation Interval (Refreshes profile order every 4s smoothly without any button click)
+  useEffect(() => {
+    if (profiles.length <= 1) return;
+    const rotationTimer = setInterval(() => {
+      setProfiles((prev) => {
+        if (prev.length <= 1) return prev;
+        const [first, ...rest] = prev;
+        return [...rest, first];
+      });
+    }, 4000);
+
+    return () => clearInterval(rotationTimer);
+  }, [profiles.length]);
 
   const getAttributesTag = (index: number, p: any) => {
     if (p.categories && p.categories.length > 0) {
@@ -81,17 +155,16 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full pb-20">
       {/* Hero Banner Card 1 */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-rose-600 to-brand-wine border border-rose-400/30 p-6 md:p-8 text-white shadow-2xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <span className="px-3 py-1 bg-black/30 backdrop-blur-md rounded-full text-[10px] font-extrabold tracking-widest uppercase text-pink-200">
-              OFFICIAL VIP CLUB
+            <span className="px-3 py-1 bg-black/30 rounded-full text-[10px] font-extrabold tracking-widest uppercase text-pink-200">
+              {t('officialVipClub')}
             </span>
             <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
-              Girls' Love
+              {t('girlsLove')}
             </h1>
             <p className="text-xs md:text-sm text-pink-100 font-medium max-w-md">
               A CLUB OF LOVE ENCOUNTERS IN THE SAME CITY. LOVE TONIGHT.
@@ -130,7 +203,7 @@ export const DashboardPage: React.FC = () => {
 
           <Link to="/verification" className="shrink-0">
             <Button variant="gold" size="md" leftIcon={<Crown className="w-4 h-4" />} rightIcon={<ArrowRight className="w-4 h-4" />}>
-              Claim Gold VIP Card
+              {t('claimVipCard')}
             </Button>
           </Link>
         </div>
@@ -169,43 +242,44 @@ export const DashboardPage: React.FC = () => {
 
       {/* Section Header */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <h2 className="text-base md:text-lg font-extrabold text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-400" /> Recommended Girl Profiles
+        <div className="flex items-center justify-between gap-3 border-b border-brand-border pb-3">
+          <h2 className="text-base md:text-lg font-black text-slate-100 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-400 animate-spin" /> {t('recommendedProfiles')}
           </h2>
-          <Link to="/matches" className="text-xs text-brand-wine hover:underline font-bold flex items-center gap-1">
-            View All Encounters <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1 px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full animate-pulse">
+              <RefreshCw className="w-3 h-3 animate-spin" /> Auto-Refreshing Live
+            </span>
+            <Link to="/matches" className="text-xs text-brand-wine hover:underline font-bold flex items-center gap-1">
+              View All <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Recommended Girl Profiles Grid */}
+      {/* Recommended Girl Profiles Grid (AT LEAST 6 SHOWN + CRISP UNBLURRED IMAGES) */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="h-64 animate-pulse bg-slate-800/50">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="h-72 animate-pulse bg-slate-800/50">
               <div className="h-full w-full" />
             </Card>
           ))}
         </div>
-      ) : profiles.length === 0 ? (
-        <Card className="p-8 text-center text-xs text-slate-400 space-y-2">
-          <p className="font-semibold">No girl profiles found for selected cities.</p>
-          <p className="text-[11px] text-slate-500">Try selecting additional cities in the dropdown above.</p>
-        </Card>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {profiles.slice(0, 6).map((profile, index) => {
             const attrTag = getAttributesTag(index, profile);
             return (
-              <Card key={profile._id} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group">
-                <div className="relative h-64 overflow-hidden">
+              <Card key={profile._id || index} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group border border-brand-border hover:border-pink-500/50 transition-all duration-300 shadow-xl">
+                {/* 100% Crisp Unblurred Profile Photo Container */}
+                <div className="relative h-72 overflow-hidden bg-black">
                   <img
                     src={profile.profileImage}
                     alt={profile.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-transparent to-transparent opacity-95" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-black/20 to-transparent opacity-95" />
 
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
                     <Badge variant="verified" size="sm">{profile.verificationLabel || 'ID Verified'}</Badge>
@@ -223,7 +297,7 @@ export const DashboardPage: React.FC = () => {
                       <h3 className="text-lg font-extrabold text-white">
                         {profile.name}
                       </h3>
-                      <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-md">
+                      <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-black/60 px-2 py-0.5 rounded-md">
                         <Star className="w-3.5 h-3.5 fill-amber-400" /> {profile.rating || 5.0}
                       </div>
                     </div>
@@ -239,7 +313,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex items-center gap-2 pt-2 border-t border-brand-border">
                     <Link to="/matches" className="flex-1">
                       <Button variant="secondary" size="sm" className="w-full">
-                        View Detail
+                        {t('viewDetail')}
                       </Button>
                     </Link>
                     <Button
@@ -247,9 +321,9 @@ export const DashboardPage: React.FC = () => {
                       size="sm"
                       className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
                       leftIcon={<Calendar className="w-3.5 h-3.5" />}
-                      onClick={() => setApplyDateProfile(profile)}
+                      onClick={() => navigate('/matches')}
                     >
-                      Apply for a date
+                      {t('applyForDate')}
                     </Button>
                   </div>
                 </div>
