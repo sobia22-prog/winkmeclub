@@ -167,7 +167,7 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Section Header & Filters */}
+      {/* Section Header */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h2 className="text-base md:text-lg font-extrabold text-slate-100 flex items-center gap-2">
@@ -176,59 +176,6 @@ export const DashboardPage: React.FC = () => {
           <Link to="/matches" className="text-xs text-brand-wine hover:underline font-bold flex items-center gap-1">
             View All Encounters <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-        </div>
-
-        {/* Multi-Select City Dropdown & Category Pills Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-          <MultiSelectCity
-            label=""
-            selectedCities={selectedCities}
-            onChange={(cities) => setSelectedCities(cities)}
-          />
-
-          {/* Category Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <button
-              onClick={() => setActiveFilter('all')}
-              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                activeFilter === 'all'
-                  ? 'bg-brand-wine text-white shadow-md shadow-brand-wine/30'
-                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setActiveFilter('vip')}
-              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                activeFilter === 'vip'
-                  ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30'
-                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              VIP Certified
-            </button>
-            <button
-              onClick={() => setActiveFilter('popular')}
-              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                activeFilter === 'popular'
-                  ? 'bg-pink-600 text-white shadow-md shadow-pink-600/30'
-                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Very Popular
-            </button>
-            <button
-              onClick={() => setActiveFilter('city')}
-              className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                activeFilter === 'city'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                  : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Same City
-            </button>
-          </div>
         </div>
       </div>
 
