@@ -189,7 +189,7 @@ export const AdminStaffPage: React.FC = () => {
         ) : staffList.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No staff members created yet. Click above to add staff.</p>
         ) : (
-          <Table headers={['Staff Member', 'Unique Invitation Code', 'Assigned Clients', 'Status', 'Actions']}>
+          <Table headers={['Staff Username', 'Unique Invitation Code', 'Assigned Clients', 'Status', 'Actions']}>
             {staffList.map((s) => (
               <tr key={s._id || s.id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
@@ -199,7 +199,6 @@ export const AdminStaffPage: React.FC = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-100">{s.fullName}</div>
-                      <div className="text-[11px] text-slate-400">{s.email}</div>
                     </div>
                   </div>
                 </td>
@@ -279,24 +278,11 @@ export const AdminStaffPage: React.FC = () => {
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Staff Member Full Name"
+              label="Staff Username"
+              placeholder="e.g. moon"
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
               required
-            />
-
-            <Input
-              label="Staff Email Address (Login ID)"
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-            />
-
-            <Input
-              label="Phone Number"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
 
             <Input

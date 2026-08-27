@@ -785,23 +785,34 @@ export class AdminController {
 
   static async createStaffMember(req: AuthRequest, res: Response) {
     try {
-      const { fullName, email, phone, password } = req.body;
-      if (!fullName || !email || !password) {
-        return res.status(400).json({ message: 'Full name, email, and password are required.' });
+      const { fullName, username, password } = req.body;
+      const staffUsername = (fullName || username || '').toString().trim();
+      if (!staffUsername || !password) {
+        return res.status(400).json({ message: 'Staff username and password are required.' });
       }
 
-      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      const cleanUser = staffUsername.toLowerCase().replace(/\s+/g, '');
+      const staffEmail = req.body.email ? req.body.email.toLowerCase() : `${cleanUser}@winkmeclub.com`;
+
+      const escapedUser = staffUsername.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const existingUser = await User.findOne({
+        $or: [
+          { email: staffEmail },
+          { fullName: new RegExp('^' + escapedUser + '$', 'i') }
+        ]
+      });
+
       if (existingUser) {
-        return res.status(400).json({ message: 'Email address is already registered.' });
+        return res.status(400).json({ message: `Staff username "${staffUsername}" is already registered.` });
       }
 
       const invitationCode = await generateStaffInvitationCode();
       const passwordHash = await bcrypt.hash(password, 10);
 
       const staff = await User.create({
-        fullName,
-        email: email.toLowerCase(),
-        phone: phone || '0000000000',
+        fullName: staffUsername,
+        email: staffEmail,
+        phone: '0000000000',
         passwordHash,
         city: 'Mumbai',
         gender: 'Male',
@@ -814,7 +825,7 @@ export class AdminController {
 
       return res.status(201).json({
         success: true,
-        message: `Staff member ${staff.fullName} created with Invitation Code: ${invitationCode}`,
+        message: `Staff member "${staff.fullName}" created with Invitation Code: ${invitationCode}`,
         staff: {
           id: staff._id,
           fullName: staff.fullName,
@@ -832,16 +843,19 @@ export class AdminController {
   static async updateStaffMember(req: AuthRequest, res: Response) {
     try {
       const { id } = req.params;
-      const { fullName, email, phone, password, status } = req.body;
+      const { fullName, username, password, status } = req.body;
+      const staffUsername = (fullName || username || '').toString().trim();
 
       const staff = await User.findById(id);
       if (!staff || staff.role !== 'STAFF') {
         return res.status(404).json({ message: 'Staff member profile not found.' });
       }
 
-      if (fullName) staff.fullName = fullName;
-      if (email) staff.email = email.toLowerCase();
-      if (phone) staff.phone = phone;
+      if (staffUsername) {
+        staff.fullName = staffUsername;
+        const cleanUser = staffUsername.toLowerCase().replace(/\s+/g, '');
+        staff.email = `${cleanUser}@winkmeclub.com`;
+      }
       if (status) staff.status = status;
       if (password && password.trim().length > 0) {
         staff.passwordHash = await bcrypt.hash(password, 10);
@@ -851,7 +865,7 @@ export class AdminController {
 
       return res.status(200).json({
         success: true,
-        message: `Staff member ${staff.fullName} updated successfully.`,
+        message: `Staff member "${staff.fullName}" updated successfully.`,
         staff: {
           id: staff._id,
           fullName: staff.fullName,

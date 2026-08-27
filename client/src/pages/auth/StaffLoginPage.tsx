@@ -9,7 +9,7 @@ import { Button } from '../../components/common/Button';
 import { UserCheck, Mail, Lock } from 'lucide-react';
 
 export const StaffLoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,13 +33,13 @@ export const StaffLoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await authService.staffLogin({ email, password });
+      const res = await authService.staffLogin({ username, password });
       if (res.data.success) {
         loginSession(res.data.token, res.data.user);
         navigate('/staff/dashboard');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Staff login failed. Check email or password.');
+      setError(err.response?.data?.message || 'Staff login failed. Check username or password.');
     } finally {
       setLoading(false);
     }
@@ -70,12 +70,12 @@ export const StaffLoginPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Staff Email Address"
-            type="email"
-            placeholder="staff@domain.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            leftIcon={<Mail className="w-4 h-4" />}
+            label="Staff Username"
+            type="text"
+            placeholder="e.g. moon"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            leftIcon={<UserCheck className="w-4 h-4" />}
             required
           />
           <Input

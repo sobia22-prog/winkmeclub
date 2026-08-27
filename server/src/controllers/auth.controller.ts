@@ -243,12 +243,22 @@ export class AuthController {
   // Staff Login Endpoint (Strictly for STAFF role only)
   static async staffLogin(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
-      if (!email || typeof email !== 'string' || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
+      const { email, username, password } = req.body;
+      const loginIdentifier = (username || email || '').toString().trim();
+      if (!loginIdentifier || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
       }
 
-      const user = await User.findOne({ email: email.toLowerCase() });
+      const cleanId = loginIdentifier.toLowerCase();
+      const escapedId = loginIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const user = await User.findOne({
+        $or: [
+          { email: cleanId },
+          { email: `${cleanId.replace(/\s+/g, '')}@winkmeclub.com` },
+          { fullName: new RegExp('^' + escapedId + '$', 'i') }
+        ]
+      });
 
       if (!user) {
         return res.status(401).json({ message: 'Invalid staff member credentials.' });
