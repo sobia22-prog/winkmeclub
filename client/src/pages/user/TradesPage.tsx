@@ -130,6 +130,8 @@ export const TradesPage: React.FC = () => {
 
       const res = await tradeService.executeTrade({
         productId: selectedProducts[0]._id,
+        productName: combinedNames,
+        productImage: selectedProducts[0].image,
         quantity: itemQty,
       });
 

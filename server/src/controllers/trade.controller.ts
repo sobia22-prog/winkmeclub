@@ -9,7 +9,7 @@ export class TradeController {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
 
-      const { productId, quantity } = req.body;
+      const { productId, quantity, productName, productImage } = req.body;
       const numQuantity = Number(quantity) || 1;
 
       const product = await Product.findById(productId);
@@ -20,8 +20,8 @@ export class TradeController {
       const trade = await TradeSettlementService.executeTrade(
         req.user._id,
         product._id.toString(),
-        product.name,
-        product.image,
+        productName || product.name,
+        productImage || product.image,
         numQuantity,
         product.price
       );
