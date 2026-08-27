@@ -11,19 +11,19 @@ import { Textarea } from '../../components/common/Textarea';
 import { Modal } from '../../components/common/Modal';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
-import { Package, PlusCircle, Edit, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Package, PlusCircle, Edit, Trash2, CheckCircle2, AlertCircle, Eye } from 'lucide-react';
 
 export const AdminProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
   const [form, setForm] = useState({
     name: '',
     description: '',
     price: 0,
-    stock: 100,
     image: '/images/products/doll.jpg',
     category: 'Toys & Gifts',
     status: 'ACTIVE',
@@ -68,7 +68,6 @@ export const AdminProductsPage: React.FC = () => {
       name: '',
       description: '',
       price: 0,
-      stock: 100,
       image: '/images/products/doll.jpg',
       category: 'Toys & Gifts',
       status: 'ACTIVE',
@@ -83,7 +82,6 @@ export const AdminProductsPage: React.FC = () => {
       name: prod.name,
       description: prod.description || '',
       price: prod.price || 0,
-      stock: prod.stock || 100,
       image: prod.image,
       category: prod.category || 'Toys & Gifts',
       status: prod.status || 'ACTIVE',
@@ -182,7 +180,7 @@ export const AdminProductsPage: React.FC = () => {
         ) : products.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No products created yet.</p>
         ) : (
-          <Table headers={['Product Image & Name', 'Category', 'Quantity (Stock)', 'Frontend Location', 'Status', 'Actions']}>
+          <Table headers={['Product Image & Name', 'Category', 'Frontend Location', 'Status', 'Actions']}>
             {products.map((p) => (
               <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
@@ -199,9 +197,6 @@ export const AdminProductsPage: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-5 py-3 text-xs text-slate-300 font-medium">{p.category}</td>
-                <td className="px-5 py-3 font-bold text-amber-400 text-xs">
-                  {p.stock || 100} units
-                </td>
                 <td className="px-5 py-3">
                   {p.isMainPage ? (
                     <button
@@ -229,6 +224,13 @@ export const AdminProductsPage: React.FC = () => {
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
                     <button
+                      onClick={() => setViewingProduct(p)}
+                      className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                      title="View Product Details"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button
                       onClick={() => handleOpenEdit(p)}
                       className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
                       title="Edit Product"
@@ -249,6 +251,60 @@ export const AdminProductsPage: React.FC = () => {
           </Table>
         )}
       </Card>
+
+      {/* View Product Details Modal */}
+      {viewingProduct && (
+        <Modal
+          isOpen={true}
+          onClose={() => setViewingProduct(null)}
+          title="Product Details"
+          maxWidth="lg"
+        >
+          <div className="space-y-5">
+            <div className="w-full h-56 rounded-2xl overflow-hidden bg-black/40 border border-brand-border">
+              <img
+                src={viewingProduct.image}
+                alt={viewingProduct.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-black text-slate-100">{viewingProduct.name}</h3>
+                {viewingProduct.isMainPage ? (
+                  <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                    ★ MAIN TRADES PAGE
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                    📁 CATALOG DRAWER
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-slate-400">
+                <span>Category: <strong className="text-slate-200">{viewingProduct.category}</strong></span>
+                <span>•</span>
+                <span>Status: <strong className="text-emerald-400">{viewingProduct.status}</strong></span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Description</span>
+              <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                {viewingProduct.description || 'No description provided.'}
+              </p>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button variant="secondary" onClick={() => setViewingProduct(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
@@ -288,14 +344,6 @@ export const AdminProductsPage: React.FC = () => {
               ]}
               value={form.isMainPage ? 'MAIN' : 'CATALOG'}
               onChange={(e) => setForm({ ...form, isMainPage: e.target.value === 'MAIN' })}
-            />
-
-            <Input
-              label="Quantity (Stock)"
-              type="number"
-              value={form.stock}
-              onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
-              required
             />
 
             <ImageUploadPicker

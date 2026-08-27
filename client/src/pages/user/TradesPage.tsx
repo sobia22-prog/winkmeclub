@@ -23,6 +23,7 @@ import {
   MoreVertical,
   X,
   Layers,
+  Eye,
 } from 'lucide-react';
 
 export const TradesPage: React.FC = () => {
@@ -38,6 +39,7 @@ export const TradesPage: React.FC = () => {
 
   // Right Drawer Slide-over state (opened via 3-dots menu)
   const [showRightDrawer, setShowRightDrawer] = useState<boolean>(false);
+  const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -247,6 +249,18 @@ export const TradesPage: React.FC = () => {
                     </div>
                   )}
 
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPreviewProduct(product);
+                    }}
+                    className="absolute bottom-2 left-2 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 hover:text-white border border-amber-500/40 hover:bg-amber-500/30 transition-all z-20"
+                    title="View Product Details"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+
                   <div className="w-full aspect-square rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
                     <img
                       src={product.image}
@@ -260,6 +274,43 @@ export const TradesPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Product Details Preview Modal */}
+      {previewProduct && (
+        <Modal
+          isOpen={true}
+          onClose={() => setPreviewProduct(null)}
+          title="Product Details"
+          maxWidth="md"
+        >
+          <div className="space-y-4 text-xs">
+            <div className="w-full h-52 rounded-2xl overflow-hidden bg-black/40 border border-brand-border">
+              <img
+                src={previewProduct.image}
+                alt={previewProduct.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-base font-black text-slate-100">{previewProduct.name}</h3>
+              <p className="text-xs text-amber-400 font-semibold">{previewProduct.category}</p>
+            </div>
+
+            <div className="p-3.5 bg-brand-card border border-brand-border rounded-xl">
+              <p className="text-slate-200 leading-relaxed font-medium">
+                {previewProduct.description || 'No description available.'}
+              </p>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button variant="gold" size="sm" onClick={() => setPreviewProduct(null)}>
+                Close Preview
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {/* RIGHT OVERLAY DRAWER BAR (Triggered by 3-dots menu button) */}
       {showRightDrawer && (
@@ -300,6 +351,18 @@ export const TradesPage: React.FC = () => {
                         : 'border-brand-border bg-brand-card/50 hover:bg-brand-card text-slate-300'
                     }`}
                   >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewProduct(product);
+                      }}
+                      className="absolute bottom-2 left-2 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 hover:text-white border border-amber-500/40 hover:bg-amber-500/30 transition-all z-20"
+                      title="View Product Details"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+
                     <img
                       src={product.image}
                       alt="Product"
