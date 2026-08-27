@@ -145,7 +145,9 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
   const [rechargeMethod, setRechargeMethod] = useState<'CRYPTO' | 'BANK'>('CRYPTO');
   const [copiedAddress, setCopiedAddress] = useState(false);
 
-  const usdtExchangeRate = settings.usdtExchangeRate || 92;
+  const effectiveUsdtExchangeRate = (currencySymbol === '$' || currencySymbol === 'USD')
+    ? 1
+    : (settings.usdtExchangeRate || 92);
   const usdtWalletAddress = settings.usdtWalletAddress || 'TXYZ987654321WinkMeClubUSDTDepositAddr';
 
   const handleCopyWalletAddress = () => {
@@ -259,7 +261,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
                 <div className="p-3.5 bg-gradient-to-r from-purple-950/60 to-brand-card border border-purple-500/40 rounded-2xl flex items-center justify-between">
                   <div>
                     <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Allowed Exchange Rate</span>
-                    <span className="text-sm font-black text-amber-400 font-mono">1 USDT = {currencySymbol}{usdtExchangeRate.toFixed(2)}</span>
+                    <span className="text-sm font-black text-amber-400 font-mono">1 USDT = {currencySymbol}{effectiveUsdtExchangeRate.toFixed(2)}</span>
                   </div>
                   <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold">
                     Official Rate Allowed
@@ -291,7 +293,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
                   <div className="flex items-center justify-between">
                     <label className="block text-xs font-semibold text-slate-300">Deposit Amount (USDT)</label>
                     <span className="text-[11px] font-bold text-emerald-400 font-mono">
-                      Equivalent: {currencySymbol}{(rechargeForm.amount * usdtExchangeRate).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      Equivalent: {currencySymbol}{(rechargeForm.amount * effectiveUsdtExchangeRate).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                   <input
