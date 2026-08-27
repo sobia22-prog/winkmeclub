@@ -91,11 +91,6 @@ export const AdminDashboardPage: React.FC = () => {
 
         {!isStaff && (
           <div className="flex items-center gap-3">
-            <Link to="/admin/settings">
-              <Button variant="secondary" size="sm" leftIcon={<Settings className="w-4 h-4 text-amber-400" />}>
-                Payment Settings
-              </Button>
-            </Link>
             <Link to="/admin/profile">
               <Button variant="gold" size="sm" leftIcon={<UserIcon className="w-4 h-4" />}>
                 Profile Settings

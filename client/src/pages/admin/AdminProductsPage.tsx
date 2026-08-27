@@ -22,7 +22,8 @@ export const AdminProductsPage: React.FC = () => {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    price: 1000,
+    price: 0,
+    stock: 100,
     image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
     category: 'Toys & Gifts',
     status: 'ACTIVE',
@@ -65,7 +66,8 @@ export const AdminProductsPage: React.FC = () => {
     setForm({
       name: '',
       description: '',
-      price: 1000,
+      price: 0,
+      stock: 100,
       image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
       category: 'Toys & Gifts',
       status: 'ACTIVE',
@@ -78,7 +80,8 @@ export const AdminProductsPage: React.FC = () => {
     setForm({
       name: prod.name,
       description: prod.description || '',
-      price: prod.price,
+      price: prod.price || 0,
+      stock: prod.stock || 100,
       image: prod.image,
       category: prod.category || 'Toys & Gifts',
       status: prod.status || 'ACTIVE',
@@ -165,7 +168,7 @@ export const AdminProductsPage: React.FC = () => {
         ) : products.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No products created yet.</p>
         ) : (
-          <Table headers={['Product Image & Name', 'Category', 'Price (₹)', 'Status', 'Actions']}>
+          <Table headers={['Product Image & Name', 'Category', 'Quantity (Stock)', 'Status', 'Actions']}>
             {products.map((p) => (
               <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
@@ -183,7 +186,7 @@ export const AdminProductsPage: React.FC = () => {
                 </td>
                 <td className="px-5 py-3 text-xs text-slate-300 font-medium">{p.category}</td>
                 <td className="px-5 py-3 font-bold text-amber-400 text-xs">
-                  ₹{p.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  {p.stock || 100} units
                 </td>
                 <td className="px-5 py-3">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
@@ -245,10 +248,10 @@ export const AdminProductsPage: React.FC = () => {
             />
 
             <Input
-              label="Price (₹)"
+              label="Quantity (Stock)"
               type="number"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+              value={form.stock}
+              onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
               required
             />
 

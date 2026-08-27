@@ -24,10 +24,22 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      const isAuthRoute = window.location.pathname.startsWith('/login') || window.location.pathname.startsWith('/register') || window.location.pathname.startsWith('/admin/login');
+      const pathname = window.location.pathname;
+      const isAuthRoute =
+        pathname.startsWith('/login') ||
+        pathname.startsWith('/register') ||
+        pathname.startsWith('/admin/login') ||
+        pathname.startsWith('/staff/login') ||
+        pathname.startsWith('/verify-otp');
       if (!isAuthRoute) {
         localStorage.removeItem('wink_token');
-        window.location.href = '/login';
+        if (pathname.startsWith('/staff')) {
+          window.location.href = '/staff/login';
+        } else if (pathname.startsWith('/admin')) {
+          window.location.href = '/admin/login';
+        } else {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

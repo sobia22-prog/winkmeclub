@@ -16,11 +16,11 @@ const ProductSchema: Schema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     description: { type: String, required: true },
-    price: { type: Number, required: true, min: 0 },
+    price: { type: Number, default: 0 },
     image: { type: String, required: true },
     category: { type: String, required: true, default: 'General' },
     status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE', index: true },
-    stock: { type: Number, default: 9999 },
+    stock: { type: Number, default: 100 },
   },
   { timestamps: true }
 );

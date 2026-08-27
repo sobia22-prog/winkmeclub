@@ -26,6 +26,10 @@ export const UserLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
+  if (user.role === 'ADMIN' || user.role === 'STAFF') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   return (
     <div className="min-h-screen bg-brand-dark flex flex-col pb-16 md:pb-0">
       <Navbar />

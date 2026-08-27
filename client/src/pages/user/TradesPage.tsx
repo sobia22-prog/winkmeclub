@@ -31,7 +31,7 @@ export const TradesPage: React.FC = () => {
 
   // Multi-item selection (up to 2 items at a time)
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [tradeQuantityMoney, setTradeQuantityMoney] = useState<number>(500);
+  const [tradeQuantity, setTradeQuantity] = useState<number>(1);
 
   // Right Drawer Slide-over state (opened via 3-dots menu)
   const [showRightDrawer, setShowRightDrawer] = useState<boolean>(false);
@@ -39,10 +39,6 @@ export const TradesPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
-  // Insufficient Balance Modal State
-  const [showInsufficientBalanceModal, setShowInsufficientBalanceModal] = useState(false);
-  const [requiredAmount, setRequiredAmount] = useState(0);
 
   // Countdown timer state for Airborne activities round
   const [timeLeft, setTimeLeft] = useState<number>(36);
@@ -88,8 +84,6 @@ export const TradesPage: React.FC = () => {
     return `00:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  const availableBalance = wallet?.availableBalance ?? 0;
-
   // Toggle selection of a product (supports selecting up to 2 items at a time)
   const handleToggleSelectProduct = (product: Product) => {
     setSelectedProducts((prev) => {
@@ -112,14 +106,7 @@ export const TradesPage: React.FC = () => {
     setError('');
     setSuccess('');
 
-    const tradeAmount = Number(tradeQuantityMoney) || 500;
-
-    // Check balance client-side first
-    if (availableBalance < tradeAmount) {
-      setRequiredAmount(tradeAmount);
-      setShowInsufficientBalanceModal(true);
-      return;
-    }
+    const itemQty = Number(tradeQuantity) || 1;
 
     setLoading(true);
 
@@ -128,23 +115,18 @@ export const TradesPage: React.FC = () => {
 
       const res = await tradeService.executeTrade({
         productId: selectedProducts[0]._id,
-        quantity: tradeAmount, // Money quantity traded
+        quantity: itemQty,
       });
 
       if (res.data.success) {
-        setSuccess(`Trade #${res.data.trade.tradeId} submitted for Round ${roundId}! (${combinedNames} — ₹${tradeAmount.toLocaleString('en-IN')})`);
+        setSuccess(`Trade #${res.data.trade.tradeId} submitted for Round ${roundId}! (${combinedNames} — Qty: ${itemQty})`);
         setSelectedProducts([]);
         fetchTradeData();
         refreshSession();
       }
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Trade execution failed.';
-      if (msg.toLowerCase().includes('insufficient')) {
-        setRequiredAmount(tradeAmount);
-        setShowInsufficientBalanceModal(true);
-      } else {
-        setError(msg);
-      }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -166,7 +148,7 @@ export const TradesPage: React.FC = () => {
             <h1 className="text-xl md:text-2xl font-black text-slate-100 flex items-center gap-2">
               <ShoppingBag className="w-6 h-6 text-fuchsia-400" /> Trades & Airborne Activities
             </h1>
-            <p className="text-[11px] text-slate-400 font-medium">Select item(s), enter trading balance quantity, and confirm round trade</p>
+            <p className="text-[11px] text-slate-400 font-medium">Select item(s), enter trading quantity, and confirm round trade</p>
           </div>
         </div>
 
@@ -266,7 +248,7 @@ export const TradesPage: React.FC = () => {
 
                   <div className="space-y-0.5">
                     <h3 className="text-xs font-black text-slate-100 truncate">{product.name}</h3>
-                    <p className="text-xs font-black text-amber-400">₹{product.price.toLocaleString('en-IN')}</p>
+                    <p className="text-xs font-black text-amber-400">Quantity: {product.stock || 100}</p>
                   </div>
                 </div>
               );
@@ -318,7 +300,7 @@ export const TradesPage: React.FC = () => {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-bold text-slate-100 truncate">{product.name}</div>
-                      <div className="text-[11px] font-bold text-amber-400">₹{product.price.toLocaleString('en-IN')}</div>
+                      <div className="text-[11px] font-bold text-amber-400">Quantity: {product.stock || 100}</div>
                     </div>
                     {isSelected && (
                       <div className="w-6 h-6 rounded-full bg-fuchsia-500 text-white flex items-center justify-center shrink-0">
@@ -355,40 +337,30 @@ export const TradesPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Middle Row: Quantity (Balance Trading Money Input) & Available Balance */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-              {/* Quantity Input (Money Quantity) */}
+            {/* Middle Row: Trade Quantity Input */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+              {/* Quantity Input */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-semibold text-slate-300">
-                  Quantity (Balance Trading)
+                  Item Trade Quantity
                 </label>
                 <input
                   type="number"
-                  step="100"
-                  min="100"
-                  value={tradeQuantityMoney}
-                  onChange={(e) => setTradeQuantityMoney(Number(e.target.value))}
+                  step="1"
+                  min="1"
+                  value={tradeQuantity}
+                  onChange={(e) => setTradeQuantity(Number(e.target.value))}
                   className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-slate-100 font-mono font-bold focus:outline-none focus:border-fuchsia-500"
                 />
               </div>
 
-              {/* Available Balance (Non-Editable) */}
+              {/* Selected Units Summary */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-semibold text-slate-400">
-                  Available Balance
-                </label>
-                <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-emerald-400 font-mono font-bold">
-                  ₹{availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </div>
-              </div>
-
-              {/* Tickets (Non-Editable = Quantity) */}
-              <div className="space-y-1">
-                <label className="block text-[11px] font-semibold text-slate-400">
-                  Tickets (Trading Balance)
+                  Trade Units
                 </label>
                 <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-amber-400 font-mono font-bold">
-                  ₹{tradeQuantityMoney.toLocaleString('en-IN')}
+                  {tradeQuantity} unit{tradeQuantity === 1 ? '' : 's'}
                 </div>
               </div>
             </div>
@@ -409,50 +381,6 @@ export const TradesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Insufficient Balance Popup Modal */}
-      {showInsufficientBalanceModal && (
-        <Modal
-          isOpen={true}
-          onClose={() => setShowInsufficientBalanceModal(false)}
-          title="⚠️ Insufficient Available Balance"
-        >
-          <div className="space-y-4 text-center py-2">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
-              <ShieldAlert className="w-7 h-7" />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-base font-bold text-slate-100">Deposit Funds to Place Trade</h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
-                Your current Available Balance is <strong className="text-emerald-400">₹{availableBalance.toFixed(2)}</strong>. You need <strong className="text-amber-400">₹{requiredAmount.toFixed(2)}</strong> to place this trade.
-              </p>
-            </div>
-
-            <div className="p-4 bg-brand-card border border-brand-border rounded-2xl text-left space-y-1 text-xs">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Required Amount:</span>
-                <span className="font-bold text-slate-100">₹{requiredAmount.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Available Balance:</span>
-                <span className="font-bold text-emerald-400">₹{availableBalance.toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="secondary" onClick={() => setShowInsufficientBalanceModal(false)}>
-                Cancel
-              </Button>
-              <Link to="/wallet">
-                <Button variant="gold" leftIcon={<Wallet className="w-4 h-4" />} rightIcon={<ArrowRight className="w-4 h-4" />}>
-                  Deposit Funds Now
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Modal>
-      )}
-
       {/* Trades History Log Table */}
       <div className="space-y-4 pt-6 border-t border-brand-border">
         <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
@@ -462,20 +390,20 @@ export const TradesPage: React.FC = () => {
         {trades.length === 0 ? (
           <Card className="p-8 text-center text-xs text-slate-500">No active round trades placed yet.</Card>
         ) : (
-          <Table headers={['Trade ID', 'Item(s)', 'Amount (₹)', 'Status', 'Outcome', 'Date']}>
+          <Table headers={['Trade ID', 'Item(s)', 'Quantity', 'Status', 'Outcome', 'Date']}>
             {trades.map((t: any) => (
               <tr key={t._id} className="hover:bg-brand-card/50 transition-colors text-xs">
                 <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
                 <td className="px-5 py-3 font-semibold text-slate-100">{t.productName}</td>
                 <td className="px-5 py-3 font-bold text-amber-400">
-                  ₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  {t.quantity || 1} units
                 </td>
                 <td className="px-5 py-3">
                   {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
                 </td>
                 <td className="px-5 py-3">
-                  {t.outcome === 'WIN' && <Badge variant="vip">WIN 🎉 (+{t.profitPercentage || 20}%)</Badge>}
-                  {t.outcome === 'LOSE' && <Badge variant="danger">LOSE (FROZEN)</Badge>}
+                  {t.outcome === 'WIN' && <Badge variant="vip">WIN 🎉</Badge>}
+                  {t.outcome === 'LOSE' && <Badge variant="danger">LOSE</Badge>}
                   {t.outcome === 'NONE' && <span className="text-[11px] text-slate-500 font-semibold">In Round</span>}
                 </td>
                 <td className="px-5 py-3 text-[11px] text-slate-500">{new Date(t.createdAt).toLocaleDateString()}</td>

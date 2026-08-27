@@ -69,19 +69,7 @@ export const Navbar: React.FC = () => {
 
       {/* Right Controls */}
       <div className="flex items-center gap-4">
-        {/* Wallet Balance Pill */}
-        {wallet && !isAdmin && (
-          <Link
-            to="/wallet"
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-brand-card border border-brand-border rounded-xl text-xs font-semibold hover:border-slate-600 transition-all"
-          >
-            <WalletIcon className="w-4 h-4 text-emerald-400" />
-            <span className="text-slate-400">Available:</span>
-            <span className="text-emerald-400 font-bold">
-              {currencySymbol}{wallet.availableBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-            </span>
-          </Link>
-        )}
+
 
         {/* Notification Bell Dropdown */}
         {user && (

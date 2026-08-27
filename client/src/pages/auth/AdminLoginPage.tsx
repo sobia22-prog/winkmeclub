@@ -13,9 +13,15 @@ export const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { loginSession } = useAuth();
+  const { user, loginSession } = useAuth();
   const { settings } = useSystemSettings();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (user && (user.role === 'ADMIN' || user.role === 'STAFF')) {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
