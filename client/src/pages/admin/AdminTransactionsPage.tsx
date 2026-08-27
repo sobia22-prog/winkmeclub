@@ -4,9 +4,12 @@ import { walletService } from '../../services/wallet.service';
 import { Card } from '../../components/common/Card';
 import { Table } from '../../components/common/Table';
 import { Badge } from '../../components/common/Badge';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { History } from 'lucide-react';
 
 export const AdminTransactionsPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -45,10 +48,10 @@ export const AdminTransactionsPage: React.FC = () => {
                 </Badge>
               </td>
               <td className="px-5 py-3 font-bold text-amber-400">
-                ₹{Math.abs(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                {currencySymbol}{Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3 text-slate-400">₹{tx.beforeBalance.toFixed(2)}</td>
-              <td className="px-5 py-3 font-semibold text-slate-200">₹{tx.afterBalance.toFixed(2)}</td>
+              <td className="px-5 py-3 text-slate-400">{currencySymbol}{tx.beforeBalance.toFixed(2)}</td>
+              <td className="px-5 py-3 font-semibold text-slate-200">{currencySymbol}{tx.afterBalance.toFixed(2)}</td>
               <td className="px-5 py-3 text-xs text-slate-300 max-w-xs truncate">{tx.description}</td>
               <td className="px-5 py-3 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</td>
             </tr>

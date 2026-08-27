@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { systemSettingsService, SystemSettingsData } from '../../services/systemSettings.service';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
@@ -7,6 +8,8 @@ import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
 import { Settings, Send, MessageCircle, QrCode, DollarSign, Building, CheckCircle2 } from 'lucide-react';
 
 export const AdminPaymentSettingsPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [form, setForm] = useState<SystemSettingsData>({
     telegramFinanceLink: 'https://t.me/winkmedatingclub_finance',
     telegramSupportLink: 'https://t.me/winkmedatingclub_support',
@@ -135,7 +138,7 @@ export const AdminPaymentSettingsPage: React.FC = () => {
             />
 
             <Input
-              label="USDT Exchange Rate (INR ₹ per 1 USDT)"
+              label={`USDT Exchange Rate (${settings.defaultCurrency || 'Local Currency'} ${currencySymbol} per 1 USDT)`}
               type="number"
               value={form.usdtExchangeRate}
               onChange={(e) => setForm({ ...form, usdtExchangeRate: Number(e.target.value) })}

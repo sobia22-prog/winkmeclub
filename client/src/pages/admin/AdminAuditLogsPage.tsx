@@ -4,9 +4,12 @@ import { AuditLog } from '../../types';
 import { Card } from '../../components/common/Card';
 import { Table } from '../../components/common/Table';
 import { Badge } from '../../components/common/Badge';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { FileText } from 'lucide-react';
 
 export const AdminAuditLogsPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +39,7 @@ export const AdminAuditLogsPage: React.FC = () => {
       ) : logs.length === 0 ? (
         <Card className="p-12 text-center text-xs text-slate-500">No audit logs recorded yet.</Card>
       ) : (
-        <Table headers={['Admin Email', 'Action Code', 'Target Entity', 'Amount (₹)', 'Audit Reason', 'Timestamp']}>
+        <Table headers={['Admin Email', 'Action Code', 'Target Entity', `Amount (${currencySymbol})`, 'Audit Reason', 'Timestamp']}>
           {logs.map((log) => (
             <tr key={log._id} className="hover:bg-brand-card/50 transition-colors">
               <td className="px-5 py-3 font-semibold text-slate-200">{log.adminEmail}</td>
@@ -49,7 +52,7 @@ export const AdminAuditLogsPage: React.FC = () => {
                 {log.targetType} {log.targetId ? `(#${log.targetId.slice(-6)})` : ''}
               </td>
               <td className="px-5 py-3 font-bold text-slate-100">
-                {log.amount ? `₹${log.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '-'}
+                {log.amount ? `${currencySymbol}${log.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '-'}
               </td>
               <td className="px-5 py-3 text-xs text-slate-400 max-w-xs truncate">{log.reason || 'N/A'}</td>
               <td className="px-5 py-3 text-xs text-slate-500">

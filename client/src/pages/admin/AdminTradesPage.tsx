@@ -7,6 +7,7 @@ import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { Select } from '../../components/common/Select';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import {
   TrendingUp,
   TrendingDown,
@@ -21,6 +22,8 @@ import {
 } from 'lucide-react';
 
 export const AdminTradesPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [trades, setTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'WIN' | 'LOSE' | 'ALL'>('PENDING');
   const [loading, setLoading] = useState(true);
@@ -165,7 +168,7 @@ export const AdminTradesPage: React.FC = () => {
       ) : filteredTrades.length === 0 ? (
         <Card className="p-12 text-center text-xs text-slate-500">No trades found in this section.</Card>
       ) : (
-        <Table headers={['Trade ID', 'User', 'Product', 'Qty', 'Amount (₹)', 'Status', 'Outcome & Profit', 'Actions']}>
+        <Table headers={['Trade ID', 'User', 'Product', 'Qty', `Amount (${currencySymbol})`, 'Status', 'Outcome & Profit', 'Actions']}>
           {filteredTrades.map((t: any) => (
             <tr key={t._id} className="hover:bg-brand-card/50 transition-colors">
               <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
@@ -175,7 +178,7 @@ export const AdminTradesPage: React.FC = () => {
               <td className="px-5 py-3 text-slate-300 font-medium">{t.productName}</td>
               <td className="px-5 py-3 text-slate-300">x{t.quantity}</td>
               <td className="px-5 py-3 font-bold text-emerald-400">
-                ₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                {currencySymbol}{t.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3">
                 {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="neutral">SETTLED</Badge>}
@@ -276,7 +279,7 @@ export const AdminTradesPage: React.FC = () => {
                 <div>
                   <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">TOTAL AMOUNT</span>
                   <span className="text-base font-black text-emerald-400 block mt-0.5">
-                    ₹{viewingTrade.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    {currencySymbol}{viewingTrade.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
@@ -397,7 +400,7 @@ export const AdminTradesPage: React.FC = () => {
             <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1.5 text-xs">
               <div>User: <span className="font-bold text-slate-100">{selectedTrade.userId && typeof selectedTrade.userId === 'object' ? (selectedTrade.userId as any).fullName : 'User'}</span></div>
               <div>Product: <span className="font-bold text-slate-100">{selectedTrade.productName} (Qty: {selectedTrade.quantity})</span></div>
-              <div>Trade Amount: <span className="font-bold text-emerald-400">₹{selectedTrade.totalAmount.toFixed(2)}</span></div>
+              <div>Trade Amount: <span className="font-bold text-emerald-400">{currencySymbol}{selectedTrade.totalAmount.toFixed(2)}</span></div>
               <div>Decided Outcome: <span className={`font-bold ${settlementOutcome === 'WIN' ? 'text-emerald-400' : 'text-rose-400'}`}>{settlementOutcome}</span></div>
             </div>
 
@@ -417,18 +420,18 @@ export const AdminTradesPage: React.FC = () => {
                 value={profitPercentage.toString()}
                 onChange={(e) => setProfitPercentage(Number(e.target.value))}
                 options={[
-                  { label: '20% Profit (+₹' + (selectedTrade.totalAmount * 0.2).toFixed(2) + ')', value: '20' },
-                  { label: '40% Profit (+₹' + (selectedTrade.totalAmount * 0.4).toFixed(2) + ')', value: '40' },
-                  { label: '60% Profit (+₹' + (selectedTrade.totalAmount * 0.6).toFixed(2) + ')', value: '60' },
-                  { label: '80% Profit (+₹' + (selectedTrade.totalAmount * 0.8).toFixed(2) + ')', value: '80' },
-                  { label: '100% Profit (+₹' + (selectedTrade.totalAmount * 1.0).toFixed(2) + ')', value: '100' },
+                  { label: '20% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.2).toFixed(2) + ')', value: '20' },
+                  { label: '40% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.4).toFixed(2) + ')', value: '40' },
+                  { label: '60% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.6).toFixed(2) + ')', value: '60' },
+                  { label: '80% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.8).toFixed(2) + ')', value: '80' },
+                  { label: '100% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 1.0).toFixed(2) + ')', value: '100' },
                 ]}
               />
             )}
 
             {settlementOutcome === 'LOSE' && (
               <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300">
-                Trade amount ₹{selectedTrade.totalAmount.toFixed(2)} will be moved into the user's Frozen Balance.
+                Trade amount {currencySymbol}{selectedTrade.totalAmount.toFixed(2)} will be moved into the user's Frozen Balance.
               </div>
             )}
 

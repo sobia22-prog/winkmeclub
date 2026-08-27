@@ -5,9 +5,12 @@ import { Card } from '../../components/common/Card';
 import { Select } from '../../components/common/Select';
 import { Table } from '../../components/common/Table';
 import { Badge } from '../../components/common/Badge';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { History, Search, ArrowDownRight, ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 export const TransactionsPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [type, setType] = useState('ALL');
   const [loading, setLoading] = useState(true);
@@ -79,13 +82,13 @@ export const TransactionsPage: React.FC = () => {
                   tx.amount > 0 ? 'text-emerald-400' : 'text-rose-400'
                 }`}
               >
-                {tx.amount > 0 ? '+' : ''}₹{Math.abs(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                {tx.amount > 0 ? '+' : ''}{currencySymbol}{Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3.5 text-slate-400">
-                ₹{tx.beforeBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                {currencySymbol}{tx.beforeBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3.5 font-semibold text-slate-200">
-                ₹{tx.afterBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                {currencySymbol}{tx.afterBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3.5 text-xs text-slate-300 max-w-xs truncate">{tx.description}</td>
               <td className="px-5 py-3.5 text-xs text-slate-500">

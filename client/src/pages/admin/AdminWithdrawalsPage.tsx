@@ -8,9 +8,12 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { Select } from '../../components/common/Select';
 import { Input } from '../../components/common/Input';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { ArrowUpRight, CheckCircle2, XCircle, Send, QrCode, Eye } from 'lucide-react';
 
 export const AdminWithdrawalsPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [status, setStatus] = useState('ALL');
   const [loading, setLoading] = useState(true);
@@ -101,7 +104,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
                 {w.userId && typeof w.userId === 'object' ? w.userId.fullName : 'User'}
               </td>
               <td className="px-5 py-3 font-bold text-rose-400">
-                -₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                -{currencySymbol}{w.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3 text-xs text-slate-300">
                 <div className="font-bold text-slate-100">{w.paymentMethod || 'Bank Account'}</div>
@@ -184,7 +187,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
           <form onSubmit={handleActionSubmit} className="space-y-4">
             <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1 text-xs">
               <div>User: <span className="font-bold text-slate-100">{selectedWithdrawal.userId && typeof selectedWithdrawal.userId === 'object' ? selectedWithdrawal.userId.fullName : 'User'}</span></div>
-              <div>Amount: <span className="font-bold text-rose-400">₹{selectedWithdrawal.amount.toFixed(2)}</span></div>
+              <div>Amount: <span className="font-bold text-rose-400">{currencySymbol}{selectedWithdrawal.amount.toFixed(2)}</span></div>
               <div>Payout Method: <span className="font-bold text-amber-400">{selectedWithdrawal.paymentMethod || 'Bank Account'}</span></div>
               <div>Holder Name: <span className="font-bold text-slate-200">{selectedWithdrawal.accountHolder}</span></div>
               {selectedWithdrawal.upiId && <div>UPI ID: <span className="font-mono text-amber-400">{selectedWithdrawal.upiId}</span></div>}

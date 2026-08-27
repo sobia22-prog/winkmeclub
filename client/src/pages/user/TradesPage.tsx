@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { tradeService } from '../../services/trade.service';
 import { Product, Trade } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
@@ -26,6 +27,8 @@ import {
 
 export const TradesPage: React.FC = () => {
   const { wallet, refreshSession } = useAuth();
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [products, setProducts] = useState<Product[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
 
@@ -232,7 +235,7 @@ export const TradesPage: React.FC = () => {
                 <div
                   key={product._id}
                   onClick={() => handleToggleSelectProduct(product)}
-                  className={`relative rounded-3xl p-4 bg-brand-surface border-2 transition-all cursor-pointer flex flex-col justify-between gap-3 text-center shadow-xl group ${
+                  className={`relative rounded-3xl p-3 bg-brand-surface border-2 transition-all cursor-pointer flex items-center justify-center shadow-xl group overflow-hidden ${
                     isSelected
                       ? 'border-fuchsia-500 bg-gradient-to-b from-fuchsia-950/50 via-brand-surface to-brand-surface shadow-fuchsia-500/30 scale-[1.02]'
                       : 'border-brand-border hover:border-fuchsia-500/40 hover:bg-brand-card'
@@ -244,17 +247,12 @@ export const TradesPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="w-24 h-24 mx-auto rounded-2xl overflow-hidden bg-black/40 p-2 border border-brand-border/60 shadow-inner">
+                  <div className="w-full aspect-square rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
                     <img
                       src={product.image}
                       alt={product.name}
                       className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                     />
-                  </div>
-
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-black text-slate-100 truncate">{product.name}</h3>
-                    <p className="text-xs font-black text-amber-400">Quantity: {product.stock || 100}</p>
                   </div>
                 </div>
               );
@@ -296,7 +294,7 @@ export const TradesPage: React.FC = () => {
                   <div
                     key={product._id}
                     onClick={() => handleToggleSelectProduct(product)}
-                    className={`p-3 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-3 ${
+                    className={`relative p-2 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center overflow-hidden ${
                       isSelected
                         ? 'border-fuchsia-500 bg-fuchsia-950/40 text-white'
                         : 'border-brand-border bg-brand-card/50 hover:bg-brand-card text-slate-300'
@@ -304,15 +302,11 @@ export const TradesPage: React.FC = () => {
                   >
                     <img
                       src={product.image}
-                      alt={product.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-brand-border shrink-0"
+                      alt="Product"
+                      className="w-full h-28 rounded-xl object-cover"
                     />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-slate-100 truncate">{product.name}</div>
-                      <div className="text-[11px] font-bold text-amber-400">Quantity: {product.stock || 100}</div>
-                    </div>
                     {isSelected && (
-                      <div className="w-6 h-6 rounded-full bg-fuchsia-500 text-white flex items-center justify-center shrink-0">
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-fuchsia-500 text-white flex items-center justify-center shrink-0 shadow-lg z-10">
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
                       </div>
                     )}
@@ -333,8 +327,15 @@ export const TradesPage: React.FC = () => {
       {selectedProducts.length > 0 && (
         <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/98 backdrop-blur-2xl border-t border-brand-border p-4 md:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
           <div className="max-w-4xl mx-auto space-y-3 text-xs">
-            {/* Top Row: Current Selection & Total Items Non-Editable Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-2 border-b border-brand-border/60">
+            {/* Top Row: Available Balance, Current Selection & Total Items */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pb-2 border-b border-brand-border/60">
+              <div className="flex items-center justify-between bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
+                <span className="text-slate-400 font-semibold">Available Balance:</span>
+                <span className="font-mono font-bold text-emerald-400">
+                  {currencySymbol}{(wallet?.availableBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
               <div className="flex items-center gap-2 bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
                 <span className="text-slate-400 font-semibold shrink-0">Current Selection:</span>
                 <span className="font-bold text-fuchsia-400 truncate">{selectedProductNames}</span>
@@ -346,12 +347,12 @@ export const TradesPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Middle Row: Trade Quantity Input */}
+            {/* Middle Row: Quantity Input & Tickets */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
               {/* Quantity Input */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-semibold text-slate-300">
-                  Item Trade Quantity
+                  Quantity
                 </label>
                 <input
                   type="number"
@@ -363,13 +364,13 @@ export const TradesPage: React.FC = () => {
                 />
               </div>
 
-              {/* Selected Units Summary */}
+              {/* Tickets Summary */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-semibold text-slate-400">
-                  Trade Units
+                  Tickets
                 </label>
                 <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-amber-400 font-mono font-bold">
-                  {tradeQuantity} unit{tradeQuantity === 1 ? '' : 's'}
+                  {tradeQuantity}
                 </div>
               </div>
             </div>

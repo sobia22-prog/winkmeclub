@@ -7,6 +7,7 @@ import { Badge } from '../../components/common/Badge';
 import { Table } from '../../components/common/Table';
 import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import {
   Users,
   ArrowLeft,
@@ -37,6 +38,8 @@ import {
 export const AdminStaffDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -156,13 +159,13 @@ export const AdminStaffDetailPage: React.FC = () => {
           />
           <StatCard
             title="Total Client Revenue"
-            value={`₹${(stats.totalApprovedRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+            value={`${currencySymbol}${(stats.totalApprovedRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
             subtitle="From approved deposits"
             icon={<DollarSign className="w-5 h-5 text-emerald-400" />}
           />
           <StatCard
             title="Client Trade Volume"
-            value={`₹${(stats.totalTradeVolume || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+            value={`${currencySymbol}${(stats.totalTradeVolume || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
             subtitle="Across settled trades"
             icon={<TrendingUp className="w-5 h-5 text-purple-400" />}
           />

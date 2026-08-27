@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal } from './Modal';
 import { Button } from './Button';
 import { AlertTriangle } from 'lucide-react';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -28,6 +29,9 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   variant = 'primary',
   isLoading = false,
 }) => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-4">
@@ -37,7 +41,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             <p className="text-sm text-slate-200">{message}</p>
             {amount !== undefined && (
               <div className="mt-2 text-lg font-bold text-amber-400">
-                Amount: ₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                Amount: {currencySymbol}{amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </div>
             )}
           </div>

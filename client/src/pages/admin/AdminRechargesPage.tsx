@@ -8,9 +8,12 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { Select } from '../../components/common/Select';
 import { Input } from '../../components/common/Input';
+import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { ArrowDownRight, CheckCircle2, XCircle, Eye, Edit3 } from 'lucide-react';
 
 export const AdminRechargesPage: React.FC = () => {
+  const { settings } = useSystemSettings();
+  const currencySymbol = settings.currencySymbol || '₹';
   const [recharges, setRecharges] = useState<RechargeRequest[]>([]);
   const [status, setStatus] = useState('ALL');
   const [loading, setLoading] = useState(true);
@@ -102,7 +105,7 @@ export const AdminRechargesPage: React.FC = () => {
                 {r.userId && typeof r.userId === 'object' ? (r.userId as any).fullName : 'User'}
               </td>
               <td className="px-5 py-3 font-bold text-emerald-400">
-                +₹{r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                +{currencySymbol}{r.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3 text-xs text-slate-300">{r.paymentMethod}</td>
               <td className="px-5 py-3 font-mono text-xs text-slate-400">{r.referenceNumber}</td>
@@ -188,7 +191,7 @@ export const AdminRechargesPage: React.FC = () => {
 
             {reviewAction === 'APPROVE' && (
               <Input
-                label="Confirm / Edit Deposit Amount (₹)"
+                label={`Confirm / Edit Deposit Amount (${currencySymbol})`}
                 type="number"
                 value={overrideAmount}
                 onChange={(e) => setOverrideAmount(Number(e.target.value))}
