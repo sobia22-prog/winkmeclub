@@ -13,6 +13,7 @@ export class ProductController {
           image: '/images/products/doll.jpg',
           category: 'Toys & Gifts',
           status: 'ACTIVE',
+          isMainPage: true,
         },
         {
           name: 'Sensual Sex Toy Edition',
@@ -22,6 +23,7 @@ export class ProductController {
           image: '/images/products/sex_toy.jpg',
           category: 'Personal Wellness',
           status: 'ACTIVE',
+          isMainPage: true,
         },
         {
           name: 'Luxury Satin Silk Bedsheet Set',
@@ -31,6 +33,7 @@ export class ProductController {
           image: '/images/products/bedsheet.jpg',
           category: 'Lifestyle & Home',
           status: 'ACTIVE',
+          isMainPage: true,
         },
         {
           name: 'Premium Ultra-Thin Condom Set',
@@ -40,6 +43,7 @@ export class ProductController {
           image: '/images/products/condom.jpg',
           category: 'Personal Care',
           status: 'ACTIVE',
+          isMainPage: true,
         },
         {
           name: 'Rose & Fine Champagne Gift Box',
@@ -49,6 +53,7 @@ export class ProductController {
           image: '/images/products/champagne.jpg',
           category: 'Luxury Accessories',
           status: 'ACTIVE',
+          isMainPage: false,
         },
         {
           name: 'Signature Crystal Decanter Set',
@@ -58,15 +63,16 @@ export class ProductController {
           image: '/images/products/decanter.jpg',
           category: 'Luxury Accessories',
           status: 'ACTIVE',
+          isMainPage: false,
         },
       ];
 
       let products = await Product.find({ status: 'ACTIVE' }).sort({ createdAt: 1 });
 
-      // Always reset/seed if product list is outdated or uses external unsplash URLs
+      // Always reset/seed if product list is outdated or uses external unsplash URLs or lacks isMainPage property
       if (
         products.length < 6 ||
-        products.some((p) => p.image.includes('unsplash') || !p.image.startsWith('/images/products/'))
+        products.some((p) => p.image.includes('unsplash') || !p.image.startsWith('/images/products/') || p.isMainPage === undefined)
       ) {
         await Product.deleteMany({});
         products = await Product.create(defaultProducts);

@@ -8,6 +8,7 @@ export interface IProduct extends Document {
   category: string;
   status: 'ACTIVE' | 'INACTIVE';
   stock?: number;
+  isMainPage?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +22,7 @@ const ProductSchema: Schema = new Schema(
     category: { type: String, required: true, default: 'General' },
     status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE', index: true },
     stock: { type: Number, default: 100 },
+    isMainPage: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );

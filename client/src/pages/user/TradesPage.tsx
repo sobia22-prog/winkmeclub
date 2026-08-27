@@ -132,7 +132,13 @@ export const TradesPage: React.FC = () => {
     }
   };
 
-  const mainFourProducts = products.slice(0, 4);
+  const mainFourProducts = (() => {
+    const featured = products.filter((p) => p.isMainPage).slice(0, 4);
+    return featured.length > 0 ? featured : products.slice(0, 4);
+  })();
+
+  const catalogProducts = products.filter((p) => !mainFourProducts.some((m) => m._id === p._id));
+
   const selectedProductNames = selectedProducts.map((p) => p.name).join(', ') || 'None selected';
   const totalItemsCount = selectedProducts.length;
 
@@ -281,7 +287,10 @@ export const TradesPage: React.FC = () => {
 
             {/* Catalog Items List in Right Overlay */}
             <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-              {products.map((product) => {
+              {catalogProducts.length === 0 ? (
+                <p className="text-center text-xs text-slate-500 py-6">All active products are currently shown on the main page.</p>
+              ) : (
+                catalogProducts.map((product) => {
                 const isSelected = selectedProducts.some((p) => p._id === product._id);
                 return (
                   <div
@@ -309,7 +318,7 @@ export const TradesPage: React.FC = () => {
                     )}
                   </div>
                 );
-              })}
+              }))}
             </div>
 
             {/* Drawer Close Button */}

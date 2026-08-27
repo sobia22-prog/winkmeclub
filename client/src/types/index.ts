@@ -82,6 +82,7 @@ export interface Product {
   image: string;
   category: string;
   status: 'ACTIVE' | 'INACTIVE';
+  isMainPage?: boolean;
 }
 
 export interface Trade {

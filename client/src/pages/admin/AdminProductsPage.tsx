@@ -24,9 +24,10 @@ export const AdminProductsPage: React.FC = () => {
     description: '',
     price: 0,
     stock: 100,
-    image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
+    image: '/images/products/doll.jpg',
     category: 'Toys & Gifts',
     status: 'ACTIVE',
+    isMainPage: false,
   });
 
   const [actionLoading, setActionLoading] = useState(false);
@@ -68,9 +69,10 @@ export const AdminProductsPage: React.FC = () => {
       description: '',
       price: 0,
       stock: 100,
-      image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=600&auto=format&fit=crop&q=80',
+      image: '/images/products/doll.jpg',
       category: 'Toys & Gifts',
       status: 'ACTIVE',
+      isMainPage: false,
     });
     setShowModal(true);
   };
@@ -85,8 +87,20 @@ export const AdminProductsPage: React.FC = () => {
       image: prod.image,
       category: prod.category || 'Toys & Gifts',
       status: prod.status || 'ACTIVE',
+      isMainPage: Boolean(prod.isMainPage),
     });
     setShowModal(true);
+  };
+
+  const handleToggleMainPage = async (product: Product) => {
+    try {
+      const newStatus = !product.isMainPage;
+      await adminService.updateProduct(product._id, { isMainPage: newStatus });
+      setMessage(`"${product.name}" moved to ${newStatus ? 'Main Trades Page' : 'Additional Catalog Drawer'}.`);
+      fetchProducts();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update product display location.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -136,7 +150,7 @@ export const AdminProductsPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
             <Package className="w-6 h-6 text-amber-400" /> Marketplace Product Catalog
           </h1>
-          <p className="text-xs text-slate-400">Configure lifestyle products available for user trading.</p>
+          <p className="text-xs text-slate-400">Configure lifestyle products shown on the Main Trades Page vs Additional Catalog Drawer.</p>
         </div>
 
         <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
@@ -168,7 +182,7 @@ export const AdminProductsPage: React.FC = () => {
         ) : products.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No products created yet.</p>
         ) : (
-          <Table headers={['Product Image & Name', 'Category', 'Quantity (Stock)', 'Status', 'Actions']}>
+          <Table headers={['Product Image & Name', 'Category', 'Quantity (Stock)', 'Frontend Location', 'Status', 'Actions']}>
             {products.map((p) => (
               <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
                 <td className="px-5 py-3">
@@ -187,6 +201,25 @@ export const AdminProductsPage: React.FC = () => {
                 <td className="px-5 py-3 text-xs text-slate-300 font-medium">{p.category}</td>
                 <td className="px-5 py-3 font-bold text-amber-400 text-xs">
                   {p.stock || 100} units
+                </td>
+                <td className="px-5 py-3">
+                  {p.isMainPage ? (
+                    <button
+                      onClick={() => handleToggleMainPage(p)}
+                      className="px-2.5 py-1 rounded-full text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 transition-all cursor-pointer shadow"
+                      title="Click to move to Additional Catalog Drawer"
+                    >
+                      ★ MAIN TRADES PAGE
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleToggleMainPage(p)}
+                      className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition-all cursor-pointer"
+                      title="Click to feature on Main Trades Page"
+                    >
+                      📁 CATALOG DRAWER
+                    </button>
+                  )}
                 </td>
                 <td className="px-5 py-3">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
@@ -245,6 +278,16 @@ export const AdminProductsPage: React.FC = () => {
               label="Product Description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+
+            <Select
+              label="Frontend Display Location"
+              options={[
+                { label: '★ Show on Main Trades Page (Featured 4 Grid)', value: 'MAIN' },
+                { label: '📁 Show in Additional Catalog Drawer (Hidden List)', value: 'CATALOG' },
+              ]}
+              value={form.isMainPage ? 'MAIN' : 'CATALOG'}
+              onChange={(e) => setForm({ ...form, isMainPage: e.target.value === 'MAIN' })}
             />
 
             <Input
