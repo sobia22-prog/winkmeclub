@@ -43,7 +43,7 @@ export const Navbar: React.FC = () => {
     <header className="h-16 bg-brand-surface/90 backdrop-blur-md border-b border-brand-border sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
       {/* Brand Logo & App Name */}
       <div className="flex items-center gap-3">
-        <Link to={isAdmin ? '/admin/dashboard' : '/dashboard'} className="flex items-center gap-2 group">
+        <Link to={user?.role === 'STAFF' ? '/staff/dashboard' : isAdmin ? '/admin/dashboard' : '/dashboard'} className="flex items-center gap-2 group">
           {settings.projectImage ? (
             <img
               src={settings.projectImage}

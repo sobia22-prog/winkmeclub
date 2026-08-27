@@ -102,7 +102,7 @@ export const App: React.FC = () => {
                 <Route path="/support" element={<SupportPage />} />
               </Route>
 
-              {/* Protected Admin Routes */}
+              {/* Protected Admin & Staff Routes */}
               <Route element={<AdminLayout />}>
                 <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="/admin/girls" element={<AdminGirlProfilesPage />} />
@@ -120,6 +120,15 @@ export const App: React.FC = () => {
                 <Route path="/admin/support" element={<AdminSupportPage />} />
                 <Route path="/admin/settings" element={<AdminPaymentSettingsPage />} />
                 <Route path="/admin/profile" element={<AdminProfilePage />} />
+
+                {/* Staff Portal Routes */}
+                <Route path="/staff" element={<Navigate to="/staff/dashboard" replace />} />
+                <Route path="/staff/dashboard" element={<AdminDashboardPage />} />
+                <Route path="/staff/girls" element={<AdminGirlProfilesPage />} />
+                <Route path="/staff/users" element={<AdminUsersPage />} />
+                <Route path="/staff/users/:id" element={<AdminUserDetailPage />} />
+                <Route path="/staff/trades" element={<AdminTradesPage />} />
+                <Route path="/staff/verifications" element={<AdminVerificationsPage />} />
               </Route>
 
               {/* Fallback 404 */}

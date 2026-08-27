@@ -19,7 +19,9 @@ export const LoginPage: React.FC = () => {
 
   React.useEffect(() => {
     if (user) {
-      if (user.role === 'ADMIN' || user.role === 'STAFF') {
+      if (user.role === 'STAFF') {
+        navigate('/staff/dashboard', { replace: true });
+      } else if (user.role === 'ADMIN') {
         navigate('/admin/dashboard', { replace: true });
       } else {
         navigate('/dashboard', { replace: true });

@@ -18,22 +18,17 @@ export const AdminLayout: React.FC = () => {
   }
 
   if (!user || !isAdmin) {
+    if (location.pathname.startsWith('/staff')) {
+      return <Navigate to="/staff/login" replace />;
+    }
     return <Navigate to="/admin/login" replace />;
   }
 
-  // Restrict Staff from accessing platform settings, products, announcements, staff, transactions, support, and profile pages
-  const forbiddenStaffPaths = [
-    '/admin/products',
-    '/admin/announcements',
-    '/admin/settings',
-    '/admin/staff',
-    '/admin/transactions',
-    '/admin/support',
-    '/admin/profile',
-  ];
-
-  if (user.role === 'STAFF' && forbiddenStaffPaths.includes(location.pathname)) {
-    return <Navigate to="/admin/dashboard" replace />;
+  // Restrict Staff from accessing admin routes and forbidden platform pages
+  if (user.role === 'STAFF') {
+    if (location.pathname.startsWith('/admin')) {
+      return <Navigate to="/staff/dashboard" replace />;
+    }
   }
 
   return (

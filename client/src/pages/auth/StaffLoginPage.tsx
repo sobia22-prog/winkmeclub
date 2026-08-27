@@ -18,8 +18,12 @@ export const StaffLoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (user && (user.role === 'STAFF' || user.role === 'ADMIN')) {
-      navigate('/admin/dashboard', { replace: true });
+    if (user) {
+      if (user.role === 'STAFF') {
+        navigate('/staff/dashboard', { replace: true });
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin/dashboard', { replace: true });
+      }
     }
   }, [user, navigate]);
 
@@ -32,7 +36,7 @@ export const StaffLoginPage: React.FC = () => {
       const res = await authService.staffLogin({ email, password });
       if (res.data.success) {
         loginSession(res.data.token, res.data.user);
-        navigate('/admin/dashboard');
+        navigate('/staff/dashboard');
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Staff login failed. Check email or password.');

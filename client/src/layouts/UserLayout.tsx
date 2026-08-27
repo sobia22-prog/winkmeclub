@@ -26,7 +26,11 @@ export const UserLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role === 'ADMIN' || user.role === 'STAFF') {
+  if (user.role === 'STAFF') {
+    return <Navigate to="/staff/dashboard" replace />;
+  }
+
+  if (user.role === 'ADMIN') {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

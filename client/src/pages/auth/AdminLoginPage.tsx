@@ -18,8 +18,12 @@ export const AdminLoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    if (user && (user.role === 'ADMIN' || user.role === 'STAFF')) {
-      navigate('/admin/dashboard', { replace: true });
+    if (user) {
+      if (user.role === 'STAFF') {
+        navigate('/staff/dashboard', { replace: true });
+      } else if (user.role === 'ADMIN') {
+        navigate('/admin/dashboard', { replace: true });
+      }
     }
   }, [user, navigate]);
 
