@@ -60,12 +60,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    const wasAdmin = user?.role === 'ADMIN' || user?.role === 'STAFF' || window.location.pathname.startsWith('/admin');
+    const isStaff = user?.role === 'STAFF' || window.location.pathname.startsWith('/staff');
+    const isAdmin = user?.role === 'ADMIN' || window.location.pathname.startsWith('/admin');
+
     localStorage.removeItem('wink_token');
     setToken(null);
     setUser(null);
     setWallet(null);
-    window.location.href = wasAdmin ? '/admin/login' : '/login';
+
+    if (isStaff) {
+      window.location.href = '/staff/login';
+    } else if (isAdmin) {
+      window.location.href = '/admin/login';
+    } else {
+      window.location.href = '/login';
+    }
   };
 
   return (
