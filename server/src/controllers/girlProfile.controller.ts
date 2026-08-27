@@ -10,10 +10,10 @@ export class GirlProfileController {
       const { category, city, search } = req.query;
       const query: any = { isActive: true };
 
-      if (category && category !== 'ALL') {
+      if (category && String(category).toUpperCase() !== 'ALL') {
         query.categories = { $in: [new RegExp(String(category), 'i')] };
       }
-      if (city && city !== 'ALL') {
+      if (city && String(city).toUpperCase() !== 'ALL') {
         query.location = new RegExp(String(city), 'i');
       }
       if (search) {
