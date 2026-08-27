@@ -23,75 +23,6 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-const mockFallbackProfiles = [
-  {
-    _id: 'mock1',
-    name: 'Aria Sharma',
-    location: 'Mumbai',
-    height: "5'6\"",
-    weight: '52kg',
-    rating: 4.9,
-    bio: 'Independent fashion model & VIP luxury escort.',
-    profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-    verificationLabel: 'VIP Verified',
-  },
-  {
-    _id: 'mock2',
-    name: 'Ananya Verma',
-    location: 'Delhi',
-    height: "5'7\"",
-    weight: '54kg',
-    rating: 5.0,
-    bio: 'Charming, sweet & educated companion for luxury dinners and events.',
-    profileImage: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80',
-    verificationLabel: 'Super VIP',
-  },
-  {
-    _id: 'mock3',
-    name: 'Riya Sen',
-    location: 'Bangalore',
-    height: "5'5\"",
-    weight: '50kg',
-    rating: 4.8,
-    bio: 'Passionate dancer & elite club VIP escort in Bangalore.',
-    profileImage: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&auto=format&fit=crop&q=80',
-    verificationLabel: 'Verified Gold',
-  },
-  {
-    _id: 'mock4',
-    name: 'Sofia Khan',
-    location: 'Hyderabad',
-    height: "5'8\"",
-    weight: '55kg',
-    rating: 4.9,
-    bio: 'High-class companion available for exclusive VIP dates.',
-    profileImage: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&auto=format&fit=crop&q=80',
-    verificationLabel: 'VIP Elite',
-  },
-  {
-    _id: 'mock5',
-    name: 'Natasha Kapoor',
-    location: 'Goa',
-    height: "5'6\"",
-    weight: '51kg',
-    rating: 5.0,
-    bio: 'Beach lover & resort escort available for luxury weekend getaways.',
-    profileImage: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&auto=format&fit=crop&q=80',
-    verificationLabel: 'VIP Diamond',
-  },
-  {
-    _id: 'mock6',
-    name: 'Kiara Mehta',
-    location: 'Pune',
-    height: "5'7\"",
-    weight: '53kg',
-    rating: 4.9,
-    bio: 'Sophisticated corporate companion & private club escort.',
-    profileImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80',
-    verificationLabel: 'VIP Verified',
-  },
-];
-
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { t } = useSystemSettings();
@@ -100,25 +31,19 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [applyDateProfile, setApplyDateProfile] = useState<any | null>(null);
 
-  // Fetch admin-curated Girl Profiles from backend
+  // Fetch admin-curated Girl Profiles from backend (STRICTLY FROM DATABASE ONLY)
   const loadProfiles = useCallback(async () => {
     setLoading(true);
     try {
       const res = await girlProfileService.getPublicProfiles({ city: 'All' });
-
       if (res.data.success) {
-        let list = res.data.profiles || [];
-        if (list.length < 6) {
-          const missingCount = 6 - list.length;
-          list = [...list, ...mockFallbackProfiles.slice(0, missingCount)];
-        }
-        setProfiles(list);
+        setProfiles(res.data.profiles || []);
       } else {
-        setProfiles(mockFallbackProfiles);
+        setProfiles([]);
       }
     } catch (err) {
       console.error('Failed to load girl profiles:', err);
-      setProfiles(mockFallbackProfiles);
+      setProfiles([]);
     } finally {
       setLoading(false);
     }

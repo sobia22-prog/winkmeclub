@@ -85,7 +85,7 @@ export const MatchesPage: React.FC = () => {
                     alt={profile.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-transparent to-transparent opacity-90" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-black/20 to-transparent opacity-95" />
 
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
                     <Badge variant="verified" size="sm">{profile.verificationLabel || 'ID Verified'}</Badge>
@@ -103,7 +103,7 @@ export const MatchesPage: React.FC = () => {
                       <h3 className="text-lg font-bold text-white flex items-center gap-2">
                         {profile.name}
                       </h3>
-                      <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-md">
+                      <div className="flex items-center gap-1 text-amber-400 text-xs font-bold bg-black/60 px-2 py-0.5 rounded-md">
                         <Star className="w-3.5 h-3.5 fill-amber-400" /> {profile.rating || 5.0}
                       </div>
                     </div>
