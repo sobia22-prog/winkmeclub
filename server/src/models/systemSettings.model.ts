@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ISystemSettings extends Document {
   appName: string;
-  defaultCurrency: 'INR' | 'EUR' | 'USD';
+  defaultCurrency: string;
   currencySymbol: string;
   projectImage: string;
   maintenanceMode: boolean;

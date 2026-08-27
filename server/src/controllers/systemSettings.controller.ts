@@ -10,6 +10,13 @@ export class SystemSettingsController {
         settings = await SystemSettings.create({});
       }
 
+      // Enforce currencySymbol alignment with defaultCurrency
+      if (settings.defaultCurrency === 'EUR') settings.currencySymbol = '€';
+      else if (settings.defaultCurrency === 'USD') settings.currencySymbol = '$';
+      else if (settings.defaultCurrency === 'PKR') settings.currencySymbol = 'Rs.';
+      else if (settings.defaultCurrency === 'GBP') settings.currencySymbol = '£';
+      else if (settings.defaultCurrency === 'INR') settings.currencySymbol = '₹';
+
       return res.status(200).json({
         success: true,
         settings,
@@ -57,7 +64,8 @@ export class SystemSettingsController {
         else if (defaultCurrency === 'USD') settings.currencySymbol = '$';
         else if (defaultCurrency === 'PKR') settings.currencySymbol = 'Rs.';
         else if (defaultCurrency === 'GBP') settings.currencySymbol = '£';
-        else settings.currencySymbol = '₹';
+        else if (defaultCurrency === 'INR') settings.currencySymbol = '₹';
+        else settings.currencySymbol = defaultCurrency;
       }
       if (req.body.currencySymbol !== undefined) {
         settings.currencySymbol = req.body.currencySymbol;

@@ -36,9 +36,16 @@ export const SystemSettingsProvider: React.FC<{ children: ReactNode }> = ({ chil
     try {
       const res = await systemSettingsService.getSettings();
       if (res.data.success && res.data.settings) {
-        setSettings(res.data.settings);
-        if (res.data.settings.appName) {
-          document.title = res.data.settings.appName;
+        const loaded = { ...res.data.settings };
+        if (loaded.defaultCurrency === 'EUR') loaded.currencySymbol = '€';
+        else if (loaded.defaultCurrency === 'USD') loaded.currencySymbol = '$';
+        else if (loaded.defaultCurrency === 'PKR') loaded.currencySymbol = 'Rs.';
+        else if (loaded.defaultCurrency === 'GBP') loaded.currencySymbol = '£';
+        else if (loaded.defaultCurrency === 'INR') loaded.currencySymbol = '₹';
+
+        setSettings(loaded);
+        if (loaded.appName) {
+          document.title = loaded.appName;
         }
       }
     } catch (err) {
