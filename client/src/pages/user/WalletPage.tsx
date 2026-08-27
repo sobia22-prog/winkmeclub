@@ -142,6 +142,18 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
 
   const presetAmounts = [500, 1000, 2000, 5000, 10000];
 
+  const [rechargeMethod, setRechargeMethod] = useState<'CRYPTO' | 'BANK'>('CRYPTO');
+  const [copiedAddress, setCopiedAddress] = useState(false);
+
+  const usdtExchangeRate = settings.usdtExchangeRate || 92;
+  const usdtWalletAddress = settings.usdtWalletAddress || 'TXYZ987654321WinkMeClubUSDTDepositAddr';
+
+  const handleCopyWalletAddress = () => {
+    navigator.clipboard.writeText(usdtWalletAddress);
+    setCopiedAddress(true);
+    setTimeout(() => setCopiedAddress(false), 2000);
+  };
+
   return (
     <div className="w-full max-w-md mx-auto space-y-6 pb-24">
       {/* Header Bar */}
@@ -194,90 +206,210 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
         </div>
       )}
 
-      {/* VIEW 1: RECHARGE WALLET (MATCHING SCREENSHOT 3 EXACTLY) */}
+      {/* VIEW 1: RECHARGE WALLET */}
       {currentTab === 'recharge' && (
         <div className="space-y-6">
+          {/* Method Selector Bar */}
+          <div className="grid grid-cols-2 gap-3 text-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setRechargeMethod('CRYPTO');
+                setRechargeForm({ ...rechargeForm, paymentMethod: 'USDT TRC20 Crypto Deposit' });
+              }}
+              className={`p-3.5 rounded-2xl border-2 font-bold transition-all flex items-center justify-center gap-2 ${
+                rechargeMethod === 'CRYPTO'
+                  ? 'border-purple-500 bg-purple-500/20 text-white shadow-lg'
+                  : 'border-brand-border bg-brand-surface text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <QrCode className="w-4 h-4 text-amber-400" /> Crypto Deposit (USDT)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setRechargeMethod('BANK');
+                setRechargeForm({ ...rechargeForm, paymentMethod: 'UPI / Bank Transfer' });
+              }}
+              className={`p-3.5 rounded-2xl border-2 font-bold transition-all flex items-center justify-center gap-2 ${
+                rechargeMethod === 'BANK'
+                  ? 'border-purple-500 bg-purple-500/20 text-white shadow-lg'
+                  : 'border-brand-border bg-brand-surface text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Building className="w-4 h-4 text-emerald-400" /> UPI / Bank Transfer
+            </button>
+          </div>
+
           <form onSubmit={handleRechargeSubmit} className="space-y-6">
-            {/* STEP 1: ENTER AMOUNT (Matching SS 3) */}
-            <Card className="p-5 space-y-4 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 font-black text-sm flex items-center justify-center border border-purple-500/40">
-                  1
+            {/* CRYPTO DEPOSIT DETAILS CARD */}
+            {rechargeMethod === 'CRYPTO' && (
+              <Card className="p-5 space-y-4 bg-brand-surface border border-purple-500/40 rounded-3xl shadow-xl text-xs">
+                <div className="flex items-center justify-between border-b border-brand-border pb-3">
+                  <div className="flex items-center gap-2 font-extrabold text-slate-100 text-sm">
+                    <QrCode className="w-5 h-5 text-amber-400" /> USDT TRC20 Crypto Deposit
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-extrabold text-[10px]">
+                    TRC20 Network
+                  </span>
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-100">Step 1: Enter Amount</h3>
-                  <p className="text-[11px] text-slate-400">Choose an amount or enter custom amount to add</p>
+
+                {/* Official Allowed Exchange Rate Banner */}
+                <div className="p-3.5 bg-gradient-to-r from-purple-950/60 to-brand-card border border-purple-500/40 rounded-2xl flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">Allowed Exchange Rate</span>
+                    <span className="text-sm font-black text-amber-400 font-mono">1 USDT = ₹{usdtExchangeRate.toFixed(2)}</span>
+                  </div>
+                  <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-lg font-bold">
+                    Official Rate Allowed
+                  </span>
                 </div>
-              </div>
 
-              {/* Custom Input */}
-              <div className="space-y-1.5 pt-1">
-                <label className="block text-xs font-semibold text-slate-300">Amount ({currencySymbol})</label>
-                <input
-                  type="number"
-                  placeholder="e.g. 1000"
-                  value={rechargeForm.amount}
-                  onChange={(e) => setRechargeForm({ ...rechargeForm, amount: Number(e.target.value) })}
-                  className="w-full bg-brand-dark border border-brand-border rounded-2xl px-4 py-3 text-slate-100 font-mono font-bold text-sm focus:outline-none focus:border-purple-500"
-                  required
-                />
-              </div>
+                {/* USDT TRC20 Wallet Address Box */}
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-slate-300">
+                    Official USDT TRC20 Deposit Address
+                  </label>
+                  <div className="flex items-center gap-2 p-3 bg-brand-dark border border-brand-border rounded-2xl">
+                    <span className="font-mono text-xs text-slate-200 truncate flex-1 font-bold">
+                      {usdtWalletAddress}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyWalletAddress}
+                      className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] flex items-center gap-1 transition-all shrink-0"
+                    >
+                      {copiedAddress ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedAddress ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
 
-              {/* Quick Amount Preset Pills (₹500, ₹1000, ₹2000, ₹5000, ₹10000) */}
-              <div className="grid grid-cols-5 gap-2 pt-1">
-                {presetAmounts.map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => setRechargeForm({ ...rechargeForm, amount: amt })}
-                    className={`py-2 px-1 text-[11px] font-bold rounded-xl border transition-all ${
-                      rechargeForm.amount === amt
-                        ? 'bg-purple-600 border-purple-500 text-white shadow-md'
-                        : 'bg-brand-card border-brand-border text-slate-300 hover:border-purple-500/40'
-                    }`}
-                  >
-                    ₹{amt.toLocaleString()}
-                  </button>
-                ))}
-              </div>
-            </Card>
+                {/* Deposit Amount Input */}
+                <div className="space-y-1.5 pt-1">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-semibold text-slate-300">Deposit Amount (USDT)</label>
+                    <span className="text-[11px] font-bold text-emerald-400 font-mono">
+                      Equivalent: ₹{(rechargeForm.amount * usdtExchangeRate).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <input
+                    type="number"
+                    step="1"
+                    min="10"
+                    placeholder="e.g. 100 USDT"
+                    value={rechargeForm.amount}
+                    onChange={(e) => setRechargeForm({ ...rechargeForm, amount: Number(e.target.value) })}
+                    className="w-full bg-brand-dark border border-brand-border rounded-2xl px-4 py-3 text-slate-100 font-mono font-bold text-sm focus:outline-none focus:border-purple-500"
+                    required
+                  />
+                </div>
 
-            {/* STEP 2: UPLOAD PAYMENT PROOF (Matching SS 3) */}
+                {/* Preset Amount Pills */}
+                <div className="grid grid-cols-5 gap-2 pt-1">
+                  {[10, 50, 100, 500, 1000].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setRechargeForm({ ...rechargeForm, amount: amt })}
+                      className={`py-2 px-1 text-[11px] font-bold rounded-xl border transition-all ${
+                        rechargeForm.amount === amt
+                          ? 'bg-purple-600 border-purple-500 text-white shadow-md'
+                          : 'bg-brand-card border-brand-border text-slate-300 hover:border-purple-500/40'
+                      }`}
+                    >
+                      {amt} USDT
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* UPI / BANK DEPOSIT DETAILS CARD */}
+            {rechargeMethod === 'BANK' && (
+              <Card className="p-5 space-y-4 bg-brand-surface border border-brand-border rounded-3xl shadow-xl text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 font-black text-sm flex items-center justify-center border border-purple-500/40">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-100">Step 1: Enter Amount</h3>
+                    <p className="text-[11px] text-slate-400">Choose an amount or enter custom amount to add</p>
+                  </div>
+                </div>
+
+                {/* Custom Input */}
+                <div className="space-y-1.5 pt-1">
+                  <label className="block text-xs font-semibold text-slate-300">Amount ({currencySymbol})</label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 1000"
+                    value={rechargeForm.amount}
+                    onChange={(e) => setRechargeForm({ ...rechargeForm, amount: Number(e.target.value) })}
+                    className="w-full bg-brand-dark border border-brand-border rounded-2xl px-4 py-3 text-slate-100 font-mono font-bold text-sm focus:outline-none focus:border-purple-500"
+                    required
+                  />
+                </div>
+
+                {/* Quick Amount Preset Pills (₹500, ₹1000, ₹2000, ₹5000, ₹10000) */}
+                <div className="grid grid-cols-5 gap-2 pt-1">
+                  {presetAmounts.map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setRechargeForm({ ...rechargeForm, amount: amt })}
+                      className={`py-2 px-1 text-[11px] font-bold rounded-xl border transition-all ${
+                        rechargeForm.amount === amt
+                          ? 'bg-purple-600 border-purple-500 text-white shadow-md'
+                          : 'bg-brand-card border-brand-border text-slate-300 hover:border-purple-500/40'
+                      }`}
+                    >
+                      ₹{amt.toLocaleString()}
+                    </button>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* STEP 2: UPLOAD PAYMENT PROOF */}
             <Card className="p-5 space-y-4 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 font-black text-sm flex items-center justify-center border border-purple-500/40">
                   2
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-100">Step 2: Upload Payment Proof</h3>
-                  <p className="text-[11px] text-slate-400">Upload payment proof / screenshot to verify transaction</p>
+                  <h3 className="text-sm font-bold text-slate-100">Step 2: Upload Deposit Proof</h3>
+                  <p className="text-[11px] text-slate-400">
+                    {rechargeMethod === 'CRYPTO' ? 'Upload blockchain transfer screenshot & TxHash' : 'Upload payment proof / screenshot to verify transaction'}
+                  </p>
                 </div>
               </div>
 
               {/* Payment Screenshot Picker */}
               <ImageUploadPicker
-                label="Payment Screenshot"
+                label={rechargeMethod === 'CRYPTO' ? 'Crypto Transfer Screenshot' : 'Payment Screenshot'}
                 value={rechargeForm.receiptUrl}
                 onChange={(url) => setRechargeForm({ ...rechargeForm, receiptUrl: url })}
                 helperText="Upload payment screenshot proof for Admin verification"
               />
 
-              {/* Transaction ID / UTR Number Input */}
+              {/* Transaction ID / TxHash Number Input */}
               <Input
-                label="Transaction ID / UTR Number"
-                placeholder="Transaction ID / UTR Number"
+                label={rechargeMethod === 'CRYPTO' ? 'TxHash / Transaction Hash' : 'Transaction ID / UTR Number'}
+                placeholder={rechargeMethod === 'CRYPTO' ? 'Enter TRC20 TxHash (e.g. 0x8a7...)' : 'Transaction ID / UTR Number'}
                 value={rechargeForm.referenceNumber}
                 onChange={(e) => setRechargeForm({ ...rechargeForm, referenceNumber: e.target.value })}
                 required
               />
 
-              {/* Submit Recharge Request Button (Purple/Pink Gradient Button as in SS 3) */}
+              {/* Submit Recharge Request Button */}
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-xl hover:scale-[1.01] active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
               >
-                {loading ? 'Submitting...' : 'Submit Recharge Request'}
+                {loading ? 'Submitting...' : rechargeMethod === 'CRYPTO' ? 'Submit Crypto Deposit Request' : 'Submit Recharge Request'}
               </button>
             </Card>
           </form>
