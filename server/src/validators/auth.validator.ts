@@ -2,18 +2,21 @@ import { z } from 'zod';
 
 export const registerSchema = z.object({
   body: z.object({
-    fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-    email: z.string().email('Invalid email address format'),
-    phone: z.string().min(8, 'Phone number must be at least 8 digits'),
+    invitationCode: z.string().min(1, 'Staff invitation code is required'),
+    fullName: z.string().min(2, 'Username or name must be at least 2 characters'),
+    username: z.string().optional(),
+    email: z.string().optional(),
+    phone: z.string().optional(),
+    city: z.string().optional(),
     password: z.string().min(6, 'Password must be at least 6 characters'),
-    city: z.string().min(2, 'City is required'),
     gender: z.enum(['Male', 'Female', 'Non-Binary', 'Other']).optional(),
   }),
 });
 
 export const loginSchema = z.object({
   body: z.object({
-    email: z.string().min(1, 'Email or username is required'),
+    username: z.string().optional(),
+    email: z.string().optional(),
     password: z.string().min(1, 'Password is required'),
   }),
 });

@@ -33,7 +33,7 @@ export const AdminLoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await authService.adminLogin({ email, password });
+      const res = await authService.adminLogin({ username: email, email, password });
       if (res.data.success) {
         loginSession(res.data.token, res.data.user);
         navigate('/admin/dashboard');
@@ -70,9 +70,9 @@ export const AdminLoginPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Admin Email"
-            type="email"
-            placeholder="admin@domain.com"
+            label="Admin Email or Username"
+            type="text"
+            placeholder="admin@domain.com or admin"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             leftIcon={<Mail className="w-4 h-4" />}

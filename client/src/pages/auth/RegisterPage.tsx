@@ -89,54 +89,26 @@ export const RegisterPage: React.FC = () => {
             required
           />
           <Input
-            label="Full Name"
+            label="Username / Full Name"
             name="fullName"
-            placeholder="John Doe"
+            placeholder="e.g. moon01"
             value={formData.fullName}
             onChange={handleChange}
             leftIcon={<User className="w-4 h-4" />}
             required
           />
-          <Input
-            label="Email Address"
-            name="email"
-            type="email"
-            placeholder="you@domain.com"
-            value={formData.email}
+          <Select
+            label="Gender"
+            name="gender"
+            value={formData.gender}
             onChange={handleChange}
-            leftIcon={<Mail className="w-4 h-4" />}
-            required
+            options={[
+              { label: 'Female', value: 'Female' },
+              { label: 'Male', value: 'Male' },
+              { label: 'Non-Binary', value: 'Non-Binary' },
+              { label: 'Other', value: 'Other' },
+            ]}
           />
-          <Input
-            label="Phone Number"
-            name="phone"
-            placeholder="+91 98765 43210"
-            value={formData.phone}
-            onChange={handleChange}
-            leftIcon={<Phone className="w-4 h-4" />}
-            required
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <Select
-              label="City"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              options={brandConfig.cities.map((c) => ({ label: c, value: c }))}
-            />
-            <Select
-              label="Gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleChange}
-              options={[
-                { label: 'Female', value: 'Female' },
-                { label: 'Male', value: 'Male' },
-                { label: 'Non-Binary', value: 'Non-Binary' },
-                { label: 'Other', value: 'Other' },
-              ]}
-            />
-          </div>
           <Input
             label="Password"
             name="password"

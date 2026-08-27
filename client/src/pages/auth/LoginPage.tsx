@@ -6,7 +6,7 @@ import { authService } from '../../services/auth.service';
 import { brandConfig } from '../../config/brand.config';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
-import { Lock, Mail } from 'lucide-react';
+import { Lock, Mail, User } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -79,12 +79,12 @@ export const LoginPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Email Address"
-            type="email"
-            placeholder="you@domain.com"
+            label="Username"
+            type="text"
+            placeholder="e.g. moon01"
             value={email}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-            leftIcon={<Mail className="w-4 h-4" />}
+            leftIcon={<User className="w-4 h-4" />}
             required
           />
           <Input

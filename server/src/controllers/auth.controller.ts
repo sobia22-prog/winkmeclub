@@ -14,7 +14,7 @@ const generateToken = (userId: string) => {
 export class AuthController {
   static async register(req: Request, res: Response) {
     try {
-      const { fullName, email, phone, password, city, gender, invitationCode } = req.body;
+      const { fullName, username, email, password, gender, invitationCode } = req.body;
 
       if (!invitationCode || typeof invitationCode !== 'string' || !invitationCode.trim()) {
         return res.status(400).json({ message: 'Staff Invitation Code is mandatory for registration.' });
@@ -31,18 +31,29 @@ export class AuthController {
         return res.status(400).json({ message: 'Invalid or inactive Staff Invitation Code. Registration requires a valid staff code.' });
       }
 
-      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      const inputName = (username || fullName || '').toString().trim();
+      const cleanUser = inputName.toLowerCase().replace(/\s+/g, '');
+      const userEmail = email && typeof email === 'string' && email.trim() ? email.toLowerCase().trim() : `${cleanUser}@winkmeclub.com`;
+      const escapedId = inputName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const existingUser = await User.findOne({
+        $or: [
+          { email: userEmail },
+          { fullName: new RegExp('^' + escapedId + '$', 'i') }
+        ]
+      });
+
       if (existingUser) {
-        return res.status(400).json({ message: 'Email address is already registered.' });
+        return res.status(400).json({ message: 'Username or account is already registered. Please choose another username.' });
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
       const user = await User.create({
-        fullName,
-        email: email.toLowerCase(),
-        phone,
+        fullName: fullName || username,
+        email: userEmail,
+        phone: '0000000000',
         passwordHash,
-        city,
+        city: 'Mumbai',
         gender: gender || 'Female',
         role: 'USER',
         assignedStaff: staffUser._id,
@@ -140,15 +151,26 @@ export class AuthController {
 
   static async login(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
-      if (!email || typeof email !== 'string' || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
+      const { email, username, password } = req.body;
+      const loginIdentifier = (username || email || '').toString().trim();
+      if (!loginIdentifier || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
       }
 
-      const user = await User.findOne({ email: email.toLowerCase() });
+      const cleanId = loginIdentifier.toLowerCase();
+      const escapedId = loginIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const user = await User.findOne({
+        role: 'USER',
+        $or: [
+          { email: cleanId },
+          { email: `${cleanId.replace(/\s+/g, '')}@winkmeclub.com` },
+          { fullName: new RegExp('^' + escapedId + '$', 'i') }
+        ]
+      });
 
       if (!user) {
-        return res.status(401).json({ message: 'Invalid email or password credentials.' });
+        return res.status(401).json({ message: 'Invalid username or password credentials.' });
       }
 
       if (user.status === 'SUSPENDED') {
@@ -157,7 +179,7 @@ export class AuthController {
 
       const isMatch = await bcrypt.compare(password, user.passwordHash);
       if (!isMatch) {
-        return res.status(401).json({ message: 'Invalid email or password credentials.' });
+        return res.status(401).json({ message: 'Invalid username or password credentials.' });
       }
 
       user.lastLoginAt = new Date();
@@ -191,12 +213,27 @@ export class AuthController {
   // Admin Login Endpoint (Strictly for ADMIN role only)
   static async adminLogin(req: Request, res: Response) {
     try {
-      const { email, password } = req.body;
-      if (!email || typeof email !== 'string' || !password) {
-        return res.status(400).json({ message: 'Email and password are required.' });
+      const { email, username, password } = req.body;
+      const loginIdentifier = (username || email || '').toString().trim();
+      if (!loginIdentifier || !password) {
+        return res.status(400).json({ message: 'Admin email/username and password are required.' });
       }
 
-      const user = await User.findOne({ email: email.toLowerCase() });
+      const cleanId = loginIdentifier.toLowerCase();
+      const escapedId = loginIdentifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      const user = await User.findOne({
+        role: 'ADMIN',
+        $or: [
+          { email: cleanId },
+          { email: `${cleanId.replace(/\s+/g, '')}@winkmeclub.com` },
+          { fullName: new RegExp('^' + escapedId + '$', 'i') }
+        ]
+      });
+
+      if (!user) {
+        return res.status(401).json({ message: 'Invalid admin credentials.' });
+      }
 
       if (!user) {
         return res.status(401).json({ message: 'Invalid admin credentials.' });
