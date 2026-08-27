@@ -110,6 +110,8 @@ const seedData = async () => {
     console.log('[Seed] Database cleaned. Seeding fresh realistic demo data...');
 
     const defaultPasswordHash = await bcrypt.hash('User@123', 10);
+    const clientPasswordHash = await bcrypt.hash('Client@123', 10);
+    const staffPasswordHash = await bcrypt.hash('Staff@123', 10);
     const adminPasswordHash = await bcrypt.hash('Admin@123', 10);
 
     // 1. Create Admin Account
@@ -121,6 +123,7 @@ const seedData = async () => {
       city: 'Mumbai',
       gender: 'Other',
       role: 'ADMIN',
+      invitationCode: 'ADMIN100',
       isVIP: true,
       isVerified: true,
       verificationStatus: 'VERIFIED',
@@ -129,7 +132,52 @@ const seedData = async () => {
       bio: 'Wink Me Club Lead Platform Manager & Security Officer.',
     });
 
-    // 2. Create Demo User
+    // 2. Create Staff Account
+    const staffUser = await User.create({
+      fullName: 'Staff Member',
+      email: 'staff@winkmeclub.com',
+      phone: '+91 98765 11111',
+      passwordHash: staffPasswordHash,
+      city: 'Mumbai',
+      gender: 'Female',
+      role: 'STAFF',
+      invitationCode: 'STAFF100',
+      isVIP: true,
+      isVerified: true,
+      verificationStatus: 'VERIFIED',
+      status: 'ACTIVE',
+      profileImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500&auto=format&fit=crop&q=80',
+      bio: 'Senior Customer Concierge & VIP Escort Coordinator.',
+    });
+
+    // 3. Create Client Account (Matching 'Client' username)
+    const clientUser = await User.create({
+      fullName: 'Client',
+      email: 'client@winkmeclub.com',
+      phone: '+91 98765 22222',
+      passwordHash: clientPasswordHash,
+      city: 'Mumbai',
+      gender: 'Male',
+      role: 'USER',
+      assignedStaff: staffUser._id,
+      isVIP: true,
+      vipExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+      isVerified: true,
+      verificationStatus: 'VERIFIED',
+      status: 'ACTIVE',
+      profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=80',
+      bio: 'VIP Client member exploring exclusive city encounters.',
+    });
+
+    await Wallet.create({
+      userId: clientUser._id,
+      availableBalance: 15000.0,
+      frozenBalance: 0,
+      totalBalance: 15000.0,
+      currency: '₹',
+    });
+
+    // 4. Create Demo User (Rahul Sharma)
     const demoUser = await User.create({
       fullName: 'Rahul Sharma',
       email: 'user@winkmeclub.com',
@@ -138,6 +186,7 @@ const seedData = async () => {
       city: 'Mumbai',
       gender: 'Male',
       role: 'USER',
+      assignedStaff: staffUser._id,
       isVIP: true,
       vipExpiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
       isVerified: true,
