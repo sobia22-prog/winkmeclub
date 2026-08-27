@@ -55,7 +55,12 @@ export class SystemSettingsController {
         settings.defaultCurrency = defaultCurrency;
         if (defaultCurrency === 'EUR') settings.currencySymbol = '€';
         else if (defaultCurrency === 'USD') settings.currencySymbol = '$';
+        else if (defaultCurrency === 'PKR') settings.currencySymbol = 'Rs.';
+        else if (defaultCurrency === 'GBP') settings.currencySymbol = '£';
         else settings.currencySymbol = '₹';
+      }
+      if (req.body.currencySymbol !== undefined) {
+        settings.currencySymbol = req.body.currencySymbol;
       }
       if (projectImage !== undefined) settings.projectImage = projectImage;
       if (maintenanceMode !== undefined) settings.maintenanceMode = Boolean(maintenanceMode);
