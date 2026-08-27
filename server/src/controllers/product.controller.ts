@@ -77,12 +77,15 @@ export class ProductController {
         await Product.deleteMany({});
         products = await Product.create(defaultProducts);
       } else {
-        // If fewer than 4 products are set as isMainPage, automatically set the first 4 products as main page items
-        const mainCount = products.filter((p) => p.isMainPage).length;
-        if (mainCount < 4) {
-          for (let i = 0; i < Math.min(4, products.length); i++) {
-            products[i].isMainPage = true;
-            await products[i].save();
+        // Enforce strictly 4 main page products: top 4 are set to true, rest are set to false
+        const mainProducts = products.filter((p) => p.isMainPage);
+        if (mainProducts.length !== 4) {
+          for (let i = 0; i < products.length; i++) {
+            const shouldBeMain = i < 4;
+            if (products[i].isMainPage !== shouldBeMain) {
+              products[i].isMainPage = shouldBeMain;
+              await products[i].save();
+            }
           }
         }
       }

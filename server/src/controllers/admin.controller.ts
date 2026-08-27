@@ -680,6 +680,14 @@ export class AdminController {
   // 7. Marketplace Product Catalog
   static async createProduct(req: AuthRequest, res: Response) {
     try {
+      if (req.body.isMainPage) {
+        const count = await Product.countDocuments({ isMainPage: true });
+        if (count >= 4) {
+          return res.status(400).json({
+            message: 'Maximum limit reached: Only 4 products can be displayed on the Main Trades Page. Please remove an existing product from the main page first.',
+          });
+        }
+      }
       const product = await Product.create(req.body);
       return res.status(201).json({ success: true, product });
     } catch (error: any) {
@@ -689,6 +697,17 @@ export class AdminController {
 
   static async updateProduct(req: AuthRequest, res: Response) {
     try {
+      if (req.body.isMainPage) {
+        const existing = await Product.findById(req.params.id);
+        if (existing && !existing.isMainPage) {
+          const count = await Product.countDocuments({ isMainPage: true });
+          if (count >= 4) {
+            return res.status(400).json({
+              message: 'Maximum limit reached: Only 4 products can be displayed on the Main Trades Page. Please remove an existing product from the main page first.',
+            });
+          }
+        }
+      }
       const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
       return res.status(200).json({ success: true, product });
     } catch (error: any) {

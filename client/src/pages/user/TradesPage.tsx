@@ -230,14 +230,14 @@ export const TradesPage: React.FC = () => {
         {mainFourProducts.length === 0 ? (
           <Card className="p-8 text-center text-xs text-slate-500">Loading main catalog items...</Card>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {mainFourProducts.map((product) => {
               const isSelected = selectedProducts.some((p) => p._id === product._id);
               return (
                 <div
                   key={product._id}
                   onClick={() => handleToggleSelectProduct(product)}
-                  className={`relative rounded-3xl p-3 bg-brand-surface border-2 transition-all cursor-pointer flex items-center justify-center shadow-xl group overflow-hidden ${
+                  className={`relative rounded-3xl p-3 bg-brand-surface border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-xl group overflow-hidden ${
                     isSelected
                       ? 'border-fuchsia-500 bg-gradient-to-b from-fuchsia-950/50 via-brand-surface to-brand-surface shadow-fuchsia-500/30 scale-[1.02]'
                       : 'border-brand-border hover:border-fuchsia-500/40 hover:bg-brand-card'
@@ -249,68 +249,23 @@ export const TradesPage: React.FC = () => {
                     </div>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setPreviewProduct(product);
-                    }}
-                    className="absolute bottom-2 left-2 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 hover:text-white border border-amber-500/40 hover:bg-amber-500/30 transition-all z-20"
-                    title="View Product Details"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                  </button>
-
-                  <div className="w-full aspect-square rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
+                  <div className="w-full h-36 md:h-40 rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
                     <img
                       src={product.image}
                       alt={product.name}
                       className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
+
+                  <h3 className="text-xs font-bold text-slate-100 truncate text-center mt-2.5 w-full px-1">
+                    {product.name}
+                  </h3>
                 </div>
               );
             })}
           </div>
         )}
       </div>
-
-      {/* Product Details Preview Modal */}
-      {previewProduct && (
-        <Modal
-          isOpen={true}
-          onClose={() => setPreviewProduct(null)}
-          title="Product Details"
-          maxWidth="md"
-        >
-          <div className="space-y-4 text-xs">
-            <div className="w-full h-52 rounded-2xl overflow-hidden bg-black/40 border border-brand-border">
-              <img
-                src={previewProduct.image}
-                alt={previewProduct.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <h3 className="text-base font-black text-slate-100">{previewProduct.name}</h3>
-              <p className="text-xs text-amber-400 font-semibold">{previewProduct.category}</p>
-            </div>
-
-            <div className="p-3.5 bg-brand-card border border-brand-border rounded-xl">
-              <p className="text-slate-200 leading-relaxed font-medium">
-                {previewProduct.description || 'No description available.'}
-              </p>
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <Button variant="gold" size="sm" onClick={() => setPreviewProduct(null)}>
-                Close Preview
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      )}
 
       {/* RIGHT OVERLAY DRAWER BAR (Triggered by 3-dots menu button) */}
       {showRightDrawer && (
@@ -345,29 +300,20 @@ export const TradesPage: React.FC = () => {
                   <div
                     key={product._id}
                     onClick={() => handleToggleSelectProduct(product)}
-                    className={`relative p-2 rounded-2xl border-2 transition-all cursor-pointer flex items-center justify-center overflow-hidden ${
+                    className={`relative p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center overflow-hidden ${
                       isSelected
                         ? 'border-fuchsia-500 bg-fuchsia-950/40 text-white'
                         : 'border-brand-border bg-brand-card/50 hover:bg-brand-card text-slate-300'
                     }`}
                   >
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreviewProduct(product);
-                      }}
-                      className="absolute bottom-2 left-2 p-1.5 rounded-xl bg-black/60 backdrop-blur-md text-amber-400 hover:text-white border border-amber-500/40 hover:bg-amber-500/30 transition-all z-20"
-                      title="View Product Details"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </button>
-
                     <img
                       src={product.image}
-                      alt="Product"
+                      alt={product.name}
                       className="w-full h-28 rounded-xl object-cover"
                     />
+                    <h4 className="text-xs font-bold text-slate-100 truncate text-center mt-2 w-full px-1">
+                      {product.name}
+                    </h4>
                     {isSelected && (
                       <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-fuchsia-500 text-white flex items-center justify-center shrink-0 shadow-lg z-10">
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
