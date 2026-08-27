@@ -35,7 +35,7 @@ export const TradesPage: React.FC = () => {
 
   // Multi-item selection (up to 2 items at a time)
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [tradeQuantity, setTradeQuantity] = useState<number>(1);
+  const [tradeQuantity, setTradeQuantity] = useState<number | string>(500);
 
   // Right Drawer Slide-over state (opened via 3-dots menu)
   const [showRightDrawer, setShowRightDrawer] = useState<boolean>(false);
@@ -111,7 +111,17 @@ export const TradesPage: React.FC = () => {
     setError('');
     setSuccess('');
 
-    const itemQty = Number(tradeQuantity) || 1;
+    const itemQty = Number(tradeQuantity);
+    if (!tradeQuantity || isNaN(itemQty) || itemQty <= 0) {
+      setError('Please enter a valid trade balance quantity before placing your trade.');
+      return;
+    }
+
+    const available = wallet?.availableBalance || 0;
+    if (itemQty > available) {
+      setError(`Insufficient available balance for this trade. Required: ${currencySymbol}${itemQty}, Available: ${currencySymbol}${available.toFixed(2)}.`);
+      return;
+    }
 
     setLoading(true);
 
@@ -208,36 +218,35 @@ export const TradesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Page Product Grid (ONLY 4 ITEMS SHOWN ON MAIN PAGE + 3-DOTS MENU BUTTON) */}
+      {/* Main Page Product Grid (2 PRODUCTS PER ROW + 3-DOTS ICON ONLY) */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
             <Flame className="w-4 h-4 text-amber-400" /> Select Trade Activity Items
           </h2>
 
-          {/* 3-DOTS MENU BUTTON (OPENS RIGHT OVERLAY DRAWER TO VIEW & ADD OTHER CATALOG ITEMS) */}
+          {/* 3-DOTS MENU ICON ONLY (OPENS RIGHT OVERLAY DRAWER) */}
           <button
             type="button"
             onClick={() => setShowRightDrawer(true)}
-            className="p-2.5 bg-brand-surface border border-brand-border hover:border-fuchsia-500 rounded-2xl text-slate-200 hover:text-white flex items-center gap-2 text-xs font-bold transition-all shadow-md cursor-pointer"
+            className="p-2 bg-brand-surface border border-brand-border hover:border-fuchsia-500 rounded-2xl text-slate-200 hover:text-white transition-all shadow-md cursor-pointer"
             title="Open More Products Catalog"
           >
-            <span>More Products</span>
-            <MoreVertical className="w-4 h-4 text-amber-400" />
+            <MoreVertical className="w-5 h-5 text-amber-400" />
           </button>
         </div>
 
         {mainFourProducts.length === 0 ? (
           <Card className="p-8 text-center text-xs text-slate-500">Loading main catalog items...</Card>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {mainFourProducts.map((product) => {
               const isSelected = selectedProducts.some((p) => p._id === product._id);
               return (
                 <div
                   key={product._id}
                   onClick={() => handleToggleSelectProduct(product)}
-                  className={`relative rounded-3xl p-3 bg-brand-surface border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-xl group overflow-hidden ${
+                  className={`relative rounded-3xl p-4 bg-brand-surface border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-xl group overflow-hidden ${
                     isSelected
                       ? 'border-fuchsia-500 bg-gradient-to-b from-fuchsia-950/50 via-brand-surface to-brand-surface shadow-fuchsia-500/30 scale-[1.02]'
                       : 'border-brand-border hover:border-fuchsia-500/40 hover:bg-brand-card'
@@ -249,7 +258,7 @@ export const TradesPage: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="w-full h-36 md:h-40 rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
+                  <div className="w-full h-44 md:h-52 rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -257,7 +266,7 @@ export const TradesPage: React.FC = () => {
                     />
                   </div>
 
-                  <h3 className="text-xs font-bold text-slate-100 truncate text-center mt-2.5 w-full px-1">
+                  <h3 className="text-xs font-bold text-slate-100 truncate text-center mt-3 w-full px-1">
                     {product.name}
                   </h3>
                 </div>
@@ -368,8 +377,9 @@ export const TradesPage: React.FC = () => {
                   step="1"
                   min="1"
                   value={tradeQuantity}
-                  onChange={(e) => setTradeQuantity(Number(e.target.value))}
+                  onChange={(e) => setTradeQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-slate-100 font-mono font-bold focus:outline-none focus:border-fuchsia-500"
+                  placeholder="500"
                 />
               </div>
 
@@ -379,7 +389,7 @@ export const TradesPage: React.FC = () => {
                   Tickets
                 </label>
                 <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-amber-400 font-mono font-bold">
-                  {tradeQuantity}
+                  {tradeQuantity || 0}
                 </div>
               </div>
             </div>
@@ -389,7 +399,7 @@ export const TradesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleExecuteTrade}
-                disabled={loading}
+                disabled={loading || !tradeQuantity || Number(tradeQuantity) <= 0 || Number(tradeQuantity) > (wallet?.availableBalance || 0)}
                 className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-xl shadow-pink-500/30 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
@@ -414,8 +424,8 @@ export const TradesPage: React.FC = () => {
               <tr key={t._id} className="hover:bg-brand-card/50 transition-colors text-xs">
                 <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
                 <td className="px-5 py-3 font-semibold text-slate-100">{t.productName}</td>
-                <td className="px-5 py-3 font-bold text-amber-400">
-                  {t.quantity || 1} units
+                <td className="px-5 py-3 font-bold text-amber-400 font-mono">
+                  {t.quantity || 0}
                 </td>
                 <td className="px-5 py-3">
                   {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
