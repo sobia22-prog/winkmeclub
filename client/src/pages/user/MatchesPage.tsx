@@ -97,9 +97,6 @@ export const MatchesPage: React.FC = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1 ${attrTag.color}`}>
                       {attrTag.text}
                     </span>
-                    <span className="px-2.5 py-0.5 bg-amber-100 text-amber-900 border border-amber-200 rounded-md text-[10px] font-semibold">
-                      On-site certification
-                    </span>
                   </div>
 
                   <div className="absolute bottom-3 left-3 right-3">
@@ -120,16 +117,15 @@ export const MatchesPage: React.FC = () => {
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white">
                   <p className="text-xs text-slate-600 line-clamp-2 italic">"{profile.bio || profile.details}"</p>
 
-                  <div className="flex flex-wrap gap-1.5">
-                    <span className="px-2.5 py-0.5 bg-amber-100 text-amber-900 text-[10px] rounded-md font-semibold border border-amber-200">
-                      My own video audit
-                    </span>
-                    {profile.categories && profile.categories.length > 0 && profile.categories.map((cat: string, idx: number) => (
-                      <span key={idx} className="px-2.5 py-0.5 bg-pink-50 text-pink-700 text-[10px] rounded-md border border-pink-200 font-bold">
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
+                  {profile.categories && profile.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {profile.categories.map((cat: string, idx: number) => (
+                        <span key={idx} className="px-2.5 py-0.5 bg-pink-50 text-pink-700 text-[10px] rounded-md border border-pink-200 font-bold">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
                     <button
