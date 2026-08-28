@@ -62,9 +62,9 @@ export const FinanceHistoryPage: React.FC = () => {
           </Link>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-              <History className="w-5 h-5 text-pink-600" /> Finance History
+              <History className="w-5 h-5 text-pink-600" /> Points History
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium">Recharges, withdrawals, and ledger activity</p>
+            <p className="text-[11px] text-slate-500 font-medium">Points, recharges, withdrawals, and ledger activity</p>
           </div>
         </div>
 
@@ -113,29 +113,27 @@ export const FinanceHistoryPage: React.FC = () => {
         {/* Summary Header Box */}
         <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-center divide-x divide-slate-200">
           <div className="space-y-1">
-            <span className="text-[10px] text-slate-600 uppercase font-semibold block">Total Recharge</span>
-            <span className="text-base font-black text-emerald-600 font-mono block">
-              {totalRecharge.toFixed(2)}
+            <span className="text-[10px] text-slate-600 uppercase font-bold block">Total Recharge</span>
+            <span className="text-base font-black text-pink-600 font-mono block">
+              {currencySymbol} {totalRecharge.toFixed(2)}
             </span>
-            <span className="text-[10px] text-slate-500 font-semibold">{currencySymbol}</span>
           </div>
 
           <div className="space-y-1 pl-3">
-            <span className="text-[10px] text-slate-600 uppercase font-semibold block">Total Withdrawal</span>
-            <span className="text-base font-black text-rose-600 font-mono block">
-              {totalWithdrawal.toFixed(2)}
+            <span className="text-[10px] text-slate-600 uppercase font-bold block">Total Withdrawal</span>
+            <span className="text-base font-black text-slate-700 font-mono block">
+              {currencySymbol} {totalWithdrawal.toFixed(2)}
             </span>
-            <span className="text-[10px] text-slate-500 font-semibold">{currencySymbol}</span>
           </div>
         </div>
 
         {/* Financial Log List */}
         {loading ? (
-          <p className="text-center text-xs text-slate-500 py-10">Loading finance history...</p>
+          <p className="text-center text-xs text-slate-500 py-10">Loading points history...</p>
         ) : filteredList.length === 0 ? (
           <div className="text-center text-xs text-slate-500 py-12 space-y-2">
             <History className="w-10 h-10 text-slate-400 mx-auto" />
-            <p>No finance records found.</p>
+            <p>No points records found.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -155,7 +153,7 @@ export const FinanceHistoryPage: React.FC = () => {
                     </div>
 
                     <div className="text-right">
-                      <span className={`text-sm font-black font-mono block ${isRecharge ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      <span className={`text-sm font-black font-mono block ${isRecharge ? 'text-pink-600' : 'text-rose-600'}`}>
                         {isRecharge ? '+' : '-'}{currencySymbol} {item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </span>
                       {item.status === 'APPROVED' && <Badge variant="success">APPROVED</Badge>}
@@ -165,17 +163,21 @@ export const FinanceHistoryPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-500 font-mono flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-slate-400" /> {new Date(item.createdAt).toLocaleString()}
-                    </span>
+                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-slate-400" /> {new Date(item.createdAt).toLocaleString()}
+                      </span>
+                      <span className="font-bold uppercase text-slate-700">{item.status}</span>
+                    </div>
 
+                    {/* View Details Wide Pink/Purple Gradient Button (Matching Screenshot 100%) */}
                     <button
                       type="button"
                       onClick={() => setSelectedItem(item)}
-                      className="px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-extrabold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
-                      <Eye className="w-3.5 h-3.5" /> View Details
+                      <Eye className="w-4 h-4" /> View Details
                     </button>
                   </div>
                 </div>

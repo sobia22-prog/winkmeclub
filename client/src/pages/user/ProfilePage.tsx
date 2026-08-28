@@ -165,13 +165,13 @@ export const ProfilePage: React.FC = () => {
             </span>
           </Link>
 
-          {/* Item 4: Finance History */}
-          <Link to="/profile/finance-history" className="flex flex-col items-center gap-2 group">
+          {/* Item 4: Points History */}
+          <Link to="/profile/points-history" className="flex flex-col items-center gap-2 group">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
               <History className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-800 group-hover:text-purple-600 transition-colors">
-              Finance History
+              Points History
             </span>
           </Link>
 
