@@ -67,16 +67,32 @@ export const DashboardPage: React.FC = () => {
     return () => clearInterval(rotationTimer);
   }, [profiles.length]);
 
-  const getAttributesTag = (index: number, p: any) => {
-    if (p.categories && p.categories.length > 0) {
-      return { text: p.categories[0], color: 'bg-amber-500/20 text-amber-300 border-amber-500/40' };
+  const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
+
+  const getQualities = (index: number, p: any): string[] => {
+    if (p.categories && Array.isArray(p.categories) && p.categories.length > 0) {
+      return p.categories;
     }
-    const tags = [
-      { text: 'Sexy & Hot', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' },
-      { text: 'Gorgeous & VIP', color: 'bg-pink-500/20 text-pink-300 border-pink-500/40' },
-      { text: 'Charming & Exotic', color: 'bg-purple-500/20 text-purple-300 border-purple-500/40' },
+    const defaultQualities = [
+      ['Sexy', 'Hot'],
+      ['Big Boobs', 'Sexy'],
+      ['Hot', 'Charming'],
+      ['Sexy', 'VIP'],
+      ['Cute', 'Gorgeous'],
     ];
-    return tags[index % tags.length];
+    return defaultQualities[index % defaultQualities.length];
+  };
+
+  const getAttributesTag = (index: number, p: any) => {
+    const qualities = getQualities(index, p);
+    const mainQuality = qualities[0] || 'Sexy';
+    const tagColors = [
+      'bg-amber-500 text-white font-bold',
+      'bg-pink-500 text-white font-bold',
+      'bg-rose-500 text-white font-bold',
+      'bg-purple-600 text-white font-bold',
+    ];
+    return { text: mainQuality, color: tagColors[index % tagColors.length] };
   };
 
   return (
@@ -195,10 +211,12 @@ export const DashboardPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {profiles.slice(0, 6).map((profile, index) => {
             const attrTag = getAttributesTag(index, profile);
+            const qualities = getQualities(index, profile);
+
             return (
               <Card key={profile._id || index} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group bg-white border border-slate-200 hover:border-pink-300 transition-all duration-300 shadow-sm">
-                {/* 100% Crisp Unblurred Profile Photo Container */}
-                <div className="relative h-72 overflow-hidden bg-black">
+                {/* Profile Photo Container */}
+                <div className="relative h-72 overflow-hidden bg-black cursor-pointer" onClick={() => setSelectedProfile(profile)}>
                   <img
                     src={profile.profileImage}
                     alt={profile.name}
@@ -235,18 +253,30 @@ export const DashboardPage: React.FC = () => {
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white">
                   <p className="text-xs text-slate-600 line-clamp-2 italic font-medium">"{profile.bio || profile.details}"</p>
 
+                  {/* Qualities / Categories Badges on Card */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {qualities.map((q: string, idx: number) => (
+                      <span key={idx} className="px-2.5 py-0.5 bg-pink-50 text-pink-700 text-[10px] rounded-md border border-pink-200 font-bold">
+                        {q}
+                      </span>
+                    ))}
+                  </div>
+
                   <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                    <Link to="/matches" className="flex-1">
-                      <Button variant="secondary" size="sm" className="w-full">
-                        {t('viewDetail')}
-                      </Button>
-                    </Link>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => setSelectedProfile(profile)}
+                    >
+                      {t('viewDetail')}
+                    </Button>
                     <Button
                       variant="gold"
                       size="sm"
                       className="flex-1 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold border-0 shadow-md"
                       leftIcon={<Calendar className="w-3.5 h-3.5" />}
-                      onClick={() => navigate('/matches')}
+                      onClick={() => setApplyDateProfile(profile)}
                     >
                       {t('applyForDate')}
                     </Button>
@@ -258,7 +288,98 @@ export const DashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* APPLY FOR A DATE POPUP MODAL (Matching Screenshot 1) */}
+      {/* DETAILED GIRL PROFILE VIEW MODAL */}
+      {selectedProfile && (
+        <Modal isOpen={true} onClose={() => setSelectedProfile(null)} title={`${selectedProfile.name} — Profile Details`}>
+          <div className="space-y-4 text-xs">
+            <div className="relative h-72 rounded-2xl overflow-hidden bg-black">
+              <img src={selectedProfile.profileImage} alt={selectedProfile.name} className="w-full h-full object-cover" />
+              <div className="absolute top-3 right-3">
+                <Badge variant="verified" size="md">{selectedProfile.verificationLabel || 'ID Verified'}</Badge>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{selectedProfile.name}</h3>
+                  <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
+                    <MapPin className="w-3.5 h-3.5 text-pink-600" /> {selectedProfile.location}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-amber-500 text-sm font-black">
+                    <Star className="w-4 h-4 fill-amber-500" /> {selectedProfile.rating || 5.0}
+                  </div>
+                  <div className="text-[10px] text-pink-600 font-semibold flex items-center justify-end gap-1 mt-0.5">
+                    <Sparkles className="w-3 h-3 text-pink-600" /> {selectedProfile.initialLikes || 500} Likes
+                  </div>
+                </div>
+              </div>
+
+              {/* Qualities / Categories Badges in Detail View */}
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Qualities & Tags</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {getQualities(0, selectedProfile).map((q: string, idx: number) => (
+                    <span key={idx} className="px-3 py-1 bg-pink-50 text-pink-700 border border-pink-200 rounded-full text-xs font-bold shadow-sm">
+                      {q}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Physical Attributes Bar */}
+              <div className="grid grid-cols-3 gap-2 p-3 bg-pink-50/50 border border-pink-100 rounded-xl text-center font-mono">
+                <div>
+                  <span className="text-[10px] text-slate-500 block font-sans">Height</span>
+                  <span className="font-bold text-slate-900">{selectedProfile.height || "162 cm"}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block font-sans">Weight</span>
+                  <span className="font-bold text-slate-900">{selectedProfile.weight || '52 kg'}</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-slate-500 block font-sans">Chest</span>
+                  <span className="font-bold text-pink-600">{selectedProfile.chestCircumference || '34B'}</span>
+                </div>
+              </div>
+
+              {selectedProfile.bio && (
+                <p className="text-xs text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200 italic">
+                  "{selectedProfile.bio}"
+                </p>
+              )}
+
+              {selectedProfile.details && (
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">About Her</span>
+                  <p className="text-xs text-slate-700 leading-relaxed">{selectedProfile.details}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex justify-end gap-3">
+              <Button variant="secondary" onClick={() => setSelectedProfile(null)}>
+                Close
+              </Button>
+              <Button
+                variant="primary"
+                className="bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold shadow-md"
+                leftIcon={<Calendar className="w-4 h-4" />}
+                onClick={() => {
+                  setApplyDateProfile(selectedProfile);
+                  setSelectedProfile(null);
+                }}
+              >
+                Apply for a date
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* APPLY FOR A DATE POPUP MODAL */}
       {applyDateProfile && (
         <Modal
           isOpen={true}
@@ -268,8 +389,8 @@ export const DashboardPage: React.FC = () => {
           maxWidth="sm"
         >
           <div className="space-y-6 pt-1 text-center">
-            <p className="text-xs text-slate-300 font-medium leading-relaxed">
-              Please contact customer service to apply for this date.
+            <p className="text-xs text-slate-600 font-medium leading-relaxed">
+              Please contact customer service to apply for a date with <strong className="text-slate-900">{applyDateProfile.name}</strong>.
             </p>
 
             <div className="flex items-center justify-center gap-3 pt-2">
@@ -284,7 +405,7 @@ export const DashboardPage: React.FC = () => {
               <Button
                 variant="gold"
                 size="md"
-                className="bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                className="bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold border-0 shadow-md"
                 onClick={() => {
                   setApplyDateProfile(null);
                   navigate('/support');

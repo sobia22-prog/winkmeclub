@@ -36,17 +36,30 @@ export const MatchesPage: React.FC = () => {
     loadProfiles();
   }, [loadProfiles]);
 
-  const getAttributesTag = (index: number, p: any) => {
-    if (p.categories && p.categories.length > 0) {
-      return { text: p.categories[0], color: 'bg-amber-500 text-white font-bold' };
+  const getQualities = (index: number, p: any): string[] => {
+    if (p.categories && Array.isArray(p.categories) && p.categories.length > 0) {
+      return p.categories;
     }
-    const tags = [
-      { text: '#Kind and generous ♥', color: 'bg-pink-500 text-white font-bold' },
-      { text: '#Emotionally stable ♥', color: 'bg-amber-500 text-white font-bold' },
-      { text: '#Polite and cute ♥', color: 'bg-sky-500 text-white font-bold' },
-      { text: '#Agile and beautiful ♥', color: 'bg-sky-500 text-white font-bold' },
+    const defaultQualities = [
+      ['Sexy', 'Hot'],
+      ['Big Boobs', 'Sexy'],
+      ['Hot', 'Charming'],
+      ['Sexy', 'VIP'],
+      ['Cute', 'Gorgeous'],
     ];
-    return tags[index % tags.length];
+    return defaultQualities[index % defaultQualities.length];
+  };
+
+  const getAttributesTag = (index: number, p: any) => {
+    const qualities = getQualities(index, p);
+    const mainQuality = qualities[0] || 'Sexy';
+    const tagColors = [
+      'bg-amber-500 text-white font-bold',
+      'bg-pink-500 text-white font-bold',
+      'bg-rose-500 text-white font-bold',
+      'bg-purple-600 text-white font-bold',
+    ];
+    return { text: mainQuality, color: tagColors[index % tagColors.length] };
   };
 
   return (
@@ -78,6 +91,8 @@ export const MatchesPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {profiles.map((profile, index) => {
             const attrTag = getAttributesTag(index, profile);
+            const qualities = getQualities(index, profile);
+
             return (
               <Card key={profile._id} hoverEffect className="overflow-hidden p-0 flex flex-col justify-between bg-white border border-slate-200 shadow-sm rounded-2xl group">
                 <div className="relative h-72 overflow-hidden cursor-pointer" onClick={() => setSelectedProfile(profile)}>
@@ -117,15 +132,13 @@ export const MatchesPage: React.FC = () => {
                 <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white">
                   <p className="text-xs text-slate-600 line-clamp-2 italic">"{profile.bio || profile.details}"</p>
 
-                  {profile.categories && profile.categories.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {profile.categories.map((cat: string, idx: number) => (
-                        <span key={idx} className="px-2.5 py-0.5 bg-pink-50 text-pink-700 text-[10px] rounded-md border border-pink-200 font-bold">
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex flex-wrap gap-1.5">
+                    {qualities.map((cat: string, idx: number) => (
+                      <span key={idx} className="px-2.5 py-0.5 bg-pink-50 text-pink-700 text-[10px] rounded-md border border-pink-200 font-bold">
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
 
                   <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
                     <button
@@ -150,7 +163,7 @@ export const MatchesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Real Time Status Banner (Matching SS 2 Bottom Red Box) */}
+      {/* Real Time Status Banner */}
       <div className="rounded-3xl bg-gradient-to-r from-pink-500 to-rose-500 p-5 md:p-6 text-white shadow-xl space-y-3 border border-pink-400/30">
         <h3 className="text-center font-extrabold text-sm md:text-base text-white uppercase tracking-wider">
           Real time status
@@ -195,6 +208,18 @@ export const MatchesPage: React.FC = () => {
                   <div className="text-[10px] text-pink-600 font-semibold flex items-center justify-end gap-1 mt-0.5">
                     <Heart className="w-3 h-3 fill-pink-600" /> {selectedProfile.initialLikes || 500} Likes
                   </div>
+                </div>
+              </div>
+
+              {/* Qualities / Categories Badges in Detail View */}
+              <div className="space-y-1">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Qualities & Tags</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {getQualities(0, selectedProfile).map((q: string, idx: number) => (
+                    <span key={idx} className="px-3 py-1 bg-pink-50 text-pink-700 border border-pink-200 rounded-full text-xs font-bold shadow-sm">
+                      {q}
+                    </span>
+                  ))}
                 </div>
               </div>
 
