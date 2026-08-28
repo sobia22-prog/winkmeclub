@@ -60,20 +60,20 @@ export const AccountPage: React.FC = () => {
 
   return (
     <div className="w-full max-w-md md:max-w-xl mx-auto space-y-5 pb-24">
-      {/* Top Header Banner: Account (Matching SS 4) */}
-      <div className="flex items-center justify-between pb-3 border-b border-brand-border">
+      {/* Top Header Banner: Account */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
           <Link
             to={activeMethod === 'MAIN' ? '/profile' : '#'}
             onClick={() => {
               if (activeMethod !== 'MAIN') setActiveMethod('MAIN');
             }}
-            className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition-colors cursor-pointer"
+            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-slate-900 transition-colors cursor-pointer shadow-sm"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-100">
+            <h1 className="text-xl font-extrabold text-slate-900">
               {activeMethod === 'MAIN'
                 ? 'Account'
                 : activeMethod === 'BANK'
@@ -86,46 +86,46 @@ export const AccountPage: React.FC = () => {
                 ? 'Google Pay'
                 : 'Paytm'}
             </h1>
-            <p className="text-[11px] text-slate-400">Withdrawal payment binding & details</p>
+            <p className="text-[11px] text-slate-500">Withdrawal payment binding & details</p>
           </div>
         </div>
 
-        <span className="text-xs font-bold text-slate-400">More</span>
+        <span className="text-xs font-bold text-slate-500">More</span>
       </div>
 
       {successMsg && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" /> {successMsg}
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2 font-semibold">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> {successMsg}
           </div>
-          <button onClick={() => setSuccessMsg('')} className="text-slate-400 hover:text-white text-xs">✕</button>
+          <button onClick={() => setSuccessMsg('')} className="text-slate-400 hover:text-slate-600 text-xs">✕</button>
         </div>
       )}
 
-      {/* VIEW 1: MAIN ACCOUNT BINDING HUB (Matching SS 4) */}
+      {/* VIEW 1: MAIN ACCOUNT BINDING HUB */}
       {activeMethod === 'MAIN' && (
-        <Card className="p-6 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-          <div className="space-y-1 pb-3 border-b border-brand-border">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-xs font-extrabold border border-purple-500/30 inline-block">
+        <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
+          <div className="space-y-1 pb-3 border-b border-slate-100">
+            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200 inline-block">
               Bank
             </span>
-            <p className="text-[11px] text-slate-400 pt-2 leading-relaxed">
+            <p className="text-[11px] text-slate-500 pt-2 leading-relaxed">
               Each account can be bound to separate UPI, Google Pay, PhonePe, and Paytm for fast withdrawals.
             </p>
           </div>
 
-          {/* 5 Method Cards Grid (Matching SS 4 Layout) */}
+          {/* 5 Method Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
             {/* Card 1: Bank */}
             <div
               onClick={() => setActiveMethod('BANK')}
-              className="p-4 rounded-2xl bg-brand-card/80 border border-brand-border hover:border-purple-500/50 transition-all cursor-pointer space-y-1.5 group"
+              className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
             >
-              <div className="flex items-center justify-between font-extrabold text-slate-100 group-hover:text-purple-400">
-                <span className="flex items-center gap-1.5"><Building className="w-4 h-4 text-purple-400" /> Bank</span>
-                {bankForm.accountNumber && <Check className="w-4 h-4 text-emerald-400" />}
+              <div className="flex items-center justify-between font-extrabold text-slate-900 group-hover:text-pink-600">
+                <span className="flex items-center gap-1.5"><Building className="w-4 h-4 text-pink-600" /> Bank</span>
+                {bankForm.accountNumber && <Check className="w-4 h-4 text-emerald-600" />}
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">
+              <p className="text-[11px] text-slate-500 leading-snug">
                 {bankForm.accountNumber ? `A/C: ${bankForm.accountNumber}` : 'Bind a bank account for direct bank transfers'}
               </p>
             </div>
@@ -133,13 +133,13 @@ export const AccountPage: React.FC = () => {
             {/* Card 2: UPI */}
             <div
               onClick={() => setActiveMethod('UPI')}
-              className="p-4 rounded-2xl bg-brand-card/80 border border-brand-border hover:border-purple-500/50 transition-all cursor-pointer space-y-1.5 group"
+              className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
             >
-              <div className="flex items-center justify-between font-extrabold text-slate-100 group-hover:text-purple-400">
-                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-purple-400" /> UPI</span>
-                {upiId && <Check className="w-4 h-4 text-emerald-400" />}
+              <div className="flex items-center justify-between font-extrabold text-slate-900 group-hover:text-pink-600">
+                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-pink-600" /> UPI</span>
+                {upiId && <Check className="w-4 h-4 text-emerald-600" />}
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">
+              <p className="text-[11px] text-slate-500 leading-snug">
                 {upiId ? upiId : 'Bind a UPI ID for fast account withdrawal'}
               </p>
             </div>
@@ -147,13 +147,13 @@ export const AccountPage: React.FC = () => {
             {/* Card 3: PhonePe */}
             <div
               onClick={() => setActiveMethod('PHONEPE')}
-              className="p-4 rounded-2xl bg-brand-card/80 border border-brand-border hover:border-purple-500/50 transition-all cursor-pointer space-y-1.5 group"
+              className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
             >
-              <div className="flex items-center justify-between font-extrabold text-slate-100 group-hover:text-purple-400">
-                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-purple-400" /> PhonePe</span>
-                {phonePe && <Check className="w-4 h-4 text-emerald-400" />}
+              <div className="flex items-center justify-between font-extrabold text-slate-900 group-hover:text-pink-600">
+                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-pink-600" /> PhonePe</span>
+                {phonePe && <Check className="w-4 h-4 text-emerald-600" />}
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">
+              <p className="text-[11px] text-slate-500 leading-snug">
                 {phonePe ? phonePe : 'Provide a PhonePe mobile number or UPI for fast payout'}
               </p>
             </div>
@@ -161,13 +161,13 @@ export const AccountPage: React.FC = () => {
             {/* Card 4: Google Pay */}
             <div
               onClick={() => setActiveMethod('GPAY')}
-              className="p-4 rounded-2xl bg-brand-card/80 border border-brand-border hover:border-purple-500/50 transition-all cursor-pointer space-y-1.5 group"
+              className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
             >
-              <div className="flex items-center justify-between font-extrabold text-slate-100 group-hover:text-purple-400">
-                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-purple-400" /> Google Pay</span>
-                {googlePay && <Check className="w-4 h-4 text-emerald-400" />}
+              <div className="flex items-center justify-between font-extrabold text-slate-900 group-hover:text-pink-600">
+                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-pink-600" /> Google Pay</span>
+                {googlePay && <Check className="w-4 h-4 text-emerald-600" />}
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">
+              <p className="text-[11px] text-slate-500 leading-snug">
                 {googlePay ? googlePay : 'Google Pay number or UPI e.g. name@okicici'}
               </p>
             </div>
@@ -175,13 +175,13 @@ export const AccountPage: React.FC = () => {
             {/* Card 5: Paytm */}
             <div
               onClick={() => setActiveMethod('PAYTM')}
-              className="p-4 rounded-2xl bg-brand-card/80 border border-brand-border hover:border-purple-500/50 transition-all cursor-pointer space-y-1.5 group"
+              className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200 hover:border-pink-300 hover:bg-pink-50/50 transition-all cursor-pointer space-y-1.5 group shadow-sm"
             >
-              <div className="flex items-center justify-between font-extrabold text-slate-100 group-hover:text-purple-400">
-                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-purple-400" /> Paytm</span>
-                {paytm && <Check className="w-4 h-4 text-emerald-400" />}
+              <div className="flex items-center justify-between font-extrabold text-slate-900 group-hover:text-pink-600">
+                <span className="flex items-center gap-1.5"><Smartphone className="w-4 h-4 text-pink-600" /> Paytm</span>
+                {paytm && <Check className="w-4 h-4 text-emerald-600" />}
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug">
+              <p className="text-[11px] text-slate-500 leading-snug">
                 {paytm ? paytm : 'Paytm wallet number or UPI address for quick payouts'}
               </p>
             </div>
@@ -191,9 +191,9 @@ export const AccountPage: React.FC = () => {
 
       {/* METHOD DETAIL FORM: PHONEPE */}
       {activeMethod === 'PHONEPE' && (
-        <Card className="p-6 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-          <div className="pb-3 border-b border-brand-border">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-xs font-extrabold border border-purple-500/30 inline-block">
+        <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
+          <div className="pb-3 border-b border-slate-100">
+            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200 inline-block">
               PhonePe
             </span>
           </div>
@@ -225,7 +225,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('PhonePe')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-xl active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add PhonePe'}
               </button>
@@ -233,7 +233,7 @@ export const AccountPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveMethod('MAIN')}
-                className="px-5 py-3 rounded-2xl bg-brand-card hover:bg-brand-card/80 text-slate-300 font-bold text-xs border border-brand-border transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -244,9 +244,9 @@ export const AccountPage: React.FC = () => {
 
       {/* METHOD DETAIL FORM: BANK */}
       {activeMethod === 'BANK' && (
-        <Card className="p-6 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-          <div className="pb-3 border-b border-brand-border">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-xs font-extrabold border border-purple-500/30 inline-block">
+        <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
+          <div className="pb-3 border-b border-slate-100">
+            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200 inline-block">
               Bank Account
             </span>
           </div>
@@ -282,7 +282,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('Bank Account')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-xl active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add Bank Account'}
               </button>
@@ -290,7 +290,7 @@ export const AccountPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveMethod('MAIN')}
-                className="px-5 py-3 rounded-2xl bg-brand-card hover:bg-brand-card/80 text-slate-300 font-bold text-xs border border-brand-border transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -301,9 +301,9 @@ export const AccountPage: React.FC = () => {
 
       {/* METHOD DETAIL FORM: UPI */}
       {activeMethod === 'UPI' && (
-        <Card className="p-6 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-          <div className="pb-3 border-b border-brand-border">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-xs font-extrabold border border-purple-500/30 inline-block">
+        <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
+          <div className="pb-3 border-b border-slate-100">
+            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200 inline-block">
               UPI
             </span>
           </div>
@@ -321,7 +321,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('UPI')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-xl active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add UPI'}
               </button>
@@ -329,7 +329,7 @@ export const AccountPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveMethod('MAIN')}
-                className="px-5 py-3 rounded-2xl bg-brand-card hover:bg-brand-card/80 text-slate-300 font-bold text-xs border border-brand-border transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -340,9 +340,9 @@ export const AccountPage: React.FC = () => {
 
       {/* METHOD DETAIL FORM: GOOGLE PAY */}
       {activeMethod === 'GPAY' && (
-        <Card className="p-6 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-          <div className="pb-3 border-b border-brand-border">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-xs font-extrabold border border-purple-500/30 inline-block">
+        <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
+          <div className="pb-3 border-b border-slate-100">
+            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200 inline-block">
               Google Pay
             </span>
           </div>
@@ -360,7 +360,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('Google Pay')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-xl active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add Google Pay'}
               </button>
@@ -368,7 +368,7 @@ export const AccountPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveMethod('MAIN')}
-                className="px-5 py-3 rounded-2xl bg-brand-card hover:bg-brand-card/80 text-slate-300 font-bold text-xs border border-brand-border transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -379,9 +379,9 @@ export const AccountPage: React.FC = () => {
 
       {/* METHOD DETAIL FORM: PAYTM */}
       {activeMethod === 'PAYTM' && (
-        <Card className="p-6 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl">
-          <div className="pb-3 border-b border-brand-border">
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-lg text-xs font-extrabold border border-purple-500/30 inline-block">
+        <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
+          <div className="pb-3 border-b border-slate-100">
+            <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200 inline-block">
               Paytm
             </span>
           </div>
@@ -399,7 +399,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('Paytm')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-xl active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add Paytm'}
               </button>
@@ -407,7 +407,7 @@ export const AccountPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setActiveMethod('MAIN')}
-                className="px-5 py-3 rounded-2xl bg-brand-card hover:bg-brand-card/80 text-slate-300 font-bold text-xs border border-brand-border transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer"
               >
                 Cancel
               </button>

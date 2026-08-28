@@ -51,28 +51,28 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-brand-surface border border-brand-border rounded-3xl p-8 shadow-2xl shadow-black/80 space-y-6">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-purple-900/5 space-y-6">
         <div className="text-center space-y-2">
           {settings.projectImage ? (
             <img
               src={settings.projectImage}
               alt={currentAppName}
-              className="w-16 h-16 rounded-2xl mx-auto object-cover border-2 border-amber-500/40 shadow-xl"
+              className="w-16 h-16 rounded-2xl mx-auto object-cover border-2 border-pink-200 shadow-md"
             />
           ) : (
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-wine to-purple-600 mx-auto flex items-center justify-center shadow-xl shadow-brand-wine/30">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-purple-600 mx-auto flex items-center justify-center shadow-lg shadow-pink-500/20">
               <span className="font-extrabold text-2xl text-white">
                 {currentAppName.charAt(0)}
               </span>
             </div>
           )}
 
-          <h2 className="text-2xl font-bold text-slate-100">{currentAppName}</h2>
-          <p className="text-xs text-slate-400">Sign in to access your VIP club dashboard</p>
+          <h2 className="text-2xl font-extrabold text-slate-900">{currentAppName}</h2>
+          <p className="text-xs text-slate-500">Sign in to access your VIP club dashboard</p>
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400 text-center">
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 text-center font-medium">
             {error}
           </div>
         )}
@@ -97,15 +97,15 @@ export const LoginPage: React.FC = () => {
             required
           />
 
-          <Button type="submit" variant="primary" className="w-full" isLoading={loading}>
+          <Button type="submit" variant="primary" className="w-full font-bold" isLoading={loading}>
             Sign In
           </Button>
         </form>
 
         <div className="pt-2 text-center">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Don't have an account?{' '}
-            <Link to="/register" className="text-brand-wine hover:underline font-semibold">
+            <Link to="/register" className="text-pink-600 hover:underline font-bold">
               Create Account
             </Link>
           </p>

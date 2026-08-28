@@ -82,10 +82,10 @@ export const DashboardPage: React.FC = () => {
   return (
     <div className="space-y-6 w-full pb-20">
       {/* Hero Banner Card 1 */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-600 via-rose-600 to-brand-wine border border-rose-400/30 p-6 md:p-8 text-white shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 p-6 md:p-8 text-white shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <span className="px-3 py-1 bg-black/30 rounded-full text-[10px] font-extrabold tracking-widest uppercase text-pink-200">
+            <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] font-extrabold tracking-widest uppercase text-white">
               {t('officialVipClub')}
             </span>
             <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
@@ -106,22 +106,22 @@ export const DashboardPage: React.FC = () => {
           <img
             src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&auto=format&fit=crop&q=80"
             alt="Girls Love Banner"
-            className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-2 border-white/40 shadow-xl shrink-0"
+            className="w-32 h-32 md:w-40 md:h-40 rounded-2xl object-cover border-2 border-white/60 shadow-lg shrink-0"
           />
         </div>
       </div>
 
       {/* Official Announcement: VIP Card Benefits Broadcast */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/60 via-brand-surface to-brand-surface border border-amber-500/40 p-6 md:p-8 space-y-6 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 md:p-8 space-y-6 shadow-sm">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400">
-              <Megaphone className="w-3.5 h-3.5 text-amber-400" /> OFFICIAL ANNOUNCEMENT
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs font-bold text-amber-700">
+              <Megaphone className="w-3.5 h-3.5 text-amber-600" /> OFFICIAL ANNOUNCEMENT
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-slate-100 flex items-center justify-center md:justify-start gap-2">
-              <Crown className="w-6 h-6 text-amber-400 fill-amber-400" /> VIP Card Benefits & Privileges Broadcast
+            <h2 className="text-xl md:text-2xl font-black text-slate-900 flex items-center justify-center md:justify-start gap-2">
+              <Crown className="w-6 h-6 text-amber-500 fill-amber-500" /> VIP Card Benefits & Privileges Broadcast
             </h2>
-            <p className="text-xs text-slate-300 max-w-lg leading-relaxed">
+            <p className="text-xs text-slate-600 max-w-lg leading-relaxed">
               Unlock the official {brandConfig.name} Gold VIP Membership Card to access exclusive encounters, airborne trading privileges, and priority profile dispatches.
             </p>
           </div>
@@ -134,59 +134,59 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* 4 VIP Card Benefits Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-amber-500/20">
-          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
-            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
+          <div className="p-3.5 bg-pink-50/50 border border-pink-100 rounded-2xl space-y-1">
+            <div className="text-pink-600 font-extrabold text-xs flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> Unlimited Encounters
             </div>
-            <p className="text-[11px] text-slate-400">Direct city-matching & profile dispatches in all cities.</p>
+            <p className="text-[11px] text-slate-500">Direct city-matching & profile dispatches in all cities.</p>
           </div>
 
-          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
-            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+          <div className="p-3.5 bg-pink-50/50 border border-pink-100 rounded-2xl space-y-1">
+            <div className="text-pink-600 font-extrabold text-xs flex items-center gap-1.5">
               <ShoppingBag className="w-3.5 h-3.5" /> Airborne Product Trade
             </div>
-            <p className="text-[11px] text-slate-400">Exclusive access to product trading & round settlements.</p>
+            <p className="text-[11px] text-slate-500">Exclusive access to product trading & round settlements.</p>
           </div>
 
-          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
-            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+          <div className="p-3.5 bg-pink-50/50 border border-pink-100 rounded-2xl space-y-1">
+            <div className="text-pink-600 font-extrabold text-xs flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5" /> Gold VIP Badge
             </div>
-            <p className="text-[11px] text-slate-400">Verified gold trust mark displayed on your profile.</p>
+            <p className="text-[11px] text-slate-500">Verified gold trust mark displayed on your profile.</p>
           </div>
 
-          <div className="p-3.5 bg-brand-card/70 border border-brand-border rounded-2xl space-y-1">
-            <div className="text-amber-400 font-extrabold text-xs flex items-center gap-1.5">
+          <div className="p-3.5 bg-pink-50/50 border border-pink-100 rounded-2xl space-y-1">
+            <div className="text-pink-600 font-extrabold text-xs flex items-center gap-1.5">
               <Zap className="w-3.5 h-3.5" /> 3x Priority Reach
             </div>
-            <p className="text-[11px] text-slate-400">3x engagement rate & priority concierge support.</p>
+            <p className="text-[11px] text-slate-500">3x engagement rate & priority concierge support.</p>
           </div>
         </div>
       </div>
 
       {/* Section Header */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3 border-b border-brand-border pb-3">
-          <h2 className="text-base md:text-lg font-black text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-400 animate-spin" /> {t('recommendedProfiles')}
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 pb-3">
+          <h2 className="text-base md:text-lg font-black text-slate-900 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-pink-600 animate-spin" /> {t('recommendedProfiles')}
           </h2>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-amber-400 flex items-center gap-1 px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full animate-pulse">
+            <span className="text-[11px] font-bold text-pink-600 flex items-center gap-1 px-2.5 py-1 bg-pink-50 border border-pink-200 rounded-full animate-pulse">
               <RefreshCw className="w-3 h-3 animate-spin" /> Auto-Refreshing Live
             </span>
-            <Link to="/matches" className="text-xs text-brand-wine hover:underline font-bold flex items-center gap-1">
+            <Link to="/matches" className="text-xs text-pink-600 hover:underline font-bold flex items-center gap-1">
               View All <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Recommended Girl Profiles Grid (AT LEAST 6 SHOWN + CRISP UNBLURRED IMAGES) */}
+      {/* Recommended Girl Profiles Grid */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i} className="h-72 animate-pulse bg-slate-800/50">
+            <Card key={i} className="h-72 animate-pulse bg-slate-100">
               <div className="h-full w-full" />
             </Card>
           ))}
@@ -196,7 +196,7 @@ export const DashboardPage: React.FC = () => {
           {profiles.slice(0, 6).map((profile, index) => {
             const attrTag = getAttributesTag(index, profile);
             return (
-              <Card key={profile._id || index} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group border border-brand-border hover:border-pink-500/50 transition-all duration-300 shadow-xl">
+              <Card key={profile._id || index} hoverEffect className="p-0 overflow-hidden flex flex-col justify-between group bg-white border border-slate-200 hover:border-pink-300 transition-all duration-300 shadow-sm">
                 {/* 100% Crisp Unblurred Profile Photo Container */}
                 <div className="relative h-72 overflow-hidden bg-black">
                   <img
@@ -204,7 +204,7 @@ export const DashboardPage: React.FC = () => {
                     alt={profile.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-brand-surface via-black/20 to-transparent opacity-95" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-black/20 to-transparent" />
 
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
                     <Badge variant="verified" size="sm">{profile.verificationLabel || 'ID Verified'}</Badge>
@@ -212,8 +212,8 @@ export const DashboardPage: React.FC = () => {
                   </div>
 
                   <div className="absolute top-3 left-3">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold border shadow-md flex items-center gap-1 ${attrTag.color}`}>
-                      <Flame className="w-3 h-3 fill-current" /> {attrTag.text}
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1 ${attrTag.color}`}>
+                      {attrTag.text}
                     </span>
                   </div>
 
@@ -226,16 +226,16 @@ export const DashboardPage: React.FC = () => {
                         <Star className="w-3.5 h-3.5 fill-amber-400" /> {profile.rating || 5.0}
                       </div>
                     </div>
-                    <p className="text-xs text-slate-300 flex items-center gap-1 mt-0.5 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-amber-400" /> {profile.location} • {profile.height} • {profile.weight}
+                    <p className="text-xs text-slate-200 flex items-center gap-1 mt-0.5 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400" /> {profile.location} • {profile.height || "162cm"} • {profile.weight || "52kg"}
                     </p>
                   </div>
                 </div>
 
-                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                  <p className="text-xs text-slate-300 line-clamp-2 italic font-medium">"{profile.bio || profile.details}"</p>
+                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between bg-white">
+                  <p className="text-xs text-slate-600 line-clamp-2 italic font-medium">"{profile.bio || profile.details}"</p>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-brand-border">
+                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                     <Link to="/matches" className="flex-1">
                       <Button variant="secondary" size="sm" className="w-full">
                         {t('viewDetail')}
@@ -244,7 +244,7 @@ export const DashboardPage: React.FC = () => {
                     <Button
                       variant="gold"
                       size="sm"
-                      className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-extrabold border-0 shadow-lg shadow-purple-600/30"
+                      className="flex-1 bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold border-0 shadow-md"
                       leftIcon={<Calendar className="w-3.5 h-3.5" />}
                       onClick={() => navigate('/matches')}
                     >

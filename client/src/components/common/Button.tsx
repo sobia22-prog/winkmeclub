@@ -24,12 +24,12 @@ export const Button: React.FC<ButtonProps> = ({
     'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-brand-dark active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
 
   const variants = {
-    primary: 'bg-brand-wine hover:bg-brand-wineHover text-white focus:ring-brand-wine shadow-lg shadow-brand-wine/20',
-    secondary: 'bg-brand-surface border border-brand-border hover:bg-brand-border text-slate-200 focus:ring-slate-500',
-    gold: 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-bold focus:ring-amber-500 shadow-lg shadow-amber-500/20',
-    danger: 'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-600 shadow-lg shadow-rose-600/20',
-    outline: 'border border-brand-wine text-brand-wine hover:bg-brand-wine/10 focus:ring-brand-wine',
-    ghost: 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/50',
+    primary: 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white focus:ring-pink-500 shadow-md shadow-pink-500/20',
+    secondary: 'bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 focus:ring-slate-400',
+    gold: 'bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 font-bold focus:ring-amber-500 shadow-md shadow-amber-500/20',
+    danger: 'bg-rose-600 hover:bg-rose-700 text-white focus:ring-rose-600 shadow-md shadow-rose-600/20',
+    outline: 'border border-pink-500 text-pink-600 hover:bg-pink-50 focus:ring-pink-500',
+    ghost: 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
   };
 
   const sizes = {

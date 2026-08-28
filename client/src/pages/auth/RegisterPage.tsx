@@ -62,17 +62,17 @@ export const RegisterPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-brand-surface border border-brand-border rounded-3xl p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-purple-900/5 space-y-6">
         <div className="text-center space-y-1">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-wine to-pink-500 flex items-center justify-center mx-auto shadow-lg shadow-brand-wine/30">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-pink-500 to-purple-600 flex items-center justify-center mx-auto shadow-md shadow-pink-500/20">
             <span className="font-extrabold text-xl text-white">W</span>
           </div>
-          <h2 className="text-2xl font-black text-slate-100">{brandConfig.name}</h2>
-          <p className="text-xs text-slate-400">Create your account to explore VIP membership</p>
+          <h2 className="text-2xl font-black text-slate-900">{brandConfig.name}</h2>
+          <p className="text-xs text-slate-500">Create your account to explore VIP membership</p>
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400 text-center">
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 text-center font-medium">
             {error}
           </div>
         )}
@@ -84,7 +84,7 @@ export const RegisterPage: React.FC = () => {
             placeholder="e.g. ST1234"
             value={formData.invitationCode}
             onChange={handleChange}
-            leftIcon={<Key className="w-4 h-4 text-amber-400" />}
+            leftIcon={<Key className="w-4 h-4 text-pink-600" />}
             helperText="Enter the official staff invitation code provided by administration."
             required
           />
@@ -132,19 +132,19 @@ export const RegisterPage: React.FC = () => {
 
           {/* Terms and Conditions Checkbox */}
           <div className="pt-2">
-            <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-300">
+            <label className="flex items-start gap-2.5 cursor-pointer text-xs text-slate-600">
               <input
                 type="checkbox"
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded border-brand-border text-brand-wine focus:ring-brand-wine cursor-pointer shrink-0"
+                className="mt-0.5 w-4 h-4 rounded border-slate-300 text-pink-600 focus:ring-pink-500 cursor-pointer shrink-0"
               />
               <span>
                 I agree to the{' '}
                 <button
                   type="button"
                   onClick={() => setShowTermsModal(true)}
-                  className="text-brand-wine hover:underline font-bold"
+                  className="text-pink-600 hover:underline font-bold"
                 >
                   Terms & Conditions & Account Credential Policy
                 </button>
@@ -152,14 +152,14 @@ export const RegisterPage: React.FC = () => {
             </label>
           </div>
 
-          <Button type="submit" variant="primary" className="w-full mt-2" isLoading={loading}>
+          <Button type="submit" variant="primary" className="w-full mt-2 font-bold" isLoading={loading}>
             Create Account
           </Button>
         </form>
 
-        <div className="text-center text-xs text-slate-400 pt-2 border-t border-brand-border">
+        <div className="text-center text-xs text-slate-500 pt-2 border-t border-slate-200">
           Already have an account?{' '}
-          <Link to="/login" className="text-brand-wine hover:underline font-bold">
+          <Link to="/login" className="text-pink-600 hover:underline font-bold">
             Sign In
           </Link>
         </div>
@@ -173,22 +173,22 @@ export const RegisterPage: React.FC = () => {
           title={`${brandConfig.name} — Terms of Service & Account Policy`}
           maxWidth="lg"
         >
-          <div className="space-y-4 text-xs text-slate-300 leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
-            <div className="p-4 bg-brand-card border border-brand-border rounded-2xl space-y-2">
-              <h4 className="font-bold text-slate-100 flex items-center gap-2 text-sm">
-                <ShieldCheck className="w-5 h-5 text-brand-wine" />
+          <div className="space-y-4 text-xs text-slate-700 leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+            <div className="p-4 bg-pink-50/50 border border-pink-100 rounded-2xl space-y-2">
+              <h4 className="font-bold text-slate-900 flex items-center gap-2 text-sm">
+                <ShieldCheck className="w-5 h-5 text-pink-600" />
                 Mandatory Membership Terms & Guidelines
               </h4>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 Please review the official user policy for account credentials, privacy, and system access.
               </p>
             </div>
 
             <div className="space-y-3">
-              <h5 className="font-bold text-slate-100 text-xs uppercase tracking-wider text-amber-400">
+              <h5 className="font-bold text-pink-600 text-xs uppercase tracking-wider">
                 Section 1: Account Credentials & Liability Disclaimer
               </h5>
-              <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 space-y-2">
+              <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 space-y-2">
                 <p className="font-bold">Important Notice Regarding Account Details & Lost Passwords:</p>
                 <p>
                   Winkmedatingclub operates as a self-managed, encrypted private membership platform. If a user forgets, loses, misplaces, compromises, or exposes their account details, login credentials, passwords, security tokens, or phone verification numbers, the company and platform administrators shall NOT be held responsible, liable, or accountable under any circumstances.
@@ -198,14 +198,14 @@ export const RegisterPage: React.FC = () => {
                 </p>
               </div>
 
-              <h5 className="font-bold text-slate-100 text-xs uppercase tracking-wider text-amber-400 pt-2">
+              <h5 className="font-bold text-pink-600 text-xs uppercase tracking-wider pt-2">
                 Section 2: VIP Verification & Security Compliance
               </h5>
               <p>
                 VIP Membership badges and product trading privileges require government ID document verification. All submitted identity documents are encrypted and evaluated under strict security protocols.
               </p>
 
-              <h5 className="font-bold text-slate-100 text-xs uppercase tracking-wider text-amber-400 pt-2">
+              <h5 className="font-bold text-pink-600 text-xs uppercase tracking-wider pt-2">
                 Section 3: Wallet Transactions & Position Holds
               </h5>
               <p>
@@ -213,7 +213,7 @@ export const RegisterPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-4 border-t border-brand-border flex justify-end">
+            <div className="pt-4 border-t border-slate-100 flex justify-end">
               <Button
                 variant="primary"
                 onClick={() => {

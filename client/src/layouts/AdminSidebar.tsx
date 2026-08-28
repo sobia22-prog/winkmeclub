@@ -48,7 +48,7 @@ export const AdminSidebar: React.FC = () => {
       ];
 
   return (
-    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-brand-surface border-r border-brand-border p-3.5 flex flex-col justify-between shrink-0 hidden md:flex self-start space-y-4">
+    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-white border-r border-slate-200 p-3.5 flex flex-col justify-between shrink-0 hidden md:flex self-start space-y-4">
       <div className="space-y-1">
         {adminNavItems.map((item) => (
           <NavLink
@@ -57,8 +57,8 @@ export const AdminSidebar: React.FC = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
                 isActive
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-brand-card'
+                  ? 'bg-pink-100 text-pink-600 border border-pink-200 font-extrabold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-pink-50/60'
               }`
             }
           >
@@ -68,10 +68,10 @@ export const AdminSidebar: React.FC = () => {
         ))}
       </div>
 
-      <div className="pt-4 border-t border-brand-border mt-auto">
+      <div className="pt-4 border-t border-slate-200 mt-auto">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors"
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           <span>Exit Panel</span>

@@ -11,14 +11,14 @@ export const BottomNav: React.FC = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-brand-surface/95 backdrop-blur-lg border-t border-brand-border md:hidden px-4 py-2 flex items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-3 py-2 flex items-center justify-around shadow-lg">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
           to={item.path}
           className={({ isActive }) =>
-            `flex flex-col items-center gap-1 text-[11px] font-semibold transition-colors ${
-              isActive ? 'text-brand-wine font-bold scale-105' : 'text-slate-400 hover:text-slate-200'
+            `flex flex-col items-center gap-1 text-[11px] font-semibold transition-all px-3 py-1 rounded-xl ${
+              isActive ? 'bg-pink-100/80 text-pink-600 font-extrabold shadow-sm border border-pink-200 scale-105' : 'text-slate-500 hover:text-slate-900'
             }`
           }
         >

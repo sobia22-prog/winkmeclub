@@ -51,19 +51,19 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className={`w-full ${maxWidths[maxWidth]} bg-brand-surface border border-amber-500/30 rounded-3xl shadow-2xl shadow-black/90 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200`}
+        className={`w-full ${maxWidths[maxWidth]} bg-white border border-pink-100 rounded-3xl shadow-2xl shadow-purple-900/10 overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200`}
       >
         {!hideHeader && title && (
-          <div className="flex items-center justify-between px-6 py-4.5 border-b border-brand-border bg-gradient-to-r from-brand-surface via-brand-card to-brand-surface">
+          <div className="flex items-center justify-between px-6 py-4.5 border-b border-pink-100 bg-gradient-to-r from-pink-50 via-white to-purple-50">
             <div>
-              <h3 className="text-lg font-bold text-slate-100">{title}</h3>
-              {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+              <h3 className="text-lg font-bold text-slate-900">{title}</h3>
+              {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors"
+              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
             >
               <X className="w-5 h-5" />
             </button>

@@ -16,7 +16,7 @@ export const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-brand-surface border-r border-brand-border p-4 flex flex-col justify-between shrink-0 hidden md:flex self-start">
+    <aside className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto w-64 bg-white border-r border-slate-200 p-4 flex flex-col justify-between shrink-0 hidden md:flex self-start">
       <div className="space-y-1.5">
         {mainNavItems.map((item) => (
           <NavLink
@@ -25,8 +25,8 @@ export const Sidebar: React.FC = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
                 isActive
-                  ? 'bg-gradient-to-r from-brand-wine to-purple-600 text-white shadow-lg shadow-brand-wine/25 scale-[1.02]'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-brand-card'
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md shadow-pink-500/20 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-pink-50/60'
               }`
             }
           >
@@ -36,10 +36,10 @@ export const Sidebar: React.FC = () => {
         ))}
       </div>
 
-      <div className="pt-4 border-t border-brand-border mt-auto">
+      <div className="pt-4 border-t border-slate-200 mt-auto">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           <span>{t('logout')}</span>
