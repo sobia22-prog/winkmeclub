@@ -214,10 +214,10 @@ export const AccountPage: React.FC = () => {
             />
 
             <ImageUploadPicker
-              label="Upload QR Code (Optional)"
+              label="Upload QR Code"
               value={qrCodeUrl}
               onChange={(url) => setQrCodeUrl(url)}
-              helperText="Upload clear QR code image for payout processing"
+              helperText="Click to upload QR code image for fast payout processing"
             />
 
             <div className="flex items-center gap-3 pt-2">
@@ -225,7 +225,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('PhonePe')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                className="py-3 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add PhonePe'}
               </button>
@@ -277,12 +277,19 @@ export const AccountPage: React.FC = () => {
               onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
             />
 
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast bank payouts"
+            />
+
             <div className="flex items-center gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => handleSaveMethod('Bank Account')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                className="py-3 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add Bank Account'}
               </button>
@@ -310,10 +317,24 @@ export const AccountPage: React.FC = () => {
 
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={user?.fullName || ''}
+              onChange={() => {}}
+            />
+
+            <Input
               label="UPI ID"
               placeholder="e.g. user@okaxis / user@upi"
               value={upiId}
               onChange={(e) => setUpiId(e.target.value)}
+            />
+
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
 
             <div className="flex items-center gap-3 pt-2">
@@ -321,7 +342,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('UPI')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                className="py-3 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add UPI'}
               </button>
@@ -349,10 +370,24 @@ export const AccountPage: React.FC = () => {
 
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={user?.fullName || ''}
+              onChange={() => {}}
+            />
+
+            <Input
               label="Google Pay Number / UPI"
               placeholder="e.g. 9876543210 or user@okicici"
               value={googlePay}
               onChange={(e) => setGooglePay(e.target.value)}
+            />
+
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
 
             <div className="flex items-center gap-3 pt-2">
@@ -360,7 +395,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('Google Pay')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                className="py-3 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add Google Pay'}
               </button>
@@ -388,10 +423,24 @@ export const AccountPage: React.FC = () => {
 
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={user?.fullName || ''}
+              onChange={() => {}}
+            />
+
+            <Input
               label="Paytm Mobile / Wallet Number"
               placeholder="e.g. 9876543210 or user@paytm"
               value={paytm}
               onChange={(e) => setPaytm(e.target.value)}
+            />
+
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
 
             <div className="flex items-center gap-3 pt-2">
@@ -399,7 +448,7 @@ export const AccountPage: React.FC = () => {
                 type="button"
                 onClick={() => handleSaveMethod('Paytm')}
                 disabled={loading}
-                className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                className="py-3 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold text-xs tracking-wider uppercase shadow-md active:scale-95 transition-all cursor-pointer disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Add Paytm'}
               </button>

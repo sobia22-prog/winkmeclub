@@ -8,6 +8,7 @@ import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { Select } from '../../components/common/Select';
 import { Modal } from '../../components/common/Modal';
+import { ImageUploadPicker } from '../../components/common/ImageUploadPicker';
 import {
   ArrowLeft,
   User,
@@ -39,6 +40,7 @@ export const EssentialInformationPage: React.FC = () => {
   const [phonePe, setPhonePe] = useState(user?.phonePe || '');
   const [paytm, setPaytm] = useState(user?.paytm || '');
   const [googlePay, setGooglePay] = useState(user?.googlePay || '');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   // Modals for adding/editing payment methods
   const [activeModal, setActiveModal] = useState<'BANK' | 'UPI' | 'PHONEPE' | 'PAYTM' | 'GPAY' | null>(null);
@@ -312,6 +314,12 @@ export const EssentialInformationPage: React.FC = () => {
               value={bankForm.ifscCode}
               onChange={(e) => setBankForm({ ...bankForm, ifscCode: e.target.value })}
             />
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
+            />
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setActiveModal(null)} type="button">
                 Cancel
@@ -328,10 +336,22 @@ export const EssentialInformationPage: React.FC = () => {
         <Modal isOpen={true} onClose={() => setActiveModal(null)} title="UPI ID Details">
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <Input
               label="UPI ID"
               placeholder="e.g. user@okaxis / user@upi"
               value={upiId}
               onChange={(e) => setUpiId(e.target.value)}
+            />
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setActiveModal(null)} type="button">
@@ -349,10 +369,22 @@ export const EssentialInformationPage: React.FC = () => {
         <Modal isOpen={true} onClose={() => setActiveModal(null)} title="PhonePe Details">
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <Input
               label="PhonePe Registered Mobile / UPI"
               placeholder="e.g. 9876543210 / name@ybl"
               value={phonePe}
               onChange={(e) => setPhonePe(e.target.value)}
+            />
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setActiveModal(null)} type="button">
@@ -370,10 +402,22 @@ export const EssentialInformationPage: React.FC = () => {
         <Modal isOpen={true} onClose={() => setActiveModal(null)} title="Paytm Details">
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <Input
               label="Paytm Registered Mobile / Wallet Number"
               placeholder="e.g. 9876543210 / name@paytm"
               value={paytm}
               onChange={(e) => setPaytm(e.target.value)}
+            />
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setActiveModal(null)} type="button">
@@ -391,10 +435,22 @@ export const EssentialInformationPage: React.FC = () => {
         <Modal isOpen={true} onClose={() => setActiveModal(null)} title="Google Pay Details">
           <div className="space-y-4 text-xs">
             <Input
+              label="Account Holder Name"
+              placeholder="Enter full name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+            />
+            <Input
               label="Google Pay Registered Mobile / UPI"
               placeholder="e.g. 9876543210 / name@okicici"
               value={googlePay}
               onChange={(e) => setGooglePay(e.target.value)}
+            />
+            <ImageUploadPicker
+              label="Upload QR Code"
+              value={qrCodeUrl}
+              onChange={(url) => setQrCodeUrl(url)}
+              helperText="Click to upload QR code image for fast payout processing"
             />
             <div className="flex justify-end gap-3 pt-2">
               <Button variant="secondary" onClick={() => setActiveModal(null)} type="button">
