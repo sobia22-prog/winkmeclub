@@ -94,13 +94,13 @@ export const EssentialInformationPage: React.FC = () => {
         </div>
       )}
 
-      {/* User Profile Avatar Card (Matching SS 1) */}
-      <div className="p-4 bg-brand-surface border border-brand-border rounded-2xl flex items-center gap-4 shadow-md">
-        <div className="w-12 h-12 rounded-full bg-purple-600 text-white font-black text-lg flex items-center justify-center border-2 border-purple-400 shrink-0">
+      {/* User Profile Avatar Card */}
+      <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center gap-4 shadow-sm">
+        <div className="w-12 h-12 rounded-full bg-pink-600 text-white font-black text-lg flex items-center justify-center border-2 border-pink-400 shrink-0">
           {userName.charAt(0) || 'R'}
         </div>
         <div>
-          <h2 className="text-sm font-extrabold text-slate-100">{userName || 'Raya'}</h2>
+          <h2 className="text-sm font-extrabold text-slate-900">{userName || 'Raya'}</h2>
         </div>
       </div>
 

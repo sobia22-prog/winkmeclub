@@ -37,10 +37,10 @@ export const TransactionsPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <History className="w-6 h-6 text-purple-400" /> Transaction Ledger
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <History className="w-6 h-6 text-pink-600" /> Transaction Ledger
           </h1>
-          <p className="text-xs text-slate-400">Complete audit trail of all financial movements and balance updates.</p>
+          <p className="text-xs text-slate-500">Complete audit trail of all financial movements and balance updates.</p>
         </div>
 
         <div className="w-full sm:w-48">
@@ -61,14 +61,14 @@ export const TransactionsPage: React.FC = () => {
       </div>
 
       {loading ? (
-        <Card className="p-8 text-center text-xs text-slate-500">Loading ledger data...</Card>
+        <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">Loading ledger data...</Card>
       ) : transactions.length === 0 ? (
-        <Card className="p-12 text-center text-xs text-slate-500">No transaction records found for selected filter.</Card>
+        <Card className="p-12 text-center text-xs text-slate-500 bg-white border border-slate-200">No transaction records found for selected filter.</Card>
       ) : (
         <Table headers={['Transaction ID', 'Type', 'Amount', 'Before Balance', 'After Balance', 'Description', 'Timestamp']}>
           {transactions.map((tx) => (
-            <tr key={tx._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3.5 font-mono font-bold text-slate-200">{tx.transactionId}</td>
+            <tr key={tx._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3.5 font-mono font-bold text-slate-900">{tx.transactionId}</td>
               <td className="px-5 py-3.5">
                 {tx.type === 'RECHARGE' && <Badge variant="success">RECHARGE</Badge>}
                 {tx.type === 'WITHDRAWAL' && <Badge variant="danger">WITHDRAWAL</Badge>}
@@ -79,18 +79,18 @@ export const TransactionsPage: React.FC = () => {
               </td>
               <td
                 className={`px-5 py-3.5 font-bold ${
-                  tx.amount > 0 ? 'text-emerald-400' : 'text-rose-400'
+                  tx.amount > 0 ? 'text-emerald-600' : 'text-rose-600'
                 }`}
               >
                 {tx.amount > 0 ? '+' : ''}{currencySymbol}{Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3.5 text-slate-400">
+              <td className="px-5 py-3.5 text-slate-600">
                 {currencySymbol}{tx.beforeBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3.5 font-semibold text-slate-200">
+              <td className="px-5 py-3.5 font-semibold text-slate-900">
                 {currencySymbol}{tx.afterBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3.5 text-xs text-slate-300 max-w-xs truncate">{tx.description}</td>
+              <td className="px-5 py-3.5 text-xs text-slate-700 max-w-xs truncate">{tx.description}</td>
               <td className="px-5 py-3.5 text-xs text-slate-500">
                 {new Date(tx.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
               </td>

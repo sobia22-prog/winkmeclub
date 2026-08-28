@@ -12,9 +12,9 @@ export const UserLayout: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-brand-dark flex items-center justify-center p-6">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="space-y-4 w-full max-w-md text-center">
-          <div className="w-12 h-12 rounded-2xl bg-brand-wine mx-auto animate-pulse" />
+          <div className="w-12 h-12 rounded-2xl bg-pink-600 mx-auto animate-pulse" />
           <Skeleton className="h-6 w-48 mx-auto" />
           <Skeleton className="h-4 w-64 mx-auto" />
         </div>
@@ -35,7 +35,7 @@ export const UserLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-brand-dark flex flex-col pb-16 md:pb-0">
+    <div className="min-h-screen bg-slate-50 flex flex-col pb-16 md:pb-0">
       <Navbar />
       <div className="flex flex-1 items-start">
         <Sidebar />

@@ -162,16 +162,16 @@ export const TradesPage: React.FC = () => {
   return (
     <div className="w-full space-y-6 pb-40">
       {/* Header Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-brand-border">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <Link to="/verification" className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition-colors">
+          <Link to="/verification" className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl md:text-2xl font-black text-slate-100 flex items-center gap-2">
-              <ShoppingBag className="w-6 h-6 text-fuchsia-400" /> Trades & Airborne Activities
+            <h1 className="text-xl md:text-2xl font-black text-slate-900 flex items-center gap-2">
+              <ShoppingBag className="w-6 h-6 text-pink-600" /> Trades & Airborne Activities
             </h1>
-            <p className="text-[11px] text-slate-400 font-medium">Select item(s), enter trading quantity, and confirm round trade</p>
+            <p className="text-[11px] text-slate-500 font-medium">Select item(s), enter trading quantity, and confirm round trade</p>
           </div>
         </div>
 
@@ -179,32 +179,32 @@ export const TradesPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-300 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold flex items-center justify-between shadow-sm">
           <span>{error}</span>
-          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-300 font-bold flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-bold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" /> {success}
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" /> {success}
           </div>
-          <button onClick={() => setSuccess('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setSuccess('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
-      {/* Airborne Activities Round Timer Banner Card (Matching Screenshot 2) */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-fuchsia-950 via-purple-900 to-brand-wine border border-fuchsia-500/40 rounded-3xl p-6 text-white shadow-2xl space-y-4">
+      {/* Airborne Activities Round Timer Banner Card */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 border border-pink-400/30 rounded-3xl p-6 text-white shadow-xl space-y-4">
         <div className="flex items-center justify-between relative z-10">
           <div>
-            <span className="text-[11px] font-extrabold text-fuchsia-200 uppercase tracking-widest block">Airborne activities</span>
+            <span className="text-[11px] font-extrabold text-pink-100 uppercase tracking-widest block">Airborne activities</span>
             <span className="text-xl md:text-2xl font-black tracking-wider text-white font-mono">{roundId}</span>
           </div>
 
           <div className="text-right">
-            <span className="text-[11px] font-bold text-fuchsia-200 uppercase tracking-widest block">Remaining Time</span>
-            <span className="text-xl font-mono font-black text-amber-300 flex items-center gap-2 justify-end">
+            <span className="text-[11px] font-bold text-pink-100 uppercase tracking-widest block">Remaining Time</span>
+            <span className="text-xl font-mono font-black text-white flex items-center gap-2 justify-end">
               <Clock className="w-5 h-5 text-amber-300 animate-pulse" />
               {formatSeconds(timeLeft)}
             </span>
@@ -212,34 +212,34 @@ export const TradesPage: React.FC = () => {
         </div>
 
         {/* Inner Round Badge Box */}
-        <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex items-center justify-between text-xs">
+        <div className="p-3 bg-white/15 backdrop-blur-md rounded-2xl border border-white/30 flex items-center justify-between text-xs text-white">
           <span className="font-mono font-bold">{roundId}</span>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full bg-pink-500 text-white font-extrabold text-[10px]">Round Active</span>
+            <span className="px-2.5 py-0.5 rounded-full bg-white text-pink-700 font-black text-[10px] shadow-sm">Round Active</span>
           </div>
         </div>
       </div>
 
-      {/* Main Page Product Grid (2 PRODUCTS PER ROW + 3-DOTS ICON ONLY) */}
+      {/* Main Page Product Grid */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
-            <Flame className="w-4 h-4 text-amber-400" /> Select Trade Activity Items
+          <h2 className="text-xs font-black uppercase tracking-widest text-slate-700 flex items-center gap-1.5">
+            <Flame className="w-4 h-4 text-pink-600" /> Select Trade Activity Items
           </h2>
 
-          {/* 3-DOTS MENU ICON ONLY (OPENS RIGHT OVERLAY DRAWER) */}
+          {/* 3-DOTS MENU ICON ONLY */}
           <button
             type="button"
             onClick={() => setShowRightDrawer(true)}
-            className="p-2 bg-brand-surface border border-brand-border hover:border-fuchsia-500 rounded-2xl text-slate-200 hover:text-white transition-all shadow-md cursor-pointer"
+            className="p-2 bg-white border border-slate-200 hover:border-pink-500 rounded-2xl text-slate-700 hover:text-pink-600 transition-all shadow-sm cursor-pointer"
             title="Open More Products Catalog"
           >
-            <MoreVertical className="w-5 h-5 text-amber-400" />
+            <MoreVertical className="w-5 h-5 text-pink-600" />
           </button>
         </div>
 
         {mainFourProducts.length === 0 ? (
-          <Card className="p-8 text-center text-xs text-slate-500">Loading main catalog items...</Card>
+          <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">Loading main catalog items...</Card>
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {mainFourProducts.map((product) => {
@@ -248,19 +248,19 @@ export const TradesPage: React.FC = () => {
                 <div
                   key={product._id}
                   onClick={() => handleToggleSelectProduct(product)}
-                  className={`relative rounded-3xl p-4 bg-brand-surface border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-xl group overflow-hidden ${
+                  className={`relative rounded-3xl p-4 bg-white border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-sm group overflow-hidden ${
                     isSelected
-                      ? 'border-fuchsia-500 bg-gradient-to-b from-fuchsia-950/50 via-brand-surface to-brand-surface shadow-fuchsia-500/30 scale-[1.02]'
-                      : 'border-brand-border hover:border-fuchsia-500/40 hover:bg-brand-card'
+                      ? 'border-pink-600 bg-pink-50/40 shadow-md scale-[1.02]'
+                      : 'border-slate-200 hover:border-pink-300 hover:bg-slate-50'
                   }`}
                 >
                   {isSelected && (
-                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-fuchsia-500 text-white flex items-center justify-center shadow-lg shadow-fuchsia-500/40 z-10">
+                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-md z-10">
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </div>
                   )}
 
-                  <div className="w-full h-44 md:h-52 rounded-2xl overflow-hidden bg-black/40 p-1 border border-brand-border/60 shadow-inner">
+                  <div className="w-full h-44 md:h-52 rounded-2xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -268,7 +268,7 @@ export const TradesPage: React.FC = () => {
                     />
                   </div>
 
-                  <h3 className="text-xs font-bold text-slate-100 truncate text-center mt-3 w-full px-1">
+                  <h3 className="text-xs font-bold text-slate-900 truncate text-center mt-3 w-full px-1">
                     {product.name}
                   </h3>
                 </div>
@@ -278,25 +278,25 @@ export const TradesPage: React.FC = () => {
         )}
       </div>
 
-      {/* RIGHT OVERLAY DRAWER BAR (Triggered by 3-dots menu button) */}
+      {/* RIGHT OVERLAY DRAWER BAR */}
       {showRightDrawer && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-xs md:max-w-sm h-full bg-brand-surface border-l border-brand-border p-5 flex flex-col justify-between space-y-4 shadow-2xl animate-in slide-in-from-right duration-300">
+        <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-xs md:max-w-sm h-full bg-white border-l border-slate-200 p-5 flex flex-col justify-between space-y-4 shadow-2xl animate-in slide-in-from-right duration-300">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-brand-border pb-3">
-              <h3 className="text-sm font-extrabold text-slate-100 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-amber-400" /> Additional Trading Catalog
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-pink-600" /> Additional Trading Catalog
               </h3>
               <button
                 type="button"
                 onClick={() => setShowRightDrawer(false)}
-                className="p-1.5 bg-brand-card hover:bg-rose-500/20 text-slate-400 hover:text-white rounded-xl transition-colors"
+                className="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500 font-medium">
               Tap any item to add it to your active multi-item trade selection (up to 2 items).
             </p>
 
@@ -313,8 +313,8 @@ export const TradesPage: React.FC = () => {
                     onClick={() => handleToggleSelectProduct(product)}
                     className={`relative p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center overflow-hidden ${
                       isSelected
-                        ? 'border-fuchsia-500 bg-fuchsia-950/40 text-white'
-                        : 'border-brand-border bg-brand-card/50 hover:bg-brand-card text-slate-300'
+                        ? 'border-pink-600 bg-pink-50 text-slate-900'
+                        : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
                     }`}
                   >
                     <img
@@ -322,11 +322,11 @@ export const TradesPage: React.FC = () => {
                       alt={product.name}
                       className="w-full h-28 rounded-xl object-cover"
                     />
-                    <h4 className="text-xs font-bold text-slate-100 truncate text-center mt-2 w-full px-1">
+                    <h4 className="text-xs font-bold text-slate-900 truncate text-center mt-2 w-full px-1">
                       {product.name}
                     </h4>
                     {isSelected && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-fuchsia-500 text-white flex items-center justify-center shrink-0 shadow-lg z-10">
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0 shadow-md z-10">
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
                       </div>
                     )}
@@ -336,42 +336,42 @@ export const TradesPage: React.FC = () => {
             </div>
 
             {/* Drawer Close Button */}
-            <Button variant="gold" className="w-full" onClick={() => setShowRightDrawer(false)}>
+            <Button variant="primary" className="w-full bg-pink-600 text-white hover:bg-pink-700 shadow-md font-extrabold" onClick={() => setShowRightDrawer(false)}>
               Done Selecting ({selectedProducts.length} Selected)
             </Button>
           </div>
         </div>
       )}
 
-      {/* TRADE CALCULATION BAR (Floating Bottom Sheet - ONLY SHOWN IF ITEMS SELECTED FOR TRADE) */}
+      {/* TRADE CALCULATION BAR (Floating Bottom Sheet) */}
       {selectedProducts.length > 0 && (
-        <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-brand-surface/98 backdrop-blur-2xl border-t border-brand-border p-4 md:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
+        <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-white/98 backdrop-blur-2xl border-t border-slate-200 p-4 md:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
           <div className="max-w-4xl mx-auto space-y-3 text-xs">
-            {/* Top Row: Available Balance, Current Selection & Total Items */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pb-2 border-b border-brand-border/60">
-              <div className="flex items-center justify-between bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
-                <span className="text-slate-400 font-semibold">Available Balance:</span>
-                <span className="font-mono font-bold text-emerald-400">
+            {/* Top Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pb-2 border-b border-slate-200">
+              <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="text-slate-600 font-semibold">Available Balance:</span>
+                <span className="font-mono font-bold text-emerald-600">
                   {currencySymbol}{(wallet?.availableBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
-                <span className="text-slate-400 font-semibold shrink-0">Current Selection:</span>
-                <span className="font-bold text-fuchsia-400 truncate">{selectedProductNames}</span>
+              <div className="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="text-slate-600 font-semibold shrink-0">Current Selection:</span>
+                <span className="font-bold text-pink-600 truncate">{selectedProductNames}</span>
               </div>
 
-              <div className="flex items-center justify-between bg-brand-dark/70 p-2.5 rounded-xl border border-brand-border">
-                <span className="text-slate-400 font-semibold">Total Items:</span>
-                <span className="font-mono font-bold text-amber-400">{totalItemsCount} item{totalItemsCount === 1 ? '' : 's'} selected</span>
+              <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="text-slate-600 font-semibold">Total Items:</span>
+                <span className="font-mono font-bold text-pink-600">{totalItemsCount} item{totalItemsCount === 1 ? '' : 's'} selected</span>
               </div>
             </div>
 
-            {/* Middle Row: Quantity Input & Tickets */}
+            {/* Middle Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
               {/* Quantity Input */}
               <div className="space-y-1">
-                <label className="block text-[11px] font-semibold text-slate-300">
+                <label className="block text-[11px] font-bold text-slate-700">
                   Quantity
                 </label>
                 <input
@@ -380,29 +380,29 @@ export const TradesPage: React.FC = () => {
                   min="1"
                   value={tradeQuantity}
                   onChange={(e) => setTradeQuantity(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2 text-slate-100 font-mono font-bold focus:outline-none focus:border-fuchsia-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold focus:outline-none focus:border-pink-500"
                   placeholder="500"
                 />
               </div>
 
               {/* Tickets Summary */}
               <div className="space-y-1">
-                <label className="block text-[11px] font-semibold text-slate-400">
+                <label className="block text-[11px] font-bold text-slate-700">
                   Tickets
                 </label>
-                <div className="w-full bg-brand-dark/50 border border-brand-border rounded-xl px-3 py-2 text-amber-400 font-mono font-bold">
+                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-pink-600 font-mono font-bold">
                   {tradeQuantity || 0}
                 </div>
               </div>
             </div>
 
-            {/* Bottom Row: Execute Trade Action Button */}
+            {/* Bottom Row */}
             <div className="pt-1">
               <button
                 type="button"
                 onClick={handleExecuteTrade}
                 disabled={loading || !tradeQuantity || Number(tradeQuantity) <= 0 || Number(tradeQuantity) > (wallet?.availableBalance || 0)}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-xl shadow-pink-500/30 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer border border-white/20"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {loading ? 'Processing Trade...' : 'Confirm Airborne Trade'}
@@ -413,20 +413,20 @@ export const TradesPage: React.FC = () => {
       )}
 
       {/* Trades History Log Table */}
-      <div className="space-y-4 pt-6 border-t border-brand-border">
-        <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-          <History className="w-4 h-4 text-purple-400" /> Airborne Trade Log History
+      <div className="space-y-4 pt-6 border-t border-slate-200">
+        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <History className="w-4 h-4 text-pink-600" /> Airborne Trade Log History
         </h2>
 
         {trades.length === 0 ? (
-          <Card className="p-8 text-center text-xs text-slate-500">No active round trades placed yet.</Card>
+          <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">No active round trades placed yet.</Card>
         ) : (
           <Table headers={['Trade ID', 'Item(s)', 'Quantity', 'Status', 'Outcome', 'Date']}>
             {trades.map((t: any) => (
-              <tr key={t._id} className="hover:bg-brand-card/50 transition-colors text-xs">
-                <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
-                <td className="px-5 py-3 font-semibold text-slate-100">{t.productName}</td>
-                <td className="px-5 py-3 font-bold text-amber-400 font-mono">
+              <tr key={t._id} className="hover:bg-slate-50 transition-colors text-xs">
+                <td className="px-5 py-3 font-mono font-bold text-slate-900">{t.tradeId}</td>
+                <td className="px-5 py-3 font-semibold text-slate-800">{t.productName}</td>
+                <td className="px-5 py-3 font-bold text-pink-600 font-mono">
                   {t.quantity || 0}
                 </td>
                 <td className="px-5 py-3">

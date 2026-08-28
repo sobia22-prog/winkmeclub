@@ -31,21 +31,21 @@ export const SupportPage: React.FC = () => {
 
   return (
     <div className="max-w-xl mx-auto space-y-6 pt-4 text-center">
-      {/* Header matching Screenshot 3 */}
+      {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-xl md:text-2xl font-black text-slate-100 flex items-center justify-center gap-2">
-          <Headphones className="w-5 h-5 text-amber-400" /> Customer Service
+        <h1 className="text-xl md:text-2xl font-black text-slate-900 flex items-center justify-center gap-2">
+          <Headphones className="w-5 h-5 text-pink-600" /> Customer Service
         </h1>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           Scan the QR or contact us on Telegram for support.
         </p>
       </div>
 
-      {/* Center White Card matching Screenshot 3 */}
-      <Card className="p-6 md:p-8 space-y-6 bg-brand-surface border border-amber-500/30 rounded-3xl shadow-2xl flex flex-col items-center">
+      {/* Center Card */}
+      <Card className="p-6 md:p-8 space-y-6 bg-white border border-slate-200 rounded-3xl shadow-sm flex flex-col items-center">
         {/* QR Code Container */}
-        <div className="relative p-3 bg-slate-950 border border-amber-500/40 rounded-2xl shadow-xl flex flex-col items-center max-w-[260px]">
-          <div className="bg-white p-2.5 rounded-xl shadow-md">
+        <div className="relative p-3 bg-pink-50 border border-pink-200 rounded-2xl shadow-sm flex flex-col items-center max-w-[260px]">
+          <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
             <img
               src={telegramSupportQrCode}
               alt="Telegram Customer Service QR Code"
@@ -53,18 +53,18 @@ export const SupportPage: React.FC = () => {
             />
           </div>
 
-          <div className="text-[11px] font-bold text-amber-400 font-mono mt-2 flex items-center justify-center gap-1">
-            <QrCode className="w-3.5 h-3.5 text-amber-400" /> @CUSTOMER_SUPPORT
+          <div className="text-[11px] font-bold text-pink-700 font-mono mt-2 flex items-center justify-center gap-1">
+            <QrCode className="w-3.5 h-3.5 text-pink-700" /> @CUSTOMER_SUPPORT
           </div>
         </div>
 
-        {/* Buttons Row matching Screenshot 3 */}
+        {/* Buttons Row */}
         <div className="flex items-center justify-center gap-3 w-full max-w-xs pt-2">
           <Button
             variant="secondary"
             size="md"
-            className="flex-1 border-slate-700 hover:border-slate-500"
-            leftIcon={copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            className="flex-1 bg-white border-slate-200 hover:bg-slate-50 text-slate-700 font-bold"
+            leftIcon={copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
             onClick={handleCopyLink}
           >
             {copied ? 'Copied!' : 'Copy Link'}
@@ -77,9 +77,9 @@ export const SupportPage: React.FC = () => {
             className="flex-1"
           >
             <Button
-              variant="gold"
+              variant="primary"
               size="md"
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white border-0 shadow-lg shadow-purple-600/30"
+              className="w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold border-0 shadow-md"
               leftIcon={<Send className="w-4 h-4" />}
             >
               Open Telegram

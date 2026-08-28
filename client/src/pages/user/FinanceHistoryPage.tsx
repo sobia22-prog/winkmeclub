@@ -54,34 +54,34 @@ export const FinanceHistoryPage: React.FC = () => {
 
   return (
     <div className="w-full max-w-md mx-auto space-y-5 pb-24">
-      {/* Top Header Bar (Matching SS 4) */}
-      <div className="flex items-center justify-between pb-3 border-b border-brand-border">
+      {/* Top Header Bar */}
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <Link to="/profile" className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition-colors">
+          <Link to="/profile" className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
-              <History className="w-5 h-5 text-purple-400" /> Finance History
+            <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <History className="w-5 h-5 text-pink-600" /> Finance History
             </h1>
-            <p className="text-[11px] text-slate-400 font-medium">Recharges, withdrawals, and ledger activity</p>
+            <p className="text-[11px] text-slate-500 font-medium">Recharges, withdrawals, and ledger activity</p>
           </div>
         </div>
 
-        <span className="text-xs font-bold text-slate-400">More</span>
+        <span className="text-xs font-bold text-slate-500">More</span>
       </div>
 
-      {/* Main Container Card (Matching SS 4 Layout) */}
-      <Card className="p-5 space-y-5 bg-brand-surface border border-brand-border rounded-3xl shadow-xl min-h-[400px]">
+      {/* Main Container Card */}
+      <Card className="p-5 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm min-h-[400px]">
         {/* Tab Selection */}
-        <div className="flex items-center gap-2 border-b border-brand-border pb-3">
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
           <button
             type="button"
             onClick={() => setActiveTab('ALL')}
             className={`px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
               activeTab === 'ALL'
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-pink-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             ALL
@@ -91,8 +91,8 @@ export const FinanceHistoryPage: React.FC = () => {
             onClick={() => setActiveTab('RECHARGE')}
             className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
               activeTab === 'RECHARGE'
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-pink-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Recharges
@@ -102,27 +102,27 @@ export const FinanceHistoryPage: React.FC = () => {
             onClick={() => setActiveTab('WITHDRAWAL')}
             className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all ${
               activeTab === 'WITHDRAWAL'
-                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-pink-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             Withdrawals
           </button>
         </div>
 
-        {/* Summary Header Box (Matching SS 4: Total Recharge & Total Withdrawal) */}
-        <div className="grid grid-cols-2 gap-3 p-4 bg-brand-card/80 border border-brand-border rounded-2xl text-xs text-center divide-x divide-brand-border">
+        {/* Summary Header Box */}
+        <div className="grid grid-cols-2 gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-center divide-x divide-slate-200">
           <div className="space-y-1">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Total Recharge</span>
-            <span className="text-base font-black text-emerald-400 font-mono block">
+            <span className="text-[10px] text-slate-600 uppercase font-semibold block">Total Recharge</span>
+            <span className="text-base font-black text-emerald-600 font-mono block">
               {totalRecharge.toFixed(2)}
             </span>
             <span className="text-[10px] text-slate-500 font-semibold">{currencySymbol}</span>
           </div>
 
           <div className="space-y-1 pl-3">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Total Withdrawal</span>
-            <span className="text-base font-black text-rose-400 font-mono block">
+            <span className="text-[10px] text-slate-600 uppercase font-semibold block">Total Withdrawal</span>
+            <span className="text-base font-black text-rose-600 font-mono block">
               {totalWithdrawal.toFixed(2)}
             </span>
             <span className="text-[10px] text-slate-500 font-semibold">{currencySymbol}</span>
@@ -134,7 +134,7 @@ export const FinanceHistoryPage: React.FC = () => {
           <p className="text-center text-xs text-slate-500 py-10">Loading finance history...</p>
         ) : filteredList.length === 0 ? (
           <div className="text-center text-xs text-slate-500 py-12 space-y-2">
-            <History className="w-10 h-10 text-slate-600 mx-auto" />
+            <History className="w-10 h-10 text-slate-400 mx-auto" />
             <p>No finance records found.</p>
           </div>
         ) : (
@@ -142,20 +142,20 @@ export const FinanceHistoryPage: React.FC = () => {
             {filteredList.map((item: any) => {
               const isRecharge = item.itemType === 'RECHARGE';
               return (
-                <div key={item._id} className="p-4 bg-brand-card border border-brand-border rounded-2xl space-y-3 shadow-md">
+                <div key={item._id} className="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`p-2 rounded-xl border ${isRecharge ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'}`}>
+                      <div className={`p-2 rounded-xl border ${isRecharge ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-rose-50 border-rose-200 text-rose-600'}`}>
                         {isRecharge ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-100">{isRecharge ? 'Wallet Deposit Recharge' : 'Payout Withdrawal'}</h4>
-                        <span className="text-[10px] font-mono text-slate-400 block">ID: {item.requestId}</span>
+                        <h4 className="text-xs font-bold text-slate-900">{isRecharge ? 'Wallet Deposit Recharge' : 'Payout Withdrawal'}</h4>
+                        <span className="text-[10px] font-mono text-slate-500 block">ID: {item.requestId}</span>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <span className={`text-sm font-black font-mono block ${isRecharge ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      <span className={`text-sm font-black font-mono block ${isRecharge ? 'text-emerald-600' : 'text-rose-600'}`}>
                         {isRecharge ? '+' : '-'}{currencySymbol} {item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </span>
                       {item.status === 'APPROVED' && <Badge variant="success">APPROVED</Badge>}
@@ -165,15 +165,15 @@ export const FinanceHistoryPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-brand-border/40 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400 font-mono flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-slate-500" /> {new Date(item.createdAt).toLocaleString()}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                    <span className="text-slate-500 font-mono flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-slate-400" /> {new Date(item.createdAt).toLocaleString()}
                     </span>
 
                     <button
                       type="button"
                       onClick={() => setSelectedItem(item)}
-                      className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-extrabold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1"
                     >
                       <Eye className="w-3.5 h-3.5" /> View Details
                     </button>
@@ -189,26 +189,26 @@ export const FinanceHistoryPage: React.FC = () => {
       {selectedItem && (
         <Modal isOpen={true} onClose={() => setSelectedItem(null)} title="Transaction Details">
           <div className="space-y-4 text-xs">
-            <div className="p-4 bg-brand-card border border-brand-border rounded-2xl space-y-2 font-mono">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 font-mono">
               <div className="flex justify-between">
-                <span className="text-slate-400">Request ID:</span>
-                <span className="text-slate-100 font-bold">{selectedItem.requestId}</span>
+                <span className="text-slate-600">Request ID:</span>
+                <span className="text-slate-900 font-bold">{selectedItem.requestId}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Type:</span>
-                <span className="text-purple-400 font-bold">{selectedItem.itemType}</span>
+                <span className="text-slate-600">Type:</span>
+                <span className="text-pink-600 font-bold">{selectedItem.itemType}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Amount:</span>
-                <span className="text-amber-400 font-bold">{currencySymbol} {selectedItem.amount.toFixed(2)}</span>
+                <span className="text-slate-600">Amount:</span>
+                <span className="text-pink-600 font-bold">{currencySymbol} {selectedItem.amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Status:</span>
-                <span className="text-emerald-400 font-bold">{selectedItem.status}</span>
+                <span className="text-slate-600">Status:</span>
+                <span className="text-emerald-600 font-bold">{selectedItem.status}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Date:</span>
-                <span className="text-slate-300">{new Date(selectedItem.createdAt).toLocaleString()}</span>
+                <span className="text-slate-600">Date:</span>
+                <span className="text-slate-700">{new Date(selectedItem.createdAt).toLocaleString()}</span>
               </div>
             </div>
 
@@ -216,7 +216,7 @@ export const FinanceHistoryPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
-                className="px-4 py-2 bg-brand-card hover:bg-brand-card/80 text-slate-300 rounded-xl text-xs font-bold transition-colors"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
               >
                 Close
               </button>

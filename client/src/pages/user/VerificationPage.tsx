@@ -32,25 +32,25 @@ export const VerificationPage: React.FC = () => {
 
       {/* Why Go VIP? Section */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-slate-100 text-center">Why Go VIP?</h2>
+        <h2 className="text-lg font-bold text-slate-900 text-center">Why Go VIP?</h2>
 
         <div className="space-y-3">
           {/* Card 1: Premium Access */}
-          <div className="p-5 bg-brand-surface border border-brand-border rounded-2xl text-center space-y-1.5 shadow-md">
-            <div className="w-10 h-10 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
-              <Crown className="w-5 h-5 fill-amber-400" />
+          <div className="p-5 bg-white border border-slate-200 rounded-2xl text-center space-y-1.5 shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto border border-amber-200">
+              <Crown className="w-5 h-5 fill-amber-500" />
             </div>
-            <h3 className="text-sm font-bold text-slate-100">Premium Access</h3>
-            <p className="text-xs text-slate-400">Unlock all features and profiles</p>
+            <h3 className="text-sm font-bold text-slate-900">Premium Access</h3>
+            <p className="text-xs text-slate-500">Unlock all features and profiles</p>
           </div>
 
           {/* Card 2: Verified Members */}
-          <div className="p-5 bg-brand-surface border border-brand-border rounded-2xl text-center space-y-1.5 shadow-md">
-            <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
+          <div className="p-5 bg-white border border-slate-200 rounded-2xl text-center space-y-1.5 shadow-sm">
+            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto border border-emerald-200">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-bold text-slate-100">Verified Members</h3>
-            <p className="text-xs text-slate-400">Connect with trusted profiles</p>
+            <h3 className="text-sm font-bold text-slate-900">Verified Members</h3>
+            <p className="text-xs text-slate-500">Connect with trusted profiles</p>
           </div>
         </div>
       </div>

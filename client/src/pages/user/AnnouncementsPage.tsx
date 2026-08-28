@@ -26,31 +26,31 @@ export const AnnouncementsPage: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto space-y-5 pb-24">
       {/* Top Header Bar with Back Link */}
-      <div className="flex items-center justify-between pb-3 border-b border-brand-border">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
         <div className="flex items-center gap-3">
-          <Link to="/profile" className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white transition-colors">
+          <Link to="/profile" className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-100 flex items-center gap-2">
-              <Megaphone className="w-5 h-5 text-pink-400" /> Announcements
+            <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+              <Megaphone className="w-5 h-5 text-pink-600" /> Announcements
             </h1>
-            <p className="text-[11px] text-slate-400">System updates & notices</p>
+            <p className="text-[11px] text-slate-500">System updates & notices</p>
           </div>
         </div>
 
-        <span className="text-xs font-bold text-slate-400">More</span>
+        <span className="text-xs font-bold text-slate-500">More</span>
       </div>
 
-      {/* Filter Tabs (All, Notice) - Matching SS 2 */}
-      <div className="flex items-center gap-2 bg-brand-surface p-1.5 border border-brand-border rounded-2xl shadow-sm">
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-2 bg-slate-100 p-1.5 border border-slate-200 rounded-2xl shadow-sm">
         <button
           type="button"
           onClick={() => setActiveTab('ALL')}
           className={`flex-1 py-2 text-xs font-extrabold rounded-xl transition-all ${
             activeTab === 'ALL'
-              ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400 shadow-sm'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-pink-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           All
@@ -60,29 +60,29 @@ export const AnnouncementsPage: React.FC = () => {
           onClick={() => setActiveTab('NOTICE')}
           className={`flex-1 py-2 text-xs font-extrabold rounded-xl transition-all ${
             activeTab === 'NOTICE'
-              ? 'bg-rose-500/10 border border-rose-500/30 text-rose-400 shadow-sm'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-pink-600 text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
           Notice
         </button>
       </div>
 
-      {/* Announcements Body Box (Matching SS 2 Layout) */}
-      <Card className="p-8 space-y-6 bg-brand-surface border border-brand-border rounded-3xl shadow-xl min-h-[300px] flex flex-col items-center justify-center text-center">
+      {/* Announcements Body Box */}
+      <Card className="p-8 space-y-6 bg-white border border-slate-200 rounded-3xl shadow-sm min-h-[300px] flex flex-col items-center justify-center text-center">
         {loading ? (
           <p className="text-xs text-slate-500">Loading system announcements...</p>
         ) : announcements.length === 0 ? (
           <div className="space-y-3 py-6">
-            <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center mx-auto text-rose-400 shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-pink-50 border border-pink-200 flex items-center justify-center mx-auto text-pink-600 shadow-sm">
               <Megaphone className="w-7 h-7" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-sm font-bold text-slate-300">No announcements yet</h3>
+              <h3 className="text-sm font-bold text-slate-900">No announcements yet</h3>
               <p className="text-[11px] text-slate-500">Check back later for new platform updates and official notices.</p>
             </div>
             <div className="pt-2">
-              <span className="px-3 py-1 rounded-full bg-brand-card border border-brand-border text-[10px] font-mono text-slate-400">
+              <span className="px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-[10px] font-mono text-slate-600">
                 Notice
               </span>
             </div>
@@ -90,12 +90,12 @@ export const AnnouncementsPage: React.FC = () => {
         ) : (
           <div className="w-full space-y-4 text-left">
             {announcements.map((item) => (
-              <div key={item._id} className="p-4 bg-brand-card border border-brand-border rounded-2xl space-y-2">
+              <div key={item._id} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold text-slate-100">{item.title}</h4>
+                  <h4 className="text-sm font-bold text-slate-900">{item.title}</h4>
                   <Badge variant="neutral" size="sm">Notice</Badge>
                 </div>
-                <p className="text-xs text-slate-300">{item.shortDescription || item.content}</p>
+                <p className="text-xs text-slate-700">{item.shortDescription || item.content}</p>
                 <span className="text-[10px] text-slate-500 block">
                   {new Date(item.createdAt).toLocaleDateString()}
                 </span>
