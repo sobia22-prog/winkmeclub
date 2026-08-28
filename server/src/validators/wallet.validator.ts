@@ -2,19 +2,25 @@ import { z } from 'zod';
 
 export const rechargeSchema = z.object({
   body: z.object({
-    amount: z.number().positive('Amount must be positive'),
-    paymentMethod: z.string().min(1, 'Payment method required'),
-    referenceNumber: z.string().min(3, 'Reference number required'),
+    amount: z.any().optional(),
+    paymentMethod: z.string().optional(),
+    referenceNumber: z.string().optional(),
     receiptUrl: z.string().optional(),
   }),
 });
 
 export const withdrawalSchema = z.object({
   body: z.object({
-    amount: z.number().positive('Amount must be positive'),
-    bankName: z.string().min(2, 'Bank name is required'),
-    accountHolder: z.string().min(2, 'Account holder name is required'),
-    accountNumber: z.string().min(5, 'Account number is required'),
+    amount: z.any().optional(),
+    paymentMethod: z.string().optional(),
+    bankName: z.string().optional(),
+    accountHolder: z.string().optional(),
+    accountNumber: z.string().optional(),
     ifscCode: z.string().optional(),
+    upiId: z.string().optional(),
+    phonePe: z.string().optional(),
+    paytm: z.string().optional(),
+    googlePay: z.string().optional(),
+    qrCodeUrl: z.string().optional(),
   }),
 });

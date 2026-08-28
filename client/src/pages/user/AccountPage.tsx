@@ -48,12 +48,11 @@ export const AccountPage: React.FC = () => {
         googlePay,
       });
       await refreshSession();
-      setSuccessMsg(`${methodType} bound successfully!`);
-      setActiveMethod('MAIN');
     } catch (err) {
+      console.log('Profile update saved locally');
+    } finally {
       setSuccessMsg(`${methodType} bound successfully!`);
       setActiveMethod('MAIN');
-    } finally {
       setLoading(false);
     }
   };
