@@ -89,6 +89,7 @@ export const App: React.FC = () => {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/profile/essential-information" element={<EssentialInformationPage />} />
                 <Route path="/profile/account" element={<AccountPage />} />
+                <Route path="/profile/withdrawal-details" element={<WithdrawalSecretPage />} />
                 <Route path="/profile/withdrawal-secret" element={<WithdrawalSecretPage />} />
                 <Route path="/profile/login-password" element={<LoginPasswordPage />} />
                 <Route path="/profile/gift-records" element={<VipRecordsPage />} />

@@ -43,7 +43,7 @@ export const WithdrawalSecretPage: React.FC = () => {
           </Link>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-pink-600" /> Withdrawal Secrets
+              <Lock className="w-5 h-5 text-pink-600" /> Withdrawal Details
             </h1>
             <p className="text-[11px] text-slate-500">Payout security & transaction PIN settings</p>
           </div>
@@ -65,13 +65,13 @@ export const WithdrawalSecretPage: React.FC = () => {
       <Card className="p-6 space-y-5 bg-white border border-slate-200 rounded-3xl shadow-sm">
         <div className="flex items-center gap-2 pb-3 border-b border-slate-200">
           <span className="px-3 py-1 bg-pink-50 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200">
-            PIN
+            Withdrawal Details
           </span>
         </div>
 
         <form onSubmit={handleSavePin} className="space-y-4 text-xs">
           <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-            <label className="block text-xs font-bold text-slate-900">Withdrawal Secret PIN</label>
+            <label className="block text-xs font-bold text-slate-900">Withdrawal Security PIN</label>
             <p className="text-[11px] text-slate-500 leading-relaxed">
               The PIN is stored securely and cannot be viewed. Enter a 4 to 8 digit PIN below to set or update it for your account.
             </p>
@@ -91,7 +91,7 @@ export const WithdrawalSecretPage: React.FC = () => {
             disabled={loading || pin.length < 4}
             className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-md hover:scale-[1.01] active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
           >
-            {loading ? 'Saving Secret PIN...' : 'Save Withdrawal PIN'}
+            {loading ? 'Saving Withdrawal Details...' : 'Save Withdrawal Details'}
           </button>
         </form>
       </Card>
