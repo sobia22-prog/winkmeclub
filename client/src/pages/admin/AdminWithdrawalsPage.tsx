@@ -70,10 +70,10 @@ export const AdminWithdrawalsPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <ArrowUpRight className="w-6 h-6 text-rose-400" /> Withdrawal Request Management
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <ArrowUpRight className="w-6 h-6 text-rose-600" /> Withdrawal Request Management
           </h1>
-          <p className="text-xs text-slate-400">Review pending UPI, QR Code, or Bank Account payouts, and approve or reject requests.</p>
+          <p className="text-xs text-slate-500">Review pending UPI, QR Code, or Bank Account payouts, and approve or reject requests.</p>
         </div>
 
         <div className="w-full sm:w-48">
@@ -98,32 +98,32 @@ export const AdminWithdrawalsPage: React.FC = () => {
       ) : (
         <Table headers={['Request ID', 'User', 'Amount', 'Payout Method & Details', 'Holder Name', 'Status', 'Actions']}>
           {withdrawals.map((w: any) => (
-            <tr key={w._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-mono font-bold text-slate-200">{w.requestId}</td>
-              <td className="px-5 py-3 font-semibold text-slate-200">
+            <tr key={w._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3 font-mono font-bold text-slate-900">{w.requestId}</td>
+              <td className="px-5 py-3 font-semibold text-slate-800">
                 {w.userId && typeof w.userId === 'object' ? w.userId.fullName : 'User'}
               </td>
-              <td className="px-5 py-3 font-bold text-rose-400">
+              <td className="px-5 py-3 font-bold text-rose-600">
                 -{currencySymbol}{w.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3 text-xs text-slate-300">
-                <div className="font-bold text-slate-100">{w.paymentMethod || 'Bank Account'}</div>
-                {w.upiId && <div className="font-mono text-amber-400">UPI: {w.upiId}</div>}
+              <td className="px-5 py-3 text-xs text-slate-700">
+                <div className="font-bold text-slate-900">{w.paymentMethod || 'Bank Account'}</div>
+                {w.upiId && <div className="font-mono text-pink-600 font-bold">UPI: {w.upiId}</div>}
                 {w.accountNumber && (
-                  <div className="font-mono text-slate-400">
+                  <div className="font-mono text-slate-600">
                     {w.bankName} • A/C: {w.accountNumber} {w.ifscCode && `(${w.ifscCode})`}
                   </div>
                 )}
                 {w.qrCodeUrl && (
                   <button
                     onClick={() => setSelectedQrUrl(w.qrCodeUrl)}
-                    className="p-1 bg-sky-500/10 border border-sky-500/30 rounded text-[11px] text-sky-400 hover:bg-sky-500/20 flex items-center gap-1 mt-1"
+                    className="p-1 bg-pink-50 border border-pink-200 rounded text-[11px] text-pink-600 hover:bg-pink-100 flex items-center gap-1 mt-1 font-bold shadow-sm"
                   >
                     <QrCode className="w-3.5 h-3.5" /> View QR Code Photo
                   </button>
                 )}
               </td>
-              <td className="px-5 py-3 text-xs font-semibold text-slate-200">{w.accountHolder}</td>
+              <td className="px-5 py-3 text-xs font-semibold text-slate-800">{w.accountHolder}</td>
               <td className="px-5 py-3">
                 {w.status === 'COMPLETED' && <Badge variant="success">COMPLETED</Badge>}
                 {w.status === 'APPROVED' && <Badge variant="warning">APPROVED</Badge>}
@@ -157,7 +157,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
                     </Button>
                   </div>
                 ) : (
-                  <span className="text-xs text-slate-500 italic">Finalized</span>
+                  <span className="text-xs text-slate-400 italic">Finalized</span>
                 )}
               </td>
             </tr>
@@ -169,7 +169,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
       {selectedQrUrl && (
         <Modal isOpen={true} onClose={() => setSelectedQrUrl(null)} title="User Payout QR Code Photo">
           <div className="space-y-4">
-            <img src={selectedQrUrl} alt="User QR Code" className="w-full max-h-96 object-contain rounded-2xl border border-brand-border" />
+            <img src={selectedQrUrl} alt="User QR Code" className="w-full max-h-96 object-contain rounded-2xl border border-slate-200 bg-slate-50" />
             <div className="flex justify-end">
               <Button variant="secondary" onClick={() => setSelectedQrUrl(null)}>Close</Button>
             </div>
@@ -185,19 +185,19 @@ export const AdminWithdrawalsPage: React.FC = () => {
           title={`Confirm Withdrawal ${actionType} — #${selectedWithdrawal.requestId}`}
         >
           <form onSubmit={handleActionSubmit} className="space-y-4">
-            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{selectedWithdrawal.userId && typeof selectedWithdrawal.userId === 'object' ? selectedWithdrawal.userId.fullName : 'User'}</span></div>
-              <div>Amount: <span className="font-bold text-rose-400">{currencySymbol}{selectedWithdrawal.amount.toFixed(2)}</span></div>
-              <div>Payout Method: <span className="font-bold text-amber-400">{selectedWithdrawal.paymentMethod || 'Bank Account'}</span></div>
-              <div>Holder Name: <span className="font-bold text-slate-200">{selectedWithdrawal.accountHolder}</span></div>
-              {selectedWithdrawal.upiId && <div>UPI ID: <span className="font-mono text-amber-400">{selectedWithdrawal.upiId}</span></div>}
-              {selectedWithdrawal.accountNumber && <div>Bank Account: <span className="font-mono text-slate-300">{selectedWithdrawal.bankName} • {selectedWithdrawal.accountNumber} ({selectedWithdrawal.ifscCode})</span></div>}
+            <div className="p-4 bg-pink-50/50 border border-pink-100 rounded-xl space-y-1 text-xs text-slate-700">
+              <div>User: <span className="font-bold text-slate-900">{selectedWithdrawal.userId && typeof selectedWithdrawal.userId === 'object' ? selectedWithdrawal.userId.fullName : 'User'}</span></div>
+              <div>Amount: <span className="font-bold text-rose-600">{currencySymbol}{selectedWithdrawal.amount.toFixed(2)}</span></div>
+              <div>Payout Method: <span className="font-bold text-pink-600">{selectedWithdrawal.paymentMethod || 'Bank Account'}</span></div>
+              <div>Holder Name: <span className="font-bold text-slate-900">{selectedWithdrawal.accountHolder}</span></div>
+              {selectedWithdrawal.upiId && <div>UPI ID: <span className="font-mono text-pink-600 font-bold">{selectedWithdrawal.upiId}</span></div>}
+              {selectedWithdrawal.accountNumber && <div>Bank Account: <span className="font-mono text-slate-800">{selectedWithdrawal.bankName} • {selectedWithdrawal.accountNumber} ({selectedWithdrawal.ifscCode})</span></div>}
             </div>
 
             {selectedWithdrawal.qrCodeUrl && (
               <div className="space-y-1">
-                <span className="text-xs text-slate-400 font-semibold block">Uploaded QR Code Photo:</span>
-                <img src={selectedWithdrawal.qrCodeUrl} alt="QR Code" className="h-40 w-full object-contain bg-black/40 rounded-xl border border-brand-border" />
+                <span className="text-xs text-slate-600 font-semibold block">Uploaded QR Code Photo:</span>
+                <img src={selectedWithdrawal.qrCodeUrl} alt="QR Code" className="h-40 w-full object-contain bg-slate-50 rounded-xl border border-slate-200" />
               </div>
             )}
 

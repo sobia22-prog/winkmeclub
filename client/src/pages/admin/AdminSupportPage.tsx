@@ -76,25 +76,25 @@ export const AdminSupportPage: React.FC = () => {
     <div className="w-full space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2.5">
-          <Headphones className="w-6 h-6 text-amber-400" /> Customer Service
+        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2.5">
+          <Headphones className="w-6 h-6 text-pink-600" /> Customer Service
         </h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           Telegram QR, link, and message shown on the member Customer Service page
         </p>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 font-semibold flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" /> {message}
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white text-xs">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700 text-xs">✕</button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400 font-semibold">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold shadow-sm">
           {error}
         </div>
       )}
@@ -123,7 +123,7 @@ export const AdminSupportPage: React.FC = () => {
 
         {/* Telegram QR Image */}
         <div className="space-y-2">
-          <label className="block text-xs font-semibold text-slate-300">Telegram QR Image</label>
+          <label className="block text-xs font-semibold text-slate-700">Telegram QR Image</label>
           <ImageUploadPicker
             value={telegramSupportQrCode}
             onChange={(url) => setTelegramSupportQrCode(url)}
@@ -137,7 +137,7 @@ export const AdminSupportPage: React.FC = () => {
         <div className="pt-4 flex justify-end">
           <Button
             type="submit"
-            variant="gold"
+            variant="primary"
             isLoading={saving}
             leftIcon={<Save className="w-4 h-4" />}
           >

@@ -100,56 +100,56 @@ export const AdminAnnouncementsPage: React.FC = () => {
     <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Megaphone className="w-6 h-6 text-amber-400" /> Platform Announcements
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Megaphone className="w-6 h-6 text-pink-600" /> Platform Announcements
           </h1>
-          <p className="text-xs text-slate-400">Broadcast news, popups, and updates to all registered users.</p>
+          <p className="text-xs text-slate-500">Broadcast news, popups, and updates to all registered users.</p>
         </div>
 
-        <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={() => setShowModal(true)}>
+        <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={() => setShowModal(true)}>
           Create Announcement
         </Button>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> {message}
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-300 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400" /> {error}
+            <AlertCircle className="w-4 h-4 text-rose-600" /> {error}
           </div>
-          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {announcements.map((a) => (
-          <Card key={a._id} className="p-5 space-y-3 relative overflow-hidden group">
+          <Card key={a._id} className="p-5 space-y-3 relative overflow-hidden group bg-white border border-slate-200 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-50 text-pink-700 border border-pink-200">
                   {a.status}
                 </span>
-                <h3 className="text-sm font-bold text-slate-100 mt-2">{a.title}</h3>
+                <h3 className="text-sm font-bold text-slate-900 mt-2">{a.title}</h3>
               </div>
               <button
                 onClick={() => handleDelete(a._id, a.title)}
-                className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 transition-colors"
                 title="Delete Announcement"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-300">{a.shortDescription}</p>
-            <p className="text-[11px] text-slate-400 border-t border-brand-border pt-2">{a.content}</p>
+            <p className="text-xs text-slate-700 font-medium">{a.shortDescription}</p>
+            <p className="text-[11px] text-slate-500 border-t border-slate-100 pt-2">{a.content}</p>
           </Card>
         ))}
       </div>
@@ -198,7 +198,7 @@ export const AdminAnnouncementsPage: React.FC = () => {
               <Button variant="secondary" onClick={() => setShowModal(false)} type="button">
                 Cancel
               </Button>
-              <Button variant="gold" type="submit" isLoading={loading}>
+              <Button variant="primary" type="submit" isLoading={loading}>
                 Publish Announcement
               </Button>
             </div>

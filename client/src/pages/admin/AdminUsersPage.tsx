@@ -243,15 +243,15 @@ export const AdminUsersPage: React.FC = () => {
       {/* Header with Top Right Status Filter Tabs */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Users className="w-6 h-6 text-amber-400" /> User Directory & Accounts
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Users className="w-6 h-6 text-pink-600" /> User Directory & Accounts
           </h1>
-          <p className="text-xs text-slate-400">Manage registered client members, status, balances, and permissions.</p>
+          <p className="text-xs text-slate-500">Manage registered client members, status, balances, and permissions.</p>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Top-Right Status Filter Tabs (All, Active, Blocked, Pending) as shown in SS 4 */}
-          <div className="flex items-center gap-1 bg-brand-surface p-1.5 border border-brand-border rounded-2xl shadow-md">
+          {/* Top-Right Status Filter Tabs */}
+          <div className="flex items-center gap-1 bg-white p-1.5 border border-slate-200 rounded-2xl shadow-sm">
             {[
               { label: 'All', value: 'ALL' },
               { label: 'Active', value: 'ACTIVE' },
@@ -264,8 +264,8 @@ export const AdminUsersPage: React.FC = () => {
                 onClick={() => setStatusFilter(tab.value)}
                 className={`px-3.5 py-1.5 text-xs font-extrabold rounded-xl transition-all ${
                   statusFilter === tab.value
-                    ? 'bg-rose-600 text-white shadow-lg scale-105'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-brand-card'
+                    ? 'bg-pink-600 text-white shadow-md'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
                 {tab.label}
@@ -273,7 +273,7 @@ export const AdminUsersPage: React.FC = () => {
             ))}
           </div>
 
-          <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
+          <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
             Create User
           </Button>
         </div>
@@ -327,32 +327,32 @@ export const AdminUsersPage: React.FC = () => {
             {users.map((u: any) => {
               const userStatus = u.status === 'SUSPENDED' ? 'BLOCKED' : (u.status || 'ACTIVE');
               return (
-                <tr key={u._id || u.id} className="hover:bg-brand-card/50 transition-colors">
+                <tr key={u._id || u.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
                       <img
                         src={u.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
                         alt={u.fullName}
-                        className="w-10 h-10 rounded-full object-cover border border-brand-border shrink-0"
+                        className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
                       />
                       <div>
-                        <div className="text-xs font-bold text-slate-100">{u.fullName}</div>
-                        <div className="text-[11px] text-slate-400">{u.email}</div>
+                        <div className="text-xs font-bold text-slate-900">{u.fullName}</div>
+                        <div className="text-[11px] text-slate-500">{u.email}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-5 py-3 text-xs">
                     {u.assignedStaff ? (
-                      <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-bold text-[11px]">
+                      <span className="px-2.5 py-1 rounded-xl bg-pink-50 border border-pink-200 text-pink-700 font-mono font-bold text-[11px]">
                         {typeof u.assignedStaff === 'object'
                           ? (u.assignedStaff.invitationCode || u.assignedStaff.fullName || 'Staff')
                           : u.assignedStaff}
                       </span>
                     ) : (
-                      <span className="text-slate-500 text-[11px] italic">Unassigned</span>
+                      <span className="text-slate-400 text-[11px] italic">Unassigned</span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-xs font-bold text-amber-400">{u.creditScore ?? 100} / 100</td>
+                  <td className="px-5 py-3 text-xs font-bold text-pink-600">{u.creditScore ?? 100} / 100</td>
                   <td className="px-5 py-3">
                     {userStatus === 'ACTIVE' && <Badge variant="verified">ACTIVE</Badge>}
                     {userStatus === 'BLOCKED' && <Badge variant="danger">BLOCKED</Badge>}
@@ -361,37 +361,34 @@ export const AdminUsersPage: React.FC = () => {
                   <td className="px-5 py-3">
                     {u.isVIP ? <Badge variant="vip">VIP</Badge> : <Badge variant="neutral">NONE</Badge>}
                   </td>
-                  <td className="px-5 py-3 font-bold text-emerald-400 text-xs">
+                  <td className="px-5 py-3 font-bold text-emerald-600 text-xs">
                     {currencySymbol}{(u.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-5 py-3 font-bold text-amber-400 text-xs">
+                  <td className="px-5 py-3 font-bold text-pink-600 text-xs">
                     {currencySymbol}{(u.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
-                  {/* EXACTLY 3 ACTION BUTTONS (View, Edit, Delete) */}
+                  {/* 3 ACTION BUTTONS */}
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-2">
-                      {/* 1. Edit Button (Pencil Icon) */}
                       <button
                         onClick={() => handleOpenEditProfile(u)}
-                        className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
+                        className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-pink-300 transition-colors shadow-sm"
                         title="Edit User Settings & Balances"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-4 h-4 text-pink-600" />
                       </button>
 
-                      {/* 2. View Button (Eye Icon) */}
                       <Link
                         to={`/admin/users/${u._id || u.id}`}
-                        className="p-2 rounded-xl bg-brand-surface border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors shadow-sm"
+                        className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-pink-300 transition-colors shadow-sm"
                         title="View Full Profile & Detailed History"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-4 h-4 text-slate-600" />
                       </Link>
 
-                      {/* 3. Delete Button (Trash Icon) */}
                       <button
                         onClick={() => handleDeleteProfile(u)}
-                        className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors shadow-sm"
+                        className="p-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 transition-colors shadow-sm"
                         title="Delete User Profile"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -416,7 +413,7 @@ export const AdminUsersPage: React.FC = () => {
         confirmText="Confirm Action"
       />
 
-      {/* EDIT USER MODAL WITH EXACT LAYOUT & FIELDS AS SHOWN IN SCREENSHOTS 1, 2, 3 */}
+      {/* EDIT USER MODAL */}
       {showProfileModal && (
         <Modal
           isOpen={true}
@@ -425,7 +422,6 @@ export const AdminUsersPage: React.FC = () => {
           maxWidth="md"
         >
           <form onSubmit={handleSaveProfile} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1 text-xs">
-            {/* Status (Active, Blocked, Pending) */}
             <Select
               label="Status"
               options={[
@@ -437,7 +433,6 @@ export const AdminUsersPage: React.FC = () => {
               onChange={(e) => setProfileForm({ ...profileForm, status: e.target.value })}
             />
 
-            {/* VIP Status (VIP, None) */}
             <Select
               label="VIP Status"
               options={[
@@ -448,7 +443,6 @@ export const AdminUsersPage: React.FC = () => {
               onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
             />
 
-            {/* Total Balance */}
             <Input
               label="Total Balance"
               type="number"
@@ -456,7 +450,6 @@ export const AdminUsersPage: React.FC = () => {
               onChange={(e) => setProfileForm({ ...profileForm, totalBalance: Number(e.target.value) })}
             />
 
-            {/* Frozen Balance */}
             <Input
               label="Frozen Balance"
               type="number"
@@ -464,7 +457,6 @@ export const AdminUsersPage: React.FC = () => {
               onChange={(e) => setProfileForm({ ...profileForm, frozenBalance: Number(e.target.value) })}
             />
 
-            {/* Credit Score */}
             <Input
               label="Credit Score"
               type="number"
@@ -472,7 +464,6 @@ export const AdminUsersPage: React.FC = () => {
               onChange={(e) => setProfileForm({ ...profileForm, creditScore: Number(e.target.value) })}
             />
 
-            {/* Allow Withdraw */}
             <div className="space-y-1">
               <Select
                 label="Allow Withdraw"
@@ -486,7 +477,6 @@ export const AdminUsersPage: React.FC = () => {
               <p className="text-[10px] text-slate-500">When set to No, this customer cannot submit withdrawal requests.</p>
             </div>
 
-            {/* Allow Trade */}
             <div className="space-y-1">
               <Select
                 label="Allow Trade"
@@ -501,7 +491,7 @@ export const AdminUsersPage: React.FC = () => {
             </div>
 
             {/* Load Amount (Total Balance) Box */}
-            <div className="p-3.5 bg-brand-dark/80 border border-brand-border rounded-2xl space-y-2">
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
               <Input
                 label={`Load Amount (${currencySymbol})`}
                 type="number"
@@ -510,20 +500,19 @@ export const AdminUsersPage: React.FC = () => {
                 onChange={(e) => setProfileForm({ ...profileForm, loadAmount: e.target.value })}
               />
               <div className="flex items-center justify-between text-xs font-bold pt-1">
-                <span className="text-slate-300">New Total Balance:</span>
-                <span className="text-emerald-400 font-mono">{currencySymbol}{newTotalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span className="text-slate-700">New Total Balance:</span>
+                <span className="text-emerald-600 font-mono">{currencySymbol}{newTotalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
 
             {/* Available Balance (auto) - Read Only Non-Editable */}
-            <div className="p-3.5 bg-brand-surface border border-brand-border rounded-2xl flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-300">Available Balance (auto)</span>
-              <span className="text-xs font-bold text-amber-400 font-mono">
+            <div className="p-3.5 bg-white border border-slate-200 rounded-2xl flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-700">Available Balance (auto)</span>
+              <span className="text-xs font-bold text-pink-600 font-mono">
                 {currencySymbol}{availableBalanceAuto.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
             </div>
 
-            {/* Reset Username (Full Name) */}
             <Input
               label="Reset Username (Full Name)"
               value={profileForm.fullName}
@@ -531,7 +520,6 @@ export const AdminUsersPage: React.FC = () => {
               required
             />
 
-            {/* Reset Password (optional) */}
             <div className="space-y-1">
               <Input
                 label="Reset Password (optional)"
@@ -543,9 +531,8 @@ export const AdminUsersPage: React.FC = () => {
               <p className="text-[10px] text-slate-500">Leave blank to keep unchanged</p>
             </div>
 
-            {/* Transaction PIN Display Status */}
-            <div className="p-3.5 bg-brand-dark/80 border border-brand-border rounded-2xl space-y-1">
-              <label className="block text-xs font-semibold text-slate-300">Transaction PIN</label>
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+              <label className="block text-xs font-semibold text-slate-700">Transaction PIN</label>
               <div className="flex items-center gap-2">
                 <Badge variant={profileForm.hasTransactionPin ? 'verified' : 'neutral'}>
                   {profileForm.hasTransactionPin ? 'Set' : 'Not set'}
@@ -556,7 +543,6 @@ export const AdminUsersPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Set New Transaction PIN (optional) */}
             <div className="space-y-1">
               <Input
                 label="Set New Transaction PIN (optional)"
@@ -569,11 +555,11 @@ export const AdminUsersPage: React.FC = () => {
             </div>
 
             {/* Save Buttons */}
-            <div className="flex justify-end gap-3 pt-3 border-t border-brand-border">
+            <div className="flex justify-end gap-3 pt-3 border-t border-slate-200">
               <Button variant="secondary" onClick={() => setShowProfileModal(false)} type="button">
                 Cancel
               </Button>
-              <Button variant="gold" type="submit" isLoading={actionLoading}>
+              <Button variant="primary" type="submit" isLoading={actionLoading}>
                 Save Changes
               </Button>
             </div>

@@ -18,15 +18,15 @@ export const StatCard: React.FC<StatCardProps> = ({
   trendUp = true,
 }) => {
   return (
-    <div className="bg-brand-surface border border-brand-border rounded-2xl p-5 hover:border-slate-700 transition-all shadow-md">
+    <div className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-pink-300 transition-all shadow-sm">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</span>
-        {icon && <div className="p-2.5 bg-brand-card border border-brand-border rounded-xl text-brand-wine">{icon}</div>}
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500">{title}</span>
+        {icon && <div className="p-2.5 bg-pink-50 border border-pink-100 rounded-xl text-pink-600">{icon}</div>}
       </div>
       <div className="mt-3 flex items-baseline justify-between">
-        <div className="text-2xl font-bold text-slate-100 tracking-tight">{value}</div>
+        <div className="text-2xl font-black text-slate-900 tracking-tight">{value}</div>
         {trend && (
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${trendUp ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${trendUp ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
             {trend}
           </span>
         )}

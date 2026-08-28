@@ -35,12 +35,12 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-4">
-        <div className="flex items-start gap-3 p-4 bg-brand-card border border-brand-border rounded-xl">
-          <AlertTriangle className="w-6 h-6 text-amber-400 shrink-0 mt-0.5" />
+        <div className="flex items-start gap-3 p-4 bg-pink-50/50 border border-pink-100 rounded-2xl">
+          <AlertTriangle className="w-6 h-6 text-pink-600 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-slate-200">{message}</p>
+            <p className="text-sm text-slate-800 font-medium">{message}</p>
             {amount !== undefined && (
-              <div className="mt-2 text-lg font-bold text-amber-400">
+              <div className="mt-2 text-lg font-extrabold text-pink-600">
                 Amount: {currencySymbol}{amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </div>
             )}

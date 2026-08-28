@@ -28,10 +28,10 @@ export const AdminAuditLogsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-          <FileText className="w-6 h-6 text-amber-400" /> Administrative Audit Trail
+        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+          <FileText className="w-6 h-6 text-pink-600" /> Administrative Audit Trail
         </h1>
-        <p className="text-xs text-slate-400">Immutable security logs of sensitive administrative actions and financial balance adjustments.</p>
+        <p className="text-xs text-slate-500">Immutable security logs of sensitive administrative actions and financial balance adjustments.</p>
       </div>
 
       {loading ? (
@@ -41,20 +41,20 @@ export const AdminAuditLogsPage: React.FC = () => {
       ) : (
         <Table headers={['Admin Email', 'Action Code', 'Target Entity', `Amount (${currencySymbol})`, 'Audit Reason', 'Timestamp']}>
           {logs.map((log) => (
-            <tr key={log._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-semibold text-slate-200">{log.adminEmail}</td>
-              <td className="px-5 py-3 font-mono font-bold text-amber-400">
+            <tr key={log._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3 font-semibold text-slate-900">{log.adminEmail}</td>
+              <td className="px-5 py-3 font-mono font-bold text-pink-600">
                 <Badge variant="warning" size="sm">
                   {log.action}
                 </Badge>
               </td>
-              <td className="px-5 py-3 text-slate-300">
+              <td className="px-5 py-3 text-slate-700">
                 {log.targetType} {log.targetId ? `(#${log.targetId.slice(-6)})` : ''}
               </td>
-              <td className="px-5 py-3 font-bold text-slate-100">
+              <td className="px-5 py-3 font-bold text-slate-900">
                 {log.amount ? `${currencySymbol}${log.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : '-'}
               </td>
-              <td className="px-5 py-3 text-xs text-slate-400 max-w-xs truncate">{log.reason || 'N/A'}</td>
+              <td className="px-5 py-3 text-xs text-slate-600 max-w-xs truncate">{log.reason || 'N/A'}</td>
               <td className="px-5 py-3 text-xs text-slate-500">
                 {new Date(log.createdAt).toLocaleString()}
               </td>

@@ -147,36 +147,36 @@ export const AdminStaffPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Users className="w-6 h-6 text-amber-400" /> Staff & Team Management
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Users className="w-6 h-6 text-pink-600" /> Staff & Team Management
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Create staff accounts, generate unique client invitation codes (`STxxxx`), and monitor team performance.
           </p>
         </div>
 
-        <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
+        <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
           Add New Staff Member
         </Button>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> {message}
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700">
             ✕
           </button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-300 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400" /> {error}
+            <AlertCircle className="w-4 h-4 text-rose-600" /> {error}
           </div>
-          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-slate-700">
             ✕
           </button>
         </div>
@@ -191,38 +191,38 @@ export const AdminStaffPage: React.FC = () => {
         ) : (
           <Table headers={['Staff Username', 'Unique Invitation Code', 'Assigned Clients', 'Status', 'Actions']}>
             {staffList.map((s) => (
-              <tr key={s._id || s.id} className="hover:bg-brand-card/50 transition-colors">
+              <tr key={s._id || s.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-pink-50 border border-pink-200 text-pink-600 flex items-center justify-center font-bold text-sm shrink-0">
                       {s.fullName.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-slate-100">{s.fullName}</div>
+                      <div className="text-xs font-bold text-slate-900">{s.fullName}</div>
                     </div>
                   </div>
                 </td>
                 <td className="px-5 py-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/40 rounded-xl font-mono text-xs font-bold text-amber-400">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-pink-50 border border-pink-200 rounded-xl font-mono text-xs font-bold text-pink-700">
                     <Key className="w-3.5 h-3.5" />
                     <span>{s.invitationCode || 'N/A'}</span>
                     {s.invitationCode && (
                       <button
                         onClick={() => copyToClipboard(s.invitationCode)}
-                        className="p-1 hover:text-white transition-colors"
+                        className="p-1 hover:text-slate-900 transition-colors"
                         title="Copy Invitation Code"
                       >
                         {copiedCode === s.invitationCode ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
                         ) : (
-                          <Copy className="w-3.5 h-3.5" />
+                          <Copy className="w-3.5 h-3.5 text-pink-600" />
                         )}
                       </button>
                     )}
                   </div>
                 </td>
-                <td className="px-5 py-3 text-xs font-extrabold text-slate-200">
-                  <span className="px-2.5 py-1 rounded-full bg-brand-card border border-brand-border">
+                <td className="px-5 py-3 text-xs font-extrabold text-slate-800">
+                  <span className="px-2.5 py-1 rounded-full bg-white border border-slate-200 shadow-sm">
                     {s.clientCount ?? 0} Clients
                   </span>
                 </td>
@@ -233,21 +233,21 @@ export const AdminStaffPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Link
                       to={`/admin/staff/${s._id || s.id}`}
-                      className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-pink-50 border border-pink-200 text-pink-600 hover:bg-pink-100 transition-colors"
                       title="View Staff Profile & Operations Summary"
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </Link>
                     <button
                       onClick={() => handleOpenEdit(s)}
-                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
+                      className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-pink-300 transition-colors shadow-sm"
                       title="Edit Staff Member"
                     >
-                      <Edit className="w-3.5 h-3.5" />
+                      <Edit className="w-3.5 h-3.5 text-pink-600" />
                     </button>
                     <button
                       onClick={() => handleDelete(s._id || s.id, s.fullName)}
-                      className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 transition-colors"
                       title="Delete Staff Account"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -298,7 +298,7 @@ export const AdminStaffPage: React.FC = () => {
               <Button variant="secondary" onClick={() => setShowModal(false)} type="button">
                 Cancel
               </Button>
-              <Button variant="gold" type="submit" isLoading={actionLoading}>
+              <Button variant="primary" type="submit" isLoading={actionLoading}>
                 {editingStaff ? 'Update Staff Member' : 'Create Staff Member'}
               </Button>
             </div>

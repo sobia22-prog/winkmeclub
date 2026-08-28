@@ -207,16 +207,16 @@ export const AdminGirlProfilesPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-amber-400" /> Girls Profile Management
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Sparkles className="w-6 h-6 text-pink-600" /> Girls Profile Management
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             CRUD curated girl profiles shown to members on the Home feed and Match discovery cards.
           </p>
         </div>
 
         <Button
-          variant="gold"
+          variant="primary"
           leftIcon={<Plus className="w-4 h-4" />}
           onClick={handleOpenCreate}
         >
@@ -225,11 +225,11 @@ export const AdminGirlProfilesPage: React.FC = () => {
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 font-semibold flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" /> {message}
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white text-xs">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700 text-xs">✕</button>
         </div>
       )}
 
@@ -239,48 +239,48 @@ export const AdminGirlProfilesPage: React.FC = () => {
       ) : profiles.length === 0 ? (
         <Card className="p-12 text-center text-xs text-slate-500 space-y-3">
           <p>No curated girl profiles added yet.</p>
-          <Button variant="gold" size="sm" onClick={handleOpenCreate}>
+          <Button variant="primary" size="sm" onClick={handleOpenCreate}>
             Create First Profile
           </Button>
         </Card>
       ) : (
         <Table headers={['Girl Profile', 'Location', 'Metrics (H/W/C)', 'Categories', 'Rating & Likes', 'Verification', 'Actions']}>
           {profiles.map((p) => (
-            <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
+            <tr key={p._id} className="hover:bg-slate-50 transition-colors">
               <td className="px-5 py-3">
                 <div className="flex items-center gap-3">
                   <img
                     src={p.profileImage}
                     alt={p.name}
-                    className="w-11 h-11 rounded-2xl object-cover border border-amber-500/40 shadow-md shrink-0"
+                    className="w-11 h-11 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0"
                   />
                   <div>
-                    <div className="text-xs font-bold text-slate-100">{p.name}</div>
-                    <div className="text-[10px] text-slate-400 truncate max-w-xs">{p.bio || 'No bio'}</div>
+                    <div className="text-xs font-bold text-slate-900">{p.name}</div>
+                    <div className="text-[10px] text-slate-500 truncate max-w-xs">{p.bio || 'No bio'}</div>
                   </div>
                 </div>
               </td>
-              <td className="px-5 py-3 text-xs text-slate-300 font-medium">
+              <td className="px-5 py-3 text-xs text-slate-700 font-medium">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-amber-400" /> {p.location || 'Mumbai'}
+                  <MapPin className="w-3 h-3 text-pink-600" /> {p.location || 'Mumbai'}
                 </span>
               </td>
-              <td className="px-5 py-3 text-[11px] text-slate-300 font-mono">
+              <td className="px-5 py-3 text-[11px] text-slate-700 font-mono">
                 {p.height || "5'6\""} • {p.weight || '52kg'} • {p.chestCircumference || '34B'}
               </td>
               <td className="px-5 py-3">
                 <div className="flex flex-wrap gap-1">
                   {(p.categories || []).map((cat: string, idx: number) => (
-                    <span key={idx} className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] font-bold rounded-lg">
+                    <span key={idx} className="px-2 py-0.5 bg-pink-50 border border-pink-200 text-pink-700 text-[10px] font-bold rounded-lg">
                       {cat}
                     </span>
                   ))}
                 </div>
               </td>
               <td className="px-5 py-3 text-xs font-bold">
-                <div className="flex items-center gap-1.5 text-amber-400">
+                <div className="flex items-center gap-1.5 text-amber-500">
                   <Star className="w-3.5 h-3.5 fill-amber-400" /> {p.rating || 5.0}
-                  <span className="text-[10px] text-rose-400 flex items-center gap-0.5 ml-1 font-semibold">
+                  <span className="text-[10px] text-rose-500 flex items-center gap-0.5 ml-1 font-semibold">
                     <Heart className="w-3 h-3 fill-rose-400" /> {p.initialLikes || 500}
                   </span>
                 </div>
@@ -292,14 +292,14 @@ export const AdminGirlProfilesPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleOpenEdit(p)}
-                    className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                    className="p-1.5 rounded-lg bg-pink-50 border border-pink-200 text-pink-600 hover:bg-pink-100 transition-colors"
                     title="Edit Profile"
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteProfile(p._id, p.name)}
-                    className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                    className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 transition-colors"
                     title="Delete Profile"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -311,7 +311,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
         </Table>
       )}
 
-      {/* CREATE / EDIT GIRL PROFILE MODAL (100% SYMMETRICAL & ELEGANT UI) */}
+      {/* CREATE / EDIT GIRL PROFILE MODAL */}
       {isModalOpen && (
         <Modal
           isOpen={true}
@@ -321,7 +321,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
         >
           <form onSubmit={handleSubmitProfile} className="space-y-4 text-xs">
             {error && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 font-semibold">
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-600 font-semibold">
                 {error}
               </div>
             )}
@@ -348,7 +348,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               />
             </div>
 
-            {/* Symmetrical Row 2: 4 Symmetrical Columns (Height, Weight, Chest, Likes) */}
+            {/* Symmetrical Row 2: 4 Symmetrical Columns */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Input
                 label="Height"
@@ -379,7 +379,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
 
             {/* Symmetrical Row 3: Categories Select Bar */}
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-slate-300">
+              <label className="block text-xs font-semibold text-slate-700">
                 Categories (Select Multiple)
               </label>
 
@@ -393,8 +393,8 @@ export const AdminGirlProfilesPage: React.FC = () => {
                       onClick={() => toggleCategory(cat.name)}
                       className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs border ${
                         isSelected
-                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md'
-                          : 'bg-brand-surface border-brand-border text-slate-400 hover:text-slate-200'
+                          ? 'bg-pink-600 text-white border-pink-600 shadow-sm'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-pink-50'
                       }`}
                     >
                       {cat.name}
@@ -406,21 +406,21 @@ export const AdminGirlProfilesPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowAddCategoryInput(true)}
-                    className="px-3 py-1.5 rounded-xl font-bold text-xs bg-amber-500/10 border border-amber-500/40 text-amber-400 hover:bg-amber-500/20 transition-all flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-xl font-bold text-xs bg-pink-50 border border-pink-200 text-pink-600 hover:bg-pink-100 transition-all flex items-center gap-1"
                   >
                     <PlusCircle className="w-3.5 h-3.5" /> + Add new category
                   </button>
                 ) : (
-                  <div className="flex items-center gap-1.5 bg-brand-surface border border-amber-500/40 rounded-xl p-1">
+                  <div className="flex items-center gap-1.5 bg-white border border-pink-200 rounded-xl p-1">
                     <input
                       type="text"
                       placeholder="New category..."
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="bg-transparent px-2.5 py-1 text-xs text-slate-100 focus:outline-none w-32 font-medium"
+                      className="bg-transparent px-2.5 py-1 text-xs text-slate-900 focus:outline-none w-32 font-medium"
                     />
                     <Button
-                      variant="gold"
+                      variant="primary"
                       size="sm"
                       onClick={handleCreateNewCategory}
                       isLoading={addingCategory}
@@ -431,7 +431,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowAddCategoryInput(false)}
-                      className="p-1 text-slate-400 hover:text-white text-xs"
+                      className="p-1 text-slate-400 hover:text-slate-700 text-xs"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -456,7 +456,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               />
             </div>
 
-            {/* Symmetrical Row 5: Verification Label & Short Bio (2 Symmetrical Single-Line Inputs) */}
+            {/* Symmetrical Row 5: Verification Label & Short Bio */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label="Verification label"
@@ -472,7 +472,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
               />
             </div>
 
-            {/* Symmetrical Row 6: Details (Full Width Textarea) */}
+            {/* Symmetrical Row 6: Details */}
             <Textarea
               label="Details"
               placeholder="Write something about her..."
@@ -483,7 +483,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
 
             {/* Symmetrical Row 7: Profile Image Upload Picker */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Profile Image</label>
+              <label className="block text-xs font-semibold text-slate-700">Profile Image</label>
               <ImageUploadPicker
                 value={profileImage}
                 onChange={(url) => setProfileImage(url)}
@@ -494,7 +494,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
             </div>
 
             {/* Footer Modal Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-brand-border">
+            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
               <Button
                 variant="secondary"
                 type="button"
@@ -504,7 +504,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
                 Cancel
               </Button>
               <Button
-                variant="gold"
+                variant="primary"
                 type="submit"
                 isLoading={submitting}
               >

@@ -72,10 +72,10 @@ export const AdminRechargesPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <ArrowDownRight className="w-6 h-6 text-emerald-400" /> Recharge / Add-Funds Management
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <ArrowDownRight className="w-6 h-6 text-emerald-600" /> Recharge / Add-Funds Management
           </h1>
-          <p className="text-xs text-slate-400">Review user add-funds requests, edit deposit amounts, inspect payment proof receipts, & approve wallet credits.</p>
+          <p className="text-xs text-slate-500">Review user add-funds requests, edit deposit amounts, inspect payment proof receipts, & approve wallet credits.</p>
         </div>
 
         <div className="w-full sm:w-48">
@@ -99,26 +99,26 @@ export const AdminRechargesPage: React.FC = () => {
       ) : (
         <Table headers={['Request ID', 'User', 'Amount', 'Method', 'Reference / TxHash', 'Proof', 'Status', 'Actions']}>
           {recharges.map((r) => (
-            <tr key={r._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-mono font-bold text-slate-200">{r.requestId}</td>
-              <td className="px-5 py-3 font-semibold text-slate-200">
+            <tr key={r._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3 font-mono font-bold text-slate-900">{r.requestId}</td>
+              <td className="px-5 py-3 font-semibold text-slate-800">
                 {r.userId && typeof r.userId === 'object' ? (r.userId as any).fullName : 'User'}
               </td>
-              <td className="px-5 py-3 font-bold text-emerald-400">
+              <td className="px-5 py-3 font-bold text-emerald-600">
                 +{currencySymbol}{r.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3 text-xs text-slate-300">{r.paymentMethod}</td>
-              <td className="px-5 py-3 font-mono text-xs text-slate-400">{r.referenceNumber}</td>
+              <td className="px-5 py-3 text-xs text-slate-700">{r.paymentMethod}</td>
+              <td className="px-5 py-3 font-mono text-xs text-slate-600">{r.referenceNumber}</td>
               <td className="px-5 py-3">
                 {r.receiptUrl ? (
                   <button
                     onClick={() => setSelectedReceiptUrl(r.receiptUrl!)}
-                    className="p-1.5 bg-brand-surface border border-brand-border rounded-lg text-slate-300 hover:text-white flex items-center gap-1 text-xs"
+                    className="p-1.5 bg-white border border-slate-200 rounded-lg text-slate-700 hover:text-slate-900 flex items-center gap-1 text-xs shadow-sm"
                   >
-                    <Eye className="w-3.5 h-3.5 text-amber-400" /> Proof
+                    <Eye className="w-3.5 h-3.5 text-pink-600" /> Proof
                   </button>
                 ) : (
-                  <span className="text-xs text-slate-500">N/A</span>
+                  <span className="text-xs text-slate-400">N/A</span>
                 )}
               </td>
               <td className="px-5 py-3">
@@ -155,7 +155,7 @@ export const AdminRechargesPage: React.FC = () => {
                     </Button>
                   </div>
                 ) : (
-                  <span className="text-xs text-slate-500 italic">Processed</span>
+                  <span className="text-xs text-slate-400 italic">Processed</span>
                 )}
               </td>
             </tr>
@@ -167,7 +167,7 @@ export const AdminRechargesPage: React.FC = () => {
       {selectedReceiptUrl && (
         <Modal isOpen={true} onClose={() => setSelectedReceiptUrl(null)} title="User Payment Receipt Screenshot">
           <div className="space-y-4">
-            <img src={selectedReceiptUrl} alt="Payment Receipt" className="w-full max-h-96 object-contain rounded-2xl border border-brand-border" />
+            <img src={selectedReceiptUrl} alt="Payment Receipt" className="w-full max-h-96 object-contain rounded-2xl border border-slate-200 bg-slate-50" />
             <div className="flex justify-end">
               <Button variant="secondary" onClick={() => setSelectedReceiptUrl(null)}>Close</Button>
             </div>
@@ -183,10 +183,10 @@ export const AdminRechargesPage: React.FC = () => {
           title={`Confirm Recharge ${reviewAction} — #${selectedRecharge.requestId}`}
         >
           <form onSubmit={handleReviewSubmit} className="space-y-4">
-            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{selectedRecharge.userId && typeof selectedRecharge.userId === 'object' ? (selectedRecharge.userId as any).fullName : 'User'}</span></div>
-              <div>Method: <span className="font-bold text-slate-200">{selectedRecharge.paymentMethod}</span></div>
-              <div>Reference: <span className="font-mono font-bold text-slate-200">{selectedRecharge.referenceNumber}</span></div>
+            <div className="p-4 bg-pink-50/50 border border-pink-100 rounded-xl space-y-1 text-xs">
+              <div>User: <span className="font-bold text-slate-900">{selectedRecharge.userId && typeof selectedRecharge.userId === 'object' ? (selectedRecharge.userId as any).fullName : 'User'}</span></div>
+              <div>Method: <span className="font-bold text-slate-800">{selectedRecharge.paymentMethod}</span></div>
+              <div>Reference: <span className="font-mono font-bold text-slate-800">{selectedRecharge.referenceNumber}</span></div>
             </div>
 
             {reviewAction === 'APPROVE' && (
@@ -202,8 +202,8 @@ export const AdminRechargesPage: React.FC = () => {
 
             {selectedRecharge.receiptUrl && (
               <div className="space-y-1">
-                <span className="text-xs text-slate-400 font-semibold block">Attached Receipt Screenshot:</span>
-                <img src={selectedRecharge.receiptUrl} alt="Receipt" className="h-40 w-full object-contain bg-black/40 rounded-xl border border-brand-border" />
+                <span className="text-xs text-slate-600 font-semibold block">Attached Receipt Screenshot:</span>
+                <img src={selectedRecharge.receiptUrl} alt="Receipt" className="h-40 w-full object-contain bg-slate-50 rounded-xl border border-slate-200" />
               </div>
             )}
 

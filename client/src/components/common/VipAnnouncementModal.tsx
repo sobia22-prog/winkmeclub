@@ -70,18 +70,18 @@ export const VipAnnouncementModal: React.FC = () => {
   return (
     <Modal isOpen={true} onClose={handleClose} title="VIP Membership Exclusive Notice">
       <div className="space-y-4">
-        <div className="p-4 bg-gradient-to-r from-amber-950/60 via-brand-surface to-brand-surface border border-amber-500/40 rounded-2xl space-y-2">
-          <div className="flex items-center gap-2 text-amber-400 font-extrabold text-sm">
-            <Crown className="w-5 h-5 fill-amber-400" /> {announcement.title}
+        <div className="p-4 bg-pink-50/50 border border-pink-100 rounded-2xl space-y-2">
+          <div className="flex items-center gap-2 text-pink-600 font-extrabold text-sm">
+            <Crown className="w-5 h-5 fill-pink-600" /> {announcement.title}
           </div>
-          <p className="text-xs text-slate-200 leading-relaxed">{announcement.content}</p>
+          <p className="text-xs text-slate-700 leading-relaxed font-medium">{announcement.content}</p>
         </div>
 
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="secondary" onClick={handleClose} type="button">
             Dismiss
           </Button>
-          <Button variant="gold" onClick={handleClaimVip} leftIcon={<Crown className="w-4 h-4" />}>
+          <Button variant="primary" onClick={handleClaimVip} leftIcon={<Crown className="w-4 h-4" />}>
             Claim Gold VIP Access
           </Button>
         </div>

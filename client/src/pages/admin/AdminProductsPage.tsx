@@ -153,36 +153,36 @@ export const AdminProductsPage: React.FC = () => {
     <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Package className="w-6 h-6 text-amber-400" /> Marketplace Product Catalog
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Package className="w-6 h-6 text-pink-600" /> Marketplace Product Catalog
           </h1>
-          <p className="text-xs text-slate-400">Configure lifestyle products shown on the Main Trades Page vs Additional Catalog Drawer.</p>
+          <p className="text-xs text-slate-500">Configure lifestyle products shown on the Main Trades Page vs Additional Catalog Drawer.</p>
         </div>
 
-        <Button variant="gold" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
+        <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
           Add New Product
         </Button>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> {message}
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-300 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400" /> {error}
+            <AlertCircle className="w-4 h-4 text-rose-600" /> {error}
           </div>
-          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
-      <Card className="p-0 overflow-hidden">
+      <Card className="p-0 overflow-hidden bg-white border border-slate-200 shadow-sm">
         {loading ? (
           <p className="text-center text-xs text-slate-500 py-10">Loading product catalog...</p>
         ) : products.length === 0 ? (
@@ -190,26 +190,26 @@ export const AdminProductsPage: React.FC = () => {
         ) : (
           <Table headers={['Product Image & Name', 'Category', 'Frontend Location', 'Status', 'Actions']}>
             {products.map((p) => (
-              <tr key={p._id} className="hover:bg-brand-card/50 transition-colors">
+              <tr key={p._id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-3">
                     <img
                       src={p.image}
                       alt={p.name}
-                      className="w-12 h-12 rounded-xl object-cover border border-brand-border bg-black/40"
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100"
                     />
                     <div>
-                      <div className="text-xs font-bold text-slate-100">{p.name}</div>
-                      <div className="text-[11px] text-slate-400 line-clamp-1">{p.description}</div>
+                      <div className="text-xs font-bold text-slate-900">{p.name}</div>
+                      <div className="text-[11px] text-slate-500 line-clamp-1">{p.description}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-5 py-3 text-xs text-slate-300 font-medium">{p.category}</td>
+                <td className="px-5 py-3 text-xs text-slate-700 font-medium">{p.category}</td>
                 <td className="px-5 py-3">
                   {p.isMainPage ? (
                     <button
                       onClick={() => handleToggleMainPage(p)}
-                      className="px-2.5 py-1 rounded-full text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30 transition-all cursor-pointer shadow"
+                      className="px-2.5 py-1 rounded-full text-[10px] font-black bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100 transition-all cursor-pointer shadow-sm"
                       title="Click to move to Additional Catalog Drawer"
                     >
                       ★ MAIN TRADES PAGE
@@ -217,7 +217,7 @@ export const AdminProductsPage: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => handleToggleMainPage(p)}
-                      className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200 transition-all cursor-pointer"
+                      className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 transition-all cursor-pointer"
                       title="Click to feature on Main Trades Page"
                     >
                       📁 CATALOG DRAWER
@@ -225,7 +225,7 @@ export const AdminProductsPage: React.FC = () => {
                   )}
                 </td>
                 <td className="px-5 py-3">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     {p.status}
                   </span>
                 </td>
@@ -233,21 +233,21 @@ export const AdminProductsPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setViewingProduct(p)}
-                      className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-pink-50 border border-pink-200 text-pink-600 hover:bg-pink-100 transition-colors"
                       title="View Product Details"
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleOpenEdit(p)}
-                      className="p-1.5 rounded-lg bg-brand-card border border-brand-border text-slate-300 hover:text-white hover:border-amber-500/40 transition-colors"
+                      className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-pink-300 transition-colors shadow-sm"
                       title="Edit Product"
                     >
-                      <Edit className="w-3.5 h-3.5" />
+                      <Edit className="w-3.5 h-3.5 text-pink-600" />
                     </button>
                     <button
                       onClick={() => handleDelete(p._id, p.name)}
-                      className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 transition-colors"
+                      className="p-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 transition-colors"
                       title="Delete Product"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -269,7 +269,7 @@ export const AdminProductsPage: React.FC = () => {
           maxWidth="lg"
         >
           <div className="space-y-5">
-            <div className="w-full h-56 rounded-2xl overflow-hidden bg-black/40 border border-brand-border">
+            <div className="w-full h-56 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
               <img
                 src={viewingProduct.image}
                 alt={viewingProduct.name}
@@ -279,28 +279,28 @@ export const AdminProductsPage: React.FC = () => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-black text-slate-100">{viewingProduct.name}</h3>
+                <h3 className="text-lg font-black text-slate-900">{viewingProduct.name}</h3>
                 {viewingProduct.isMainPage ? (
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                  <span className="px-3 py-1 rounded-full text-xs font-black bg-pink-50 text-pink-700 border border-pink-200">
                     ★ MAIN TRADES PAGE
                   </span>
                 ) : (
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
                     📁 CATALOG DRAWER
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-3 text-xs text-slate-400">
-                <span>Category: <strong className="text-slate-200">{viewingProduct.category}</strong></span>
+              <div className="flex items-center gap-3 text-xs text-slate-500">
+                <span>Category: <strong className="text-slate-800">{viewingProduct.category}</strong></span>
                 <span>•</span>
-                <span>Status: <strong className="text-emerald-400">{viewingProduct.status}</strong></span>
+                <span>Status: <strong className="text-emerald-600">{viewingProduct.status}</strong></span>
               </div>
             </div>
 
-            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Description</span>
-              <p className="text-xs text-slate-200 leading-relaxed font-medium">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider block">Description</span>
+              <p className="text-xs text-slate-800 leading-relaxed font-medium">
                 {viewingProduct.description || 'No description provided.'}
               </p>
             </div>
@@ -377,7 +377,7 @@ export const AdminProductsPage: React.FC = () => {
               <Button variant="secondary" onClick={() => setShowModal(false)} type="button">
                 Cancel
               </Button>
-              <Button variant="gold" type="submit" isLoading={actionLoading}>
+              <Button variant="primary" type="submit" isLoading={actionLoading}>
                 {editingProduct ? 'Update Product' : 'Create Product'}
               </Button>
             </div>

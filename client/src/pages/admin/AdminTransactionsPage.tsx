@@ -28,10 +28,10 @@ export const AdminTransactionsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-          <History className="w-6 h-6 text-purple-400" /> Platform Transaction Ledger
+        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+          <History className="w-6 h-6 text-pink-600" /> Platform Transaction Ledger
         </h1>
-        <p className="text-xs text-slate-400">Master audit trail of all financial movements across all accounts.</p>
+        <p className="text-xs text-slate-500">Master audit trail of all financial movements across all accounts.</p>
       </div>
 
       {loading ? (
@@ -39,20 +39,20 @@ export const AdminTransactionsPage: React.FC = () => {
       ) : (
         <Table headers={['Tx ID', 'User ID', 'Type', 'Amount', 'Before Balance', 'After Balance', 'Description', 'Date']}>
           {transactions.map((tx) => (
-            <tr key={tx._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-mono font-bold text-slate-200">{tx.transactionId}</td>
-              <td className="px-5 py-3 font-mono text-xs text-slate-400">{tx.userId}</td>
+            <tr key={tx._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3 font-mono font-bold text-slate-900">{tx.transactionId}</td>
+              <td className="px-5 py-3 font-mono text-xs text-slate-600">{tx.userId}</td>
               <td className="px-5 py-3">
                 <Badge variant="neutral" size="sm">
                   {tx.type}
                 </Badge>
               </td>
-              <td className="px-5 py-3 font-bold text-amber-400">
+              <td className="px-5 py-3 font-bold text-pink-600">
                 {currencySymbol}{Math.abs(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
-              <td className="px-5 py-3 text-slate-400">{currencySymbol}{tx.beforeBalance.toFixed(2)}</td>
-              <td className="px-5 py-3 font-semibold text-slate-200">{currencySymbol}{tx.afterBalance.toFixed(2)}</td>
-              <td className="px-5 py-3 text-xs text-slate-300 max-w-xs truncate">{tx.description}</td>
+              <td className="px-5 py-3 text-slate-600">{currencySymbol}{tx.beforeBalance.toFixed(2)}</td>
+              <td className="px-5 py-3 font-semibold text-slate-900">{currencySymbol}{tx.afterBalance.toFixed(2)}</td>
+              <td className="px-5 py-3 text-xs text-slate-700 max-w-xs truncate">{tx.description}</td>
               <td className="px-5 py-3 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</td>
             </tr>
           ))}

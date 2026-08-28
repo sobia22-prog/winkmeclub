@@ -58,50 +58,50 @@ export const AdminPaymentSettingsPage: React.FC = () => {
 
   return (
     <div className="w-full space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Settings className="w-6 h-6 text-amber-400" /> Telegram & Payment Settings
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Settings className="w-6 h-6 text-pink-600" /> Telegram & Payment Settings
           </h1>
-          <p className="text-xs text-slate-400">Configure your official Telegram handles, USDT crypto deposit wallet, and exchange rate live.</p>
+          <p className="text-xs text-slate-500">Configure your official Telegram handles, USDT crypto deposit wallet, and exchange rate live.</p>
         </div>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> {message}
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400 flex items-center justify-between">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold flex items-center justify-between shadow-sm">
           <span>{error}</span>
-          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
-      <Card className="p-6 md:p-8 space-y-6 w-full bg-brand-surface border border-brand-border">
+      <Card className="p-6 md:p-8 space-y-6 w-full bg-white border border-slate-200 shadow-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-300 space-y-1">
+          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 space-y-1">
             <strong>📢 Live Dynamic Synchronization:</strong>
-            <p className="text-[11px] text-slate-300">
+            <p className="text-[11px] text-emerald-700 font-medium">
               Any changes saved here will instantly update the user Wallet deposit screen (`/wallet`) and Support page (`/support`) in real-time.
             </p>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-sm font-extrabold text-slate-200 uppercase tracking-widest flex items-center gap-2">
-              <Send className="w-4 h-4 text-sky-400" /> Telegram Official Handles
+            <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+              <Send className="w-4 h-4 text-sky-600" /> Telegram Official Handles
             </h3>
 
             <Input
               label="Telegram Finance Link (Add Funds / Deposit Chat)"
               value={form.telegramFinanceLink}
               onChange={(e) => setForm({ ...form, telegramFinanceLink: e.target.value })}
-              leftIcon={<Send className="w-4 h-4 text-sky-400" />}
+              leftIcon={<Send className="w-4 h-4 text-sky-600" />}
               helperText="Users click this link on /wallet to talk to your Finance Department"
               required
             />
@@ -110,7 +110,7 @@ export const AdminPaymentSettingsPage: React.FC = () => {
               label="Telegram 24/7 Customer Support Link"
               value={form.telegramSupportLink}
               onChange={(e) => setForm({ ...form, telegramSupportLink: e.target.value })}
-              leftIcon={<MessageCircle className="w-4 h-4 text-sky-400" />}
+              leftIcon={<MessageCircle className="w-4 h-4 text-sky-600" />}
               helperText="Users click this link on /support for 24/7 VIP assistance"
               required
             />
@@ -123,16 +123,16 @@ export const AdminPaymentSettingsPage: React.FC = () => {
             />
           </div>
 
-          <div className="space-y-4 pt-4 border-t border-brand-border">
-            <h3 className="text-sm font-extrabold text-slate-200 uppercase tracking-widest flex items-center gap-2">
-              <QrCode className="w-4 h-4 text-amber-400" /> USDT Crypto Deposit Settings
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+            <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+              <QrCode className="w-4 h-4 text-pink-600" /> USDT Crypto Deposit Settings
             </h3>
 
             <Input
               label="USDT TRC20 Wallet Address"
               value={form.usdtWalletAddress}
               onChange={(e) => setForm({ ...form, usdtWalletAddress: e.target.value })}
-              leftIcon={<QrCode className="w-4 h-4 text-amber-400" />}
+              leftIcon={<QrCode className="w-4 h-4 text-pink-600" />}
               helperText="Your official TRC20 wallet address displayed on the USDT deposit tab"
               required
             />
@@ -142,22 +142,22 @@ export const AdminPaymentSettingsPage: React.FC = () => {
               type="number"
               value={form.usdtExchangeRate}
               onChange={(e) => setForm({ ...form, usdtExchangeRate: Number(e.target.value) })}
-              leftIcon={<DollarSign className="w-4 h-4 text-emerald-400" />}
+              leftIcon={<DollarSign className="w-4 h-4 text-emerald-600" />}
               helperText="Rate used to convert user deposit amounts to USDT (Default: 92.00)"
               required
             />
           </div>
 
-          <div className="space-y-4 pt-4 border-t border-brand-border">
-            <h3 className="text-sm font-extrabold text-slate-200 uppercase tracking-widest flex items-center gap-2">
-              <Building className="w-4 h-4 text-purple-400" /> Optional Bank & UPI Chat Details
+          <div className="space-y-4 pt-4 border-t border-slate-100">
+            <h3 className="text-sm font-extrabold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+              <Building className="w-4 h-4 text-purple-600" /> Optional Bank & UPI Chat Details
             </h3>
 
             <Input
               label="Admin UPI ID"
               value={form.adminUpiId}
               onChange={(e) => setForm({ ...form, adminUpiId: e.target.value })}
-              leftIcon={<Building className="w-4 h-4 text-purple-400" />}
+              leftIcon={<Building className="w-4 h-4 text-purple-600" />}
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -185,7 +185,7 @@ export const AdminPaymentSettingsPage: React.FC = () => {
           </div>
 
           <div className="pt-2 flex justify-end">
-            <Button variant="gold" type="submit" isLoading={loading}>
+            <Button variant="primary" type="submit" isLoading={loading}>
               Save Payment Settings Live
             </Button>
           </div>

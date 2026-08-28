@@ -16,3 +16,12 @@
 *::-webkit-scrollbar {
   display: none; /* Chrome, Safari and Opera */
 }
+
+/* Fix Chrome/Edge browser autofill blue background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+}

@@ -96,70 +96,70 @@ export const AdminTradesPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-amber-400" /> Airborne Trade Request Management
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <TrendingUp className="w-6 h-6 text-pink-600" /> Airborne Trade Request Management
           </h1>
-          <p className="text-xs text-slate-400">Review pending trades, view full trade details, assign Win Profit percentages (20%-100%), or modify results.</p>
+          <p className="text-xs text-slate-500">Review pending trades, view full trade details, assign Win Profit percentages (20%-100%), or modify results.</p>
         </div>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 font-semibold flex items-center justify-between">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" /> {message}
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white text-xs">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700 text-xs">✕</button>
         </div>
       )}
 
-      {/* Separated Trade Status Tabs (Pending / WIN / LOSE / All) */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-brand-border pb-3">
+      {/* Separated Trade Status Tabs */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 pb-3">
         <button
           onClick={() => setActiveTab('PENDING')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
             activeTab === 'PENDING'
-              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
-              : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              ? 'bg-pink-600 text-white shadow-md'
+              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
           <span>Pending Trades</span>
-          <span className="px-2 py-0.5 rounded-full bg-slate-950/20 text-[10px]">{pendingCount}</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px]">{pendingCount}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('WIN')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
             activeTab === 'WIN'
-              ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20'
-              : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              ? 'bg-emerald-600 text-white shadow-md'
+              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
           <span>WIN Trades 🎉</span>
-          <span className="px-2 py-0.5 rounded-full bg-slate-950/20 text-[10px]">{winCount}</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px]">{winCount}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('LOSE')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
             activeTab === 'LOSE'
-              ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20'
-              : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              ? 'bg-rose-600 text-white shadow-md'
+              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
           <span>LOSE Trades</span>
-          <span className="px-2 py-0.5 rounded-full bg-black/30 text-[10px]">{loseCount}</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px]">{loseCount}</span>
         </button>
 
         <button
           onClick={() => setActiveTab('ALL')}
           className={`px-4 py-2.5 rounded-xl text-xs font-extrabold transition-all flex items-center gap-2 ${
             activeTab === 'ALL'
-              ? 'bg-brand-wine text-white shadow-md shadow-brand-wine/20'
-              : 'bg-brand-surface border border-brand-border text-slate-400 hover:text-slate-200'
+              ? 'bg-purple-600 text-white shadow-md'
+              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
         >
           <span>All Trades</span>
-          <span className="px-2 py-0.5 rounded-full bg-black/30 text-[10px]">{trades.length}</span>
+          <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px]">{trades.length}</span>
         </button>
       </div>
 
@@ -170,14 +170,14 @@ export const AdminTradesPage: React.FC = () => {
       ) : (
         <Table headers={['Trade ID', 'User', 'Product', 'Qty', `Amount (${currencySymbol})`, 'Status', 'Outcome & Profit', 'Actions']}>
           {filteredTrades.map((t: any) => (
-            <tr key={t._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-mono font-bold text-slate-200">{t.tradeId}</td>
-              <td className="px-5 py-3 font-semibold text-slate-200">
+            <tr key={t._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3 font-mono font-bold text-slate-900">{t.tradeId}</td>
+              <td className="px-5 py-3 font-semibold text-slate-800">
                 {t.userId && typeof t.userId === 'object' ? t.userId.fullName : 'User'}
               </td>
-              <td className="px-5 py-3 text-slate-300 font-medium">{t.productName}</td>
-              <td className="px-5 py-3 text-slate-300">x{t.quantity}</td>
-              <td className="px-5 py-3 font-bold text-emerald-400">
+              <td className="px-5 py-3 text-slate-700 font-medium">{t.productName}</td>
+              <td className="px-5 py-3 text-slate-700">x{t.quantity}</td>
+              <td className="px-5 py-3 font-bold text-emerald-600">
                 {currencySymbol}{t.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </td>
               <td className="px-5 py-3">
@@ -194,7 +194,7 @@ export const AdminTradesPage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setViewingTrade(t)}
-                    className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                    className="p-1.5 rounded-lg bg-pink-50 border border-pink-200 text-pink-600 hover:bg-pink-100 transition-colors"
                     title="View Full Trade Details"
                   >
                     <Eye className="w-3.5 h-3.5" />
@@ -203,7 +203,7 @@ export const AdminTradesPage: React.FC = () => {
                   {t.status === 'PENDING' ? (
                     <>
                       <Button
-                        variant="gold"
+                        variant="primary"
                         size="sm"
                         leftIcon={<Trophy className="w-3.5 h-3.5" />}
                         onClick={() => {
@@ -247,7 +247,7 @@ export const AdminTradesPage: React.FC = () => {
         </Table>
       )}
 
-      {/* VIEW TRADE REQUEST DETAILS POPUP MODAL (Matching Reference Image) */}
+      {/* VIEW TRADE REQUEST DETAILS POPUP MODAL */}
       {viewingTrade && (() => {
         const userObj = typeof viewingTrade.userId === 'object' ? (viewingTrade.userId as any) : null;
         const staffObj = userObj?.assignedStaff && typeof userObj.assignedStaff === 'object' ? userObj.assignedStaff : null;
@@ -264,70 +264,70 @@ export const AdminTradesPage: React.FC = () => {
             maxWidth="2xl"
           >
             <div className="space-y-6">
-              {/* Top Summary Banner: PICK / SELECTION, QUANTITY, TOTAL AMOUNT */}
-              <div className="grid grid-cols-3 gap-4 p-5 bg-gradient-to-r from-amber-950/40 via-brand-card to-brand-surface border border-amber-500/30 rounded-2xl text-center shadow-lg">
+              {/* Top Summary Banner */}
+              <div className="grid grid-cols-3 gap-4 p-5 bg-pink-50/50 border border-pink-100 rounded-2xl text-center shadow-sm">
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">PICK / ITEM</span>
-                  <span className="text-sm font-black text-amber-400 truncate block mt-0.5">{viewingTrade.productName}</span>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-extrabold block">PICK / ITEM</span>
+                  <span className="text-sm font-black text-pink-600 truncate block mt-0.5">{viewingTrade.productName}</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">QUANTITY</span>
-                  <span className="text-base font-black text-slate-100 block mt-0.5">{viewingTrade.quantity}.00</span>
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-extrabold block">QUANTITY</span>
+                  <span className="text-base font-black text-slate-900 block mt-0.5">{viewingTrade.quantity}.00</span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] uppercase tracking-wider text-slate-400 font-extrabold block">TOTAL AMOUNT</span>
-                  <span className="text-base font-black text-emerald-400 block mt-0.5">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-500 font-extrabold block">TOTAL AMOUNT</span>
+                  <span className="text-base font-black text-emerald-600 block mt-0.5">
                     {currencySymbol}{viewingTrade.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
 
               {/* Customer Profile Card */}
-              <div className="p-4 bg-brand-card border border-brand-border rounded-2xl flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center font-black text-lg shrink-0">
+              <div className="p-4 bg-white border border-slate-200 rounded-2xl flex items-center gap-4 shadow-sm">
+                <div className="w-12 h-12 rounded-xl bg-pink-50 border border-pink-200 text-pink-600 flex items-center justify-center font-black text-lg shrink-0">
                   {userObj?.fullName?.charAt(0).toUpperCase() || 'C'}
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">CUSTOMER</span>
-                  <span className="text-base font-extrabold text-slate-100">{userObj?.fullName || 'User / Deleted Account'}</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">CUSTOMER</span>
+                  <span className="text-base font-extrabold text-slate-900">{userObj?.fullName || 'User / Deleted Account'}</span>
                 </div>
               </div>
 
               {/* TRADE INFORMATION Section */}
-              <div className="p-5 bg-brand-card/60 border border-brand-border rounded-2xl space-y-3 text-xs">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-wider border-b border-brand-border pb-2">
+              <div className="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs">
+                <h4 className="text-[11px] font-black text-slate-600 uppercase tracking-wider border-b border-slate-200 pb-2">
                   TRADE INFORMATION
                 </h4>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <span className="text-slate-400 block font-semibold text-[11px]">Customer Email</span>
-                    <span className="text-slate-200 font-bold">{userObj?.email || 'N/A'}</span>
+                    <span className="text-slate-500 block font-semibold text-[11px]">Customer Email</span>
+                    <span className="text-slate-800 font-bold">{userObj?.email || 'N/A'}</span>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block font-semibold text-[11px]">Products</span>
-                    <span className="text-slate-200 font-bold">{viewingTrade.productName}</span>
+                    <span className="text-slate-500 block font-semibold text-[11px]">Products</span>
+                    <span className="text-slate-800 font-bold">{viewingTrade.productName}</span>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block font-semibold text-[11px]">Referral / Staff Code</span>
-                    <span className="text-amber-400 font-mono font-bold">
+                    <span className="text-slate-500 block font-semibold text-[11px]">Referral / Staff Code</span>
+                    <span className="text-pink-600 font-mono font-bold">
                       {staffObj?.invitationCode ? `${staffObj.invitationCode} (${staffObj.fullName})` : 'Unassigned'}
                     </span>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block font-semibold text-[11px]">Trade Status</span>
+                    <span className="text-slate-500 block font-semibold text-[11px]">Trade Status</span>
                     <span className="font-bold">
                       {viewingTrade.status === 'SETTLED' ? <Badge variant="verified">SETTLED</Badge> : <Badge variant="warning">PENDING</Badge>}
                     </span>
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block font-semibold text-[11px]">Bird-Eye Outcome</span>
+                    <span className="text-slate-500 block font-semibold text-[11px]">Bird-Eye Outcome</span>
                     <div className="mt-0.5">
                       {isWin ? (
                         <Badge variant="success">▲ WIN (+{profitPct}%)</Badge>
@@ -340,8 +340,8 @@ export const AdminTradesPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <span className="text-slate-400 block font-semibold text-[11px]">Created Date</span>
-                    <span className="text-slate-300 font-medium">{new Date(viewingTrade.createdAt).toLocaleString()}</span>
+                    <span className="text-slate-500 block font-semibold text-[11px]">Created Date</span>
+                    <span className="text-slate-700 font-medium">{new Date(viewingTrade.createdAt).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -351,7 +351,7 @@ export const AdminTradesPage: React.FC = () => {
                 {viewingTrade.status === 'PENDING' ? (
                   <div className="flex items-center gap-2">
                     <Button
-                      variant="gold"
+                      variant="primary"
                       size="sm"
                       leftIcon={<Trophy className="w-3.5 h-3.5" />}
                       onClick={() => {
@@ -397,11 +397,11 @@ export const AdminTradesPage: React.FC = () => {
           title={`Confirm Trade Result — #${selectedTrade.tradeId}`}
         >
           <form onSubmit={handleSettleSubmit} className="space-y-4">
-            <div className="p-4 bg-brand-card border border-brand-border rounded-xl space-y-1.5 text-xs">
-              <div>User: <span className="font-bold text-slate-100">{selectedTrade.userId && typeof selectedTrade.userId === 'object' ? (selectedTrade.userId as any).fullName : 'User'}</span></div>
-              <div>Product: <span className="font-bold text-slate-100">{selectedTrade.productName} (Qty: {selectedTrade.quantity})</span></div>
-              <div>Trade Amount: <span className="font-bold text-emerald-400">{currencySymbol}{selectedTrade.totalAmount.toFixed(2)}</span></div>
-              <div>Decided Outcome: <span className={`font-bold ${settlementOutcome === 'WIN' ? 'text-emerald-400' : 'text-rose-400'}`}>{settlementOutcome}</span></div>
+            <div className="p-4 bg-pink-50/50 border border-pink-100 rounded-xl space-y-1.5 text-xs text-slate-700">
+              <div>User: <span className="font-bold text-slate-900">{selectedTrade.userId && typeof selectedTrade.userId === 'object' ? (selectedTrade.userId as any).fullName : 'User'}</span></div>
+              <div>Product: <span className="font-bold text-slate-900">{selectedTrade.productName} (Qty: {selectedTrade.quantity})</span></div>
+              <div>Trade Amount: <span className="font-bold text-emerald-600">{currencySymbol}{selectedTrade.totalAmount.toFixed(2)}</span></div>
+              <div>Decided Outcome: <span className={`font-bold ${settlementOutcome === 'WIN' ? 'text-emerald-600' : 'text-rose-600'}`}>{settlementOutcome}</span></div>
             </div>
 
             <Select
@@ -430,7 +430,7 @@ export const AdminTradesPage: React.FC = () => {
             )}
 
             {settlementOutcome === 'LOSE' && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300">
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700">
                 Trade amount {currencySymbol}{selectedTrade.totalAmount.toFixed(2)} will be moved into the user's Frozen Balance.
               </div>
             )}
@@ -440,7 +440,7 @@ export const AdminTradesPage: React.FC = () => {
                 Cancel
               </Button>
               <Button
-                variant={settlementOutcome === 'WIN' ? 'gold' : 'danger'}
+                variant={settlementOutcome === 'WIN' ? 'primary' : 'danger'}
                 type="submit"
                 isLoading={actionLoading}
               >

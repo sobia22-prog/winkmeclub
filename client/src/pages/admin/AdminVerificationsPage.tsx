@@ -83,10 +83,10 @@ export const AdminVerificationsPage: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-purple-400" /> VIP Identity Verification Requests
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <ShieldCheck className="w-6 h-6 text-pink-600" /> VIP Identity Verification Requests
           </h1>
-          <p className="text-xs text-slate-400">Inspect submitted government IDs, verify selfies, & manage Gold VIP status controls.</p>
+          <p className="text-xs text-slate-500">Inspect submitted government IDs, verify selfies, & manage Gold VIP status controls.</p>
         </div>
 
         <div className="w-full sm:w-48">
@@ -104,9 +104,9 @@ export const AdminVerificationsPage: React.FC = () => {
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <span>{message}</span>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
@@ -117,13 +117,13 @@ export const AdminVerificationsPage: React.FC = () => {
       ) : (
         <Table headers={['User', 'Full Name', 'ID Type', 'ID Number', 'Interactive Status Control', 'Submitted At', 'Actions']}>
           {verifications.map((v) => (
-            <tr key={v._id} className="hover:bg-brand-card/50 transition-colors">
-              <td className="px-5 py-3 font-semibold text-slate-200">
+            <tr key={v._id} className="hover:bg-slate-50 transition-colors">
+              <td className="px-5 py-3 font-semibold text-slate-900">
                 {v.userId && typeof v.userId === 'object' ? v.userId.fullName : 'User'}
               </td>
-              <td className="px-5 py-3 text-slate-300">{v.fullName}</td>
-              <td className="px-5 py-3 text-slate-400">{v.idType}</td>
-              <td className="px-5 py-3 font-mono text-slate-300">{v.idNumber}</td>
+              <td className="px-5 py-3 text-slate-800">{v.fullName}</td>
+              <td className="px-5 py-3 text-slate-600">{v.idType}</td>
+              <td className="px-5 py-3 font-mono text-slate-700">{v.idNumber}</td>
               <td className="px-5 py-3">
                 {/* Interactive Status Selector inside Table */}
                 <select
@@ -137,15 +137,15 @@ export const AdminVerificationsPage: React.FC = () => {
                   }}
                   className={`text-xs font-bold rounded-xl px-3 py-1.5 border transition-all cursor-pointer focus:outline-none ${
                     v.status === 'APPROVED'
-                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                       : v.status === 'PENDING'
-                      ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-                      : 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : 'bg-rose-50 text-rose-700 border-rose-200'
                   }`}
                 >
-                  <option value="APPROVED" className="bg-brand-surface text-emerald-400 font-bold">✓ APPROVED</option>
-                  <option value="PENDING" className="bg-brand-surface text-amber-400 font-bold">⌛ PENDING</option>
-                  <option value="REJECTED" className="bg-brand-surface text-rose-400 font-bold">✕ REJECTED</option>
+                  <option value="APPROVED" className="bg-white text-emerald-700 font-bold">✓ APPROVED</option>
+                  <option value="PENDING" className="bg-white text-amber-700 font-bold">⌛ PENDING</option>
+                  <option value="REJECTED" className="bg-white text-rose-700 font-bold">✕ REJECTED</option>
                 </select>
               </td>
               <td className="px-5 py-3 text-xs text-slate-500">{new Date(v.createdAt).toLocaleDateString()}</td>
@@ -178,45 +178,45 @@ export const AdminVerificationsPage: React.FC = () => {
           <form onSubmit={handleReviewSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-xs font-semibold text-slate-400 block mb-1.5">Government ID Document</span>
+                <span className="text-xs font-semibold text-slate-600 block mb-1.5">Government ID Document</span>
                 <img
                   src={selectedVerification.idDocumentUrl}
                   alt="ID Document"
-                  className="w-full h-44 object-cover rounded-xl border border-brand-border shadow-md"
+                  className="w-full h-44 object-cover rounded-xl border border-slate-200 shadow-sm"
                 />
               </div>
 
               <div>
-                <span className="text-xs font-semibold text-slate-400 block mb-1.5">Verification Selfie Photo</span>
+                <span className="text-xs font-semibold text-slate-600 block mb-1.5">Verification Selfie Photo</span>
                 <img
                   src={selectedVerification.selfieUrl}
                   alt="Selfie"
-                  className="w-full h-44 object-cover rounded-xl border border-brand-border shadow-md"
+                  className="w-full h-44 object-cover rounded-xl border border-slate-200 shadow-sm"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div>
-                <span className="text-slate-400 block">ID Type</span>
-                <span className="font-semibold text-slate-200">{selectedVerification.idType}</span>
+                <span className="text-slate-500 block">ID Type</span>
+                <span className="font-semibold text-slate-800">{selectedVerification.idType}</span>
               </div>
               <div>
-                <span className="text-slate-400 block">ID Number</span>
-                <span className="font-mono font-semibold text-slate-200">{selectedVerification.idNumber}</span>
+                <span className="text-slate-500 block">ID Number</span>
+                <span className="font-mono font-semibold text-slate-800">{selectedVerification.idNumber}</span>
               </div>
             </div>
 
-            <div className="space-y-2 pt-2 border-t border-brand-border">
-              <label className="block text-xs font-semibold text-slate-300">Admin Action / Status Change</label>
+            <div className="space-y-2 pt-2 border-t border-slate-100">
+              <label className="block text-xs font-semibold text-slate-700">Admin Action / Status Change</label>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setReviewAction('APPROVE')}
                   className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     reviewAction === 'APPROVE'
-                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-md shadow-emerald-500/10'
-                      : 'bg-brand-surface border-brand-border text-slate-400'
+                      ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-sm'
+                      : 'bg-white border-slate-200 text-slate-600'
                   }`}
                 >
                   <CheckCircle2 className="w-4 h-4" /> Approve & Enable VIP
@@ -226,8 +226,8 @@ export const AdminVerificationsPage: React.FC = () => {
                   onClick={() => setReviewAction('PENDING')}
                   className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     reviewAction === 'PENDING'
-                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-md shadow-amber-500/10'
-                      : 'bg-brand-surface border-brand-border text-slate-400'
+                      ? 'bg-amber-50 border-amber-300 text-amber-700 shadow-sm'
+                      : 'bg-white border-slate-200 text-slate-600'
                   }`}
                 >
                   ⌛ Set Pending
@@ -237,8 +237,8 @@ export const AdminVerificationsPage: React.FC = () => {
                   onClick={() => setReviewAction('REJECT')}
                   className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     reviewAction === 'REJECT'
-                      ? 'bg-rose-500/20 border-rose-500/50 text-rose-400 shadow-md shadow-rose-500/10'
-                      : 'bg-brand-surface border-brand-border text-slate-400'
+                      ? 'bg-rose-50 border-rose-300 text-rose-700 shadow-sm'
+                      : 'bg-white border-slate-200 text-slate-600'
                   }`}
                 >
                   <XCircle className="w-4 h-4" /> Reject Request
@@ -256,7 +256,7 @@ export const AdminVerificationsPage: React.FC = () => {
               />
             )}
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-brand-border">
+            <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
               <Button variant="secondary" onClick={() => setSelectedVerification(null)} type="button">
                 Cancel
               </Button>

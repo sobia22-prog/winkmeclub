@@ -78,11 +78,11 @@ export const AdminDashboardPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-100 flex items-center gap-2">
-            <Activity className="w-6 h-6 text-amber-400" />
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Activity className="w-6 h-6 text-pink-600" />
             {isStaff ? `${user?.fullName || 'Staff'} — Client Command Center` : 'Platform Admin Dashboard'}
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             {isStaff
               ? 'Real-time metrics, client user activity, revenue, and transaction history for your assigned clients.'
               : 'Real-time system statistics, overall user growth, and platform revenue metrics.'}
@@ -92,7 +92,7 @@ export const AdminDashboardPage: React.FC = () => {
         {!isStaff && (
           <div className="flex items-center gap-3">
             <Link to="/admin/profile">
-              <Button variant="gold" size="sm" leftIcon={<UserIcon className="w-4 h-4" />}>
+              <Button variant="primary" size="sm" leftIcon={<UserIcon className="w-4 h-4" />}>
                 Profile Settings
               </Button>
             </Link>
@@ -100,56 +100,56 @@ export const AdminDashboardPage: React.FC = () => {
         )}
       </div>
 
-      {/* 4 KPI Cards (Total Users, Active Users, Girls Profiles, Revenue) */}
+      {/* 4 KPI Cards */}
       {stats ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title={isStaff ? 'My Total Clients' : 'Total Registered Users'}
             value={stats.totalUsers || 0}
             subtitle={isStaff ? 'Assigned client accounts' : `${stats.activeUsers || 0} Active • ${stats.vipUsers || 0} VIP Members`}
-            icon={<Users className="w-5 h-5 text-amber-400" />}
+            icon={<Users className="w-5 h-5 text-pink-600" />}
           />
           <StatCard
             title={isStaff ? 'My Active Clients' : 'Active System Users'}
             value={stats.activeUsers || 0}
             subtitle="Active accounts in good standing"
-            icon={<UserCheck className="w-5 h-5 text-emerald-400" />}
+            icon={<UserCheck className="w-5 h-5 text-emerald-600" />}
           />
           <StatCard
             title="Girls Profiles"
             value={stats.girlsProfiles || 0}
             subtitle="Curated match catalog"
-            icon={<Sparkles className="w-5 h-5 text-pink-400" />}
+            icon={<Sparkles className="w-5 h-5 text-purple-600" />}
           />
           <StatCard
             title={isStaff ? 'Client Revenue' : 'Total Revenue'}
             value={`${currencySymbol}${(stats.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
             subtitle="From approved deposit recharges"
-            icon={<DollarSign className="w-5 h-5 text-purple-400" />}
+            icon={<DollarSign className="w-5 h-5 text-pink-600" />}
           />
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Card key={i} className="h-28 bg-slate-800/50">
+            <Card key={i} className="h-28 bg-slate-100">
               <div className="h-full w-full" />
             </Card>
           ))}
         </div>
       )}
 
-      {/* 2 CHARTS SIDE-BY-SIDE ON THE SAME LINE (Line Chart 2/3 width, Bar Chart 1/3 width) */}
+      {/* 2 CHARTS SIDE-BY-SIDE */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-        {/* Chart 1: Revenue & Growth (Line Chart - 2/3 Width) */}
-        <Card className="lg:col-span-2 space-y-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-brand-border pb-3">
+        {/* Chart 1: Revenue & Growth */}
+        <Card className="lg:col-span-2 space-y-4 flex flex-col justify-between bg-white border border-slate-200">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-emerald-400" /> Revenue & Growth
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-emerald-600" /> Revenue & Growth
               </h3>
-              <p className="text-xs text-slate-400">Monthly revenue trend across the year</p>
+              <p className="text-xs text-slate-500">Monthly revenue trend across the year</p>
             </div>
-            <span className="px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-[11px] rounded-lg">
+            <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[11px] rounded-lg">
               Yearly Revenue
             </span>
           </div>
@@ -157,20 +157,20 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a3142" />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
+                <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#131722', borderColor: '#2a3142', borderRadius: '12px' }}
-                  labelStyle={{ color: '#f8fafc' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  labelStyle={{ color: '#0f172a', fontWeight: 'bold' }}
                   formatter={(val: any) => [`${currencySymbol}${Number(val).toLocaleString()}`, 'Revenue']}
                 />
                 <Line
                   type="monotone"
                   dataKey="Revenue"
-                  stroke="#10b981"
+                  stroke="#ec4899"
                   strokeWidth={3}
-                  dot={{ r: 4, fill: '#10b981' }}
+                  dot={{ r: 4, fill: '#ec4899' }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -178,16 +178,16 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
         </Card>
 
-        {/* Chart 2: New Users (Bar Chart - 1/3 Width) */}
-        <Card className="lg:col-span-1 space-y-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-brand-border pb-3">
+        {/* Chart 2: New Users */}
+        <Card className="lg:col-span-1 space-y-4 flex flex-col justify-between bg-white border border-slate-200">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-base font-extrabold text-slate-100 flex items-center gap-2">
-                <Users className="w-5 h-5 text-amber-400" /> New Users
+              <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-pink-600" /> New Users
               </h3>
-              <p className="text-xs text-slate-400">Monthly new user acquisition</p>
+              <p className="text-xs text-slate-500">Monthly new user acquisition</p>
             </div>
-            <span className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-[11px] rounded-lg">
+            <span className="px-2.5 py-1 bg-pink-50 border border-pink-200 text-pink-700 font-bold text-[11px] rounded-lg">
               User Signups
             </span>
           </div>
@@ -195,15 +195,15 @@ export const AdminDashboardPage: React.FC = () => {
           <div className="h-72 w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#2a3142" />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
+                <YAxis stroke="#64748b" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#131722', borderColor: '#2a3142', borderRadius: '12px' }}
-                  labelStyle={{ color: '#f8fafc' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                  labelStyle={{ color: '#0f172a', fontWeight: 'bold' }}
                   formatter={(val: any) => [val, 'New Users']}
                 />
-                <Bar dataKey="NewUsers" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="NewUsers" fill="#9333ea" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -211,12 +211,12 @@ export const AdminDashboardPage: React.FC = () => {
       </div>
 
       {/* Recent Transactions Table */}
-      <Card className="space-y-4">
-        <div className="flex items-center justify-between border-b border-brand-border pb-3">
-          <h3 className="text-base font-bold text-slate-100">
+      <Card className="space-y-4 bg-white border border-slate-200">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 className="text-base font-bold text-slate-900">
             {isStaff ? 'Recent Client Transactions' : 'Recent System Transactions'}
           </h3>
-          <span className="text-xs text-slate-400">Latest 8 entries</span>
+          <span className="text-xs text-slate-500">Latest 8 entries</span>
         </div>
 
         {recentTransactions.length === 0 ? (
@@ -224,9 +224,9 @@ export const AdminDashboardPage: React.FC = () => {
         ) : (
           <Table headers={['Transaction ID', 'Client Name', 'Type', 'Amount', 'Description', 'Date']}>
             {recentTransactions.map((tx) => (
-              <tr key={tx._id} className="hover:bg-brand-card/50 transition-colors">
-                <td className="px-5 py-3 font-mono font-bold text-slate-200">{tx.transactionId}</td>
-                <td className="px-5 py-3 text-slate-200 font-semibold">
+              <tr key={tx._id} className="hover:bg-slate-50 transition-colors">
+                <td className="px-5 py-3 font-mono font-bold text-slate-900">{tx.transactionId}</td>
+                <td className="px-5 py-3 text-slate-800 font-semibold">
                   {tx.userId && typeof tx.userId === 'object' ? (tx.userId as any).fullName : 'User / Deleted'}
                 </td>
                 <td className="px-5 py-3">
@@ -234,10 +234,10 @@ export const AdminDashboardPage: React.FC = () => {
                     {tx.type}
                   </Badge>
                 </td>
-                <td className="px-5 py-3 font-bold text-amber-400">
+                <td className="px-5 py-3 font-bold text-pink-600">
                   {currencySymbol}{Math.abs(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                 </td>
-                <td className="px-5 py-3 text-xs text-slate-400 max-w-xs truncate">{tx.description}</td>
+                <td className="px-5 py-3 text-xs text-slate-600 max-w-xs truncate">{tx.description}</td>
                 <td className="px-5 py-3 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}

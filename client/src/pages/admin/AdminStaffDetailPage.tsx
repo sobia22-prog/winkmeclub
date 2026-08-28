@@ -122,24 +122,24 @@ export const AdminStaffDetailPage: React.FC = () => {
           Back to Staff Directory
         </Button>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-amber-500/10 border border-amber-500/40 rounded-full font-mono text-xs font-bold text-amber-400 shadow-lg shadow-amber-500/5">
-          <Key className="w-3.5 h-3.5" /> Code: {staff.invitationCode || 'N/A'}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-pink-50 border border-pink-200 rounded-full font-mono text-xs font-bold text-pink-700 shadow-sm">
+          <Key className="w-3.5 h-3.5 text-pink-600" /> Code: {staff.invitationCode || 'N/A'}
         </div>
       </div>
 
       {/* Staff Header Profile Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-950/40 via-brand-surface to-brand-surface border border-amber-500/30 p-6 md:p-8 space-y-6 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 md:p-8 space-y-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500/20 to-amber-500/10 border-2 border-amber-500/40 text-amber-400 flex items-center justify-center font-black text-2xl shadow-xl shrink-0">
+            <div className="w-16 h-16 rounded-2xl bg-pink-50 border-2 border-pink-200 text-pink-600 flex items-center justify-center font-black text-2xl shadow-sm shrink-0">
               {staff.fullName?.charAt(0).toUpperCase() || 'S'}
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-black text-slate-100">{staff.fullName || 'Staff Member'}</h1>
+                <h1 className="text-2xl font-black text-slate-900">{staff.fullName || 'Staff Member'}</h1>
                 {staff.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE STAFF</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 {staff.email} {staff.phone ? `• ${staff.phone}` : ''}
               </p>
               <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
@@ -150,42 +150,42 @@ export const AdminStaffDetailPage: React.FC = () => {
         </div>
 
         {/* Overview Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-brand-border/60">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
           <StatCard
             title="Assigned Clients"
             value={stats.clientCount}
             subtitle="Directly linked members"
-            icon={<Users className="w-5 h-5 text-amber-400" />}
+            icon={<Users className="w-5 h-5 text-pink-600" />}
           />
           <StatCard
             title="Total Client Revenue"
             value={`${currencySymbol}${(stats.totalApprovedRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
             subtitle="From approved deposits"
-            icon={<DollarSign className="w-5 h-5 text-emerald-400" />}
+            icon={<DollarSign className="w-5 h-5 text-emerald-600" />}
           />
           <StatCard
             title="Client Trade Volume"
             value={`${currencySymbol}${(stats.totalTradeVolume || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`}
             subtitle="Across settled trades"
-            icon={<TrendingUp className="w-5 h-5 text-purple-400" />}
+            icon={<TrendingUp className="w-5 h-5 text-purple-600" />}
           />
           <StatCard
             title="Total Trade Orders"
             value={stats.tradesCount}
             subtitle="Executed trade orders"
-            icon={<Activity className="w-5 h-5 text-cyan-400" />}
+            icon={<Activity className="w-5 h-5 text-sky-600" />}
           />
         </div>
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-brand-border overflow-x-auto pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200 overflow-x-auto pb-2">
         <button
           onClick={() => setActiveTab('clients')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'clients'
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-brand-card'
+              ? 'bg-pink-600 text-white shadow-md'
+              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <Users className="w-4 h-4" /> Associated Clients ({clients.length})
@@ -195,8 +195,8 @@ export const AdminStaffDetailPage: React.FC = () => {
           onClick={() => setActiveTab('trades')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'trades'
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-brand-card'
+              ? 'bg-pink-600 text-white shadow-md'
+              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <TrendingUp className="w-4 h-4" /> All Client Trades ({trades.length})
@@ -206,8 +206,8 @@ export const AdminStaffDetailPage: React.FC = () => {
           onClick={() => setActiveTab('recharges')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'recharges'
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-brand-card'
+              ? 'bg-pink-600 text-white shadow-md'
+              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <ArrowDownRight className="w-4 h-4" /> Recharges ({recharges.length})
@@ -217,8 +217,8 @@ export const AdminStaffDetailPage: React.FC = () => {
           onClick={() => setActiveTab('withdrawals')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'withdrawals'
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-brand-card'
+              ? 'bg-pink-600 text-white shadow-md'
+              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <ArrowUpRight className="w-4 h-4" /> Withdrawals ({withdrawals.length})
@@ -228,8 +228,8 @@ export const AdminStaffDetailPage: React.FC = () => {
           onClick={() => setActiveTab('transactions')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
             activeTab === 'transactions'
-              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-brand-card'
+              ? 'bg-pink-600 text-white shadow-md'
+              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
           }`}
         >
           <History className="w-4 h-4" /> Transaction Ledger ({transactions.length})
@@ -246,36 +246,36 @@ export const AdminStaffDetailPage: React.FC = () => {
           ) : (
             <Table headers={['Client Name & Email', 'City', 'Status', 'VIP Status', 'Available Balance', 'Frozen Balance', 'Action']}>
               {clients.map((c: any) => (
-                <tr key={c._id || c.id} className="hover:bg-brand-card/50 transition-colors">
+                <tr key={c._id || c.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
                       <img
                         src={c.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'}
                         alt={c.fullName}
-                        className="w-9 h-9 rounded-full object-cover border border-brand-border shrink-0"
+                        className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
                       />
                       <div>
-                        <div className="text-xs font-bold text-slate-100">{c.fullName}</div>
-                        <div className="text-[11px] text-slate-400">{c.email}</div>
+                        <div className="text-xs font-bold text-slate-900">{c.fullName}</div>
+                        <div className="text-[11px] text-slate-500">{c.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-xs text-slate-300 font-medium">{c.city || 'Mumbai'}</td>
+                  <td className="px-5 py-3 text-xs text-slate-700 font-medium">{c.city || 'Mumbai'}</td>
                   <td className="px-5 py-3">
                     {c.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
                   </td>
                   <td className="px-5 py-3">
                     {c.isVIP ? <Badge variant="vip">VIP CLUB</Badge> : <Badge variant="neutral">REGULAR</Badge>}
                   </td>
-                  <td className="px-5 py-3 font-bold text-emerald-400 text-xs">
+                  <td className="px-5 py-3 font-bold text-emerald-600 text-xs">
                     ₹{(c.wallet?.availableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-5 py-3 font-bold text-amber-400 text-xs">
+                  <td className="px-5 py-3 font-bold text-pink-600 text-xs">
                     ₹{(c.wallet?.frozenBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
                   <td className="px-5 py-3">
                     <Button
-                      variant="gold"
+                      variant="primary"
                       size="sm"
                       leftIcon={<Eye className="w-3.5 h-3.5" />}
                       onClick={() => setSelectedClient(c)}
@@ -305,51 +305,51 @@ export const AdminStaffDetailPage: React.FC = () => {
                 const payoutAmt = t.payoutAmount || (isWin ? t.totalAmount + profitAmt : isLose ? 0 : t.totalAmount);
 
                 return (
-                  <tr key={t._id} className="hover:bg-brand-card/50 transition-colors">
-                    <td className="px-5 py-3 font-mono font-bold text-slate-200">
+                  <tr key={t._id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-5 py-3 font-mono font-bold text-slate-900">
                       <div>{t.tradeId}</div>
                       <div className="text-[10px] text-slate-500 font-normal">{new Date(t.createdAt).toLocaleDateString()}</div>
                     </td>
-                    <td className="px-5 py-3 font-semibold text-slate-200">
+                    <td className="px-5 py-3 font-semibold text-slate-800">
                       {t.userId && typeof t.userId === 'object' ? (t.userId as any).fullName || 'Client' : 'Client'}
                     </td>
-                    <td className="px-5 py-3 text-slate-300 font-medium">
+                    <td className="px-5 py-3 text-slate-700 font-medium">
                       <div className="flex items-center gap-2">
                         {t.productImage && (
-                          <img src={t.productImage} alt={t.productName} className="w-7 h-7 rounded-lg object-cover border border-brand-border shrink-0" />
+                          <img src={t.productImage} alt={t.productName} className="w-7 h-7 rounded-lg object-cover border border-slate-200 shrink-0" />
                         )}
                         <span>{t.productName}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-3 text-slate-300 font-bold">x{t.quantity}</td>
-                    <td className="px-5 py-3 font-bold text-slate-100">
+                    <td className="px-5 py-3 text-slate-700 font-bold">x{t.quantity}</td>
+                    <td className="px-5 py-3 font-bold text-slate-900">
                       ₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </td>
                     <td className="px-5 py-3">
                       {isWin ? (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-500/50 rounded-xl text-xs font-black text-emerald-400 shadow-md shadow-emerald-500/10">
-                          <TrendingUp className="w-4 h-4 text-emerald-400 animate-pulse" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-black text-emerald-700 shadow-sm">
+                          <TrendingUp className="w-4 h-4 text-emerald-600" />
                           <span>▲ WIN (+{profitPct}%)</span>
                         </div>
                       ) : isLose ? (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/20 border border-rose-500/50 rounded-xl text-xs font-black text-rose-400 shadow-md shadow-rose-500/10">
-                          <TrendingDown className="w-4 h-4 text-rose-400" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 border border-rose-200 rounded-xl text-xs font-black text-rose-700 shadow-sm">
+                          <TrendingDown className="w-4 h-4 text-rose-600" />
                           <span>▼ LOSE (-100%)</span>
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-500/50 rounded-xl text-xs font-bold text-amber-400">
-                          <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200 rounded-xl text-xs font-bold text-amber-700">
+                          <Clock className="w-3.5 h-3.5 text-amber-600" />
                           <span>⏳ IN PROGRESS</span>
                         </div>
                       )}
                     </td>
                     <td className="px-5 py-3 font-extrabold text-xs">
                       {isWin ? (
-                        <span className="text-emerald-400">+₹{payoutAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-emerald-600">+₹{payoutAmt.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                       ) : isLose ? (
-                        <span className="text-rose-400">-₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-rose-600">-₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                       ) : (
-                        <span className="text-amber-400">₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} (Staked)</span>
+                        <span className="text-amber-600">₹{t.totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })} (Staked)</span>
                       )}
                     </td>
                     <td className="px-5 py-3">
@@ -371,16 +371,16 @@ export const AdminStaffDetailPage: React.FC = () => {
           ) : (
             <Table headers={['Request ID', 'Client Name', 'Amount', 'Method', 'Reference', 'Status', 'Date']}>
               {recharges.map((r: any) => (
-                <tr key={r._id} className="hover:bg-brand-card/50 transition-colors">
-                  <td className="px-5 py-3 font-mono font-bold text-slate-200">{r.requestId}</td>
-                  <td className="px-5 py-3 font-semibold text-slate-200">
+                <tr key={r._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-3 font-mono font-bold text-slate-900">{r.requestId}</td>
+                  <td className="px-5 py-3 font-semibold text-slate-800">
                     {r.userId && typeof r.userId === 'object' ? (r.userId as any).fullName || 'Client' : 'Client'}
                   </td>
-                  <td className="px-5 py-3 font-bold text-emerald-400">
+                  <td className="px-5 py-3 font-bold text-emerald-600">
                     +₹{r.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-5 py-3 text-xs text-slate-300">{r.paymentMethod}</td>
-                  <td className="px-5 py-3 font-mono text-xs text-slate-400">{r.referenceNumber}</td>
+                  <td className="px-5 py-3 text-xs text-slate-700">{r.paymentMethod}</td>
+                  <td className="px-5 py-3 font-mono text-xs text-slate-600">{r.referenceNumber}</td>
                   <td className="px-5 py-3">
                     {r.status === 'APPROVED' ? (
                       <Badge variant="success">APPROVED</Badge>
@@ -390,7 +390,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                       <Badge variant="warning">PENDING</Badge>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-xs text-slate-400">{new Date(r.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 text-xs text-slate-500">{new Date(r.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
             </Table>
@@ -406,15 +406,15 @@ export const AdminStaffDetailPage: React.FC = () => {
           ) : (
             <Table headers={['Request ID', 'Client Name', 'Amount', 'Payout Details', 'Status', 'Date']}>
               {withdrawals.map((w: any) => (
-                <tr key={w._id} className="hover:bg-brand-card/50 transition-colors">
-                  <td className="px-5 py-3 font-mono font-bold text-slate-200">{w.requestId}</td>
-                  <td className="px-5 py-3 font-semibold text-slate-200">
+                <tr key={w._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-3 font-mono font-bold text-slate-900">{w.requestId}</td>
+                  <td className="px-5 py-3 font-semibold text-slate-800">
                     {w.userId && typeof w.userId === 'object' ? (w.userId as any).fullName || 'Client' : 'Client'}
                   </td>
-                  <td className="px-5 py-3 font-bold text-rose-400">
+                  <td className="px-5 py-3 font-bold text-rose-600">
                     -₹{w.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-5 py-3 text-xs text-slate-300">
+                  <td className="px-5 py-3 text-xs text-slate-700">
                     {w.bankName ? `${w.bankName} (${w.accountNumber})` : w.upiId || 'Bank Transfer'}
                   </td>
                   <td className="px-5 py-3">
@@ -426,7 +426,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                       <Badge variant="warning">PENDING</Badge>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-xs text-slate-400">{new Date(w.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 text-xs text-slate-500">{new Date(w.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
             </Table>
@@ -442,9 +442,9 @@ export const AdminStaffDetailPage: React.FC = () => {
           ) : (
             <Table headers={['Transaction ID', 'Client Name', 'Type', 'Amount', 'Description', 'Timestamp']}>
               {transactions.map((tx: any) => (
-                <tr key={tx._id} className="hover:bg-brand-card/50 transition-colors">
-                  <td className="px-5 py-3 font-mono font-bold text-slate-200">{tx.transactionId}</td>
-                  <td className="px-5 py-3 font-semibold text-slate-200">
+                <tr key={tx._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-3 font-mono font-bold text-slate-900">{tx.transactionId}</td>
+                  <td className="px-5 py-3 font-semibold text-slate-800">
                     {tx.userId && typeof tx.userId === 'object' ? (tx.userId as any).fullName || 'Client' : 'Client'}
                   </td>
                   <td className="px-5 py-3">
@@ -452,10 +452,10 @@ export const AdminStaffDetailPage: React.FC = () => {
                       {tx.type}
                     </Badge>
                   </td>
-                  <td className="px-5 py-3 font-bold text-amber-400">
+                  <td className="px-5 py-3 font-bold text-pink-600">
                     ₹{Math.abs(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </td>
-                  <td className="px-5 py-3 text-xs text-slate-400 max-w-xs truncate">{tx.description}</td>
+                  <td className="px-5 py-3 text-xs text-slate-700 max-w-xs truncate">{tx.description}</td>
                   <td className="px-5 py-3 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleString()}</td>
                 </tr>
               ))}

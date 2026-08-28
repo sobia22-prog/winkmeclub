@@ -49,24 +49,24 @@ export const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-dark flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-brand-surface border border-amber-500/30 rounded-3xl p-8 shadow-2xl space-y-6">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-purple-900/5 space-y-6">
         <div className="text-center space-y-2">
           {settings.projectImage ? (
             <img
               src={settings.projectImage}
               alt={currentAppName}
-              className="w-16 h-16 rounded-2xl mx-auto object-cover border-2 border-amber-500/40 shadow-xl"
+              className="w-16 h-16 rounded-2xl mx-auto object-cover border-2 border-pink-200 shadow-md"
             />
           ) : (
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/40 text-amber-400 mx-auto flex items-center justify-center shadow-lg shadow-amber-500/10">
+            <div className="w-14 h-14 rounded-2xl bg-pink-50 border border-pink-200 text-pink-600 mx-auto flex items-center justify-center shadow-md shadow-pink-500/10">
               <ShieldAlert className="w-7 h-7" />
             </div>
           )}
-          <h2 className="text-2xl font-bold text-slate-100">Admin Command Center</h2>
-          <p className="text-xs text-slate-400">{currentAppName} Administrative Portal</p>
+          <h2 className="text-2xl font-black text-slate-900">Admin Command Center</h2>
+          <p className="text-xs text-slate-500">{currentAppName} Administrative Portal</p>
         </div>
 
-        {error && <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400 text-center">{error}</div>}
+        {error && <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600 text-center font-medium">{error}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
@@ -75,7 +75,7 @@ export const AdminLoginPage: React.FC = () => {
             placeholder="admin@domain.com or admin"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            leftIcon={<Mail className="w-4 h-4" />}
+            leftIcon={<Mail className="w-4 h-4 text-slate-400" />}
             required
           />
           <Input
@@ -84,11 +84,11 @@ export const AdminLoginPage: React.FC = () => {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            leftIcon={<Lock className="w-4 h-4" />}
+            leftIcon={<Lock className="w-4 h-4 text-slate-400" />}
             required
           />
 
-          <Button type="submit" variant="gold" className="w-full" isLoading={loading}>
+          <Button type="submit" variant="primary" className="w-full font-bold" isLoading={loading}>
             Authenticate Admin
           </Button>
         </form>

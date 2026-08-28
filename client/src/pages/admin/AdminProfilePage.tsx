@@ -94,44 +94,44 @@ export const AdminProfilePage: React.FC = () => {
   return (
     <div className="w-full space-y-6">
       {/* Page Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <Sliders className="w-6 h-6 text-amber-400" /> Admin & Website Profile Settings
+          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+            <Sliders className="w-6 h-6 text-pink-600" /> Admin & Website Profile Settings
           </h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             Configure global website settings, default currency, branding logo, maintenance mode, and admin security credentials.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-xs font-bold text-amber-400 shrink-0">
-          <ShieldCheck className="w-4 h-4 text-amber-400" /> {adminUser?.role === 'STAFF' ? 'STAFF MEMBER ACCESS' : 'SUPER ADMIN ACCESS'}
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 border border-pink-200 rounded-full text-xs font-bold text-pink-700 shrink-0">
+          <ShieldCheck className="w-4 h-4 text-pink-600" /> {adminUser?.role === 'STAFF' ? 'STAFF MEMBER ACCESS' : 'SUPER ADMIN ACCESS'}
         </div>
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-xs text-emerald-400 flex items-center justify-between shadow-lg">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-700 font-semibold flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> {message}
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {message}
           </div>
-          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setMessage('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400 flex items-center justify-between">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold shadow-sm flex items-center justify-between">
           <span>{error}</span>
-          <button onClick={() => setError('')} className="text-slate-400 hover:text-white">✕</button>
+          <button onClick={() => setError('')} className="text-slate-400 hover:text-slate-700">✕</button>
         </div>
       )}
 
-      {/* SECTION 1: GENERAL SETTINGS (Matching Video Screenshot) */}
-      <Card className="p-6 md:p-8 space-y-6 w-full bg-brand-surface border border-amber-500/30 shadow-2xl">
-        <div className="border-b border-brand-border pb-3">
-          <h2 className="text-lg font-black text-slate-100 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-amber-400" /> General Settings
+      {/* SECTION 1: GENERAL SETTINGS */}
+      <Card className="p-6 md:p-8 space-y-6 w-full bg-white border border-slate-200 shadow-sm">
+        <div className="border-b border-slate-100 pb-3">
+          <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+            <Globe className="w-5 h-5 text-pink-600" /> General Settings
           </h2>
-          <p className="text-xs text-slate-400">Global brand configuration applied throughout user, staff, and admin panels.</p>
+          <p className="text-xs text-slate-500">Global brand configuration applied throughout user, staff, and admin panels.</p>
         </div>
 
         <form onSubmit={handleSaveGeneralSettings} className="space-y-6 w-full text-xs">
@@ -142,18 +142,18 @@ export const AdminProfilePage: React.FC = () => {
               placeholder="Wink Me Club"
               value={appName}
               onChange={(e) => setAppName(e.target.value)}
-              leftIcon={<Globe className="w-4 h-4 text-amber-400" />}
+              leftIcon={<Globe className="w-4 h-4 text-pink-600" />}
               required
             />
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                <DollarSign className="w-3.5 h-3.5 text-amber-400" /> Default Currency
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5 text-pink-600" /> Default Currency
               </label>
               <select
                 value={defaultCurrency}
                 onChange={(e) => setDefaultCurrency(e.target.value as any)}
-                className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2.5 text-slate-100 text-xs font-bold focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs font-bold focus:outline-none focus:border-pink-500 transition-colors shadow-sm"
               >
                 <option value="INR">INR (₹)</option>
                 <option value="EUR">EUR (€)</option>
@@ -164,10 +164,10 @@ export const AdminProfilePage: React.FC = () => {
 
           {/* Project Image (Logo) with Upload Image & Remove buttons */}
           <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-amber-400" /> Project Image
+            <label className="block text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+              <ImageIcon className="w-3.5 h-3.5 text-pink-600" /> Project Image
             </label>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500">
               Logo shown on login, user dashboard, and admin sidebar. Recommended: square PNG/JPG, at least 128x128.
             </p>
 
@@ -181,12 +181,12 @@ export const AdminProfilePage: React.FC = () => {
           </div>
 
           {/* Maintenance Mode Toggle Checkbox */}
-          <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-between gap-4">
+          <div className="p-4 bg-pink-50/50 border border-pink-100 rounded-2xl flex items-center justify-between gap-4">
             <div className="space-y-0.5">
-              <span className="text-xs font-black text-amber-400 flex items-center gap-1.5">
-                <Wrench className="w-4 h-4 text-amber-400" /> Maintenance Mode
+              <span className="text-xs font-black text-pink-700 flex items-center gap-1.5">
+                <Wrench className="w-4 h-4 text-pink-600" /> Maintenance Mode
               </span>
-              <p className="text-[11px] text-slate-300">
+              <p className="text-[11px] text-slate-600 font-medium">
                 Disable the app for all users temporarily during maintenance upgrades.
               </p>
             </div>
@@ -198,7 +198,7 @@ export const AdminProfilePage: React.FC = () => {
                 onChange={(e) => setMaintenanceMode(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
             </label>
           </div>
 
@@ -210,18 +210,18 @@ export const AdminProfilePage: React.FC = () => {
               placeholder="support@winkmeclub.com"
               value={supportEmail}
               onChange={(e) => setSupportEmail(e.target.value)}
-              leftIcon={<Mail className="w-4 h-4 text-amber-400" />}
+              leftIcon={<Mail className="w-4 h-4 text-pink-600" />}
               required
             />
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
-                <Languages className="w-3.5 h-3.5 text-amber-400" /> Default Language
+              <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                <Languages className="w-3.5 h-3.5 text-pink-600" /> Default Language
               </label>
               <select
                 value={defaultLanguage}
                 onChange={(e) => setDefaultLanguage(e.target.value as any)}
-                className="w-full bg-brand-dark border border-brand-border rounded-xl px-3 py-2.5 text-slate-100 text-xs font-bold focus:outline-none focus:border-amber-500 transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-slate-900 text-xs font-bold focus:outline-none focus:border-pink-500 transition-colors shadow-sm"
               >
                 <option value="English">English</option>
                 <option value="Hindi">Hindi (हिंदी)</option>
@@ -232,8 +232,8 @@ export const AdminProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end border-t border-brand-border">
-            <Button variant="gold" type="submit" isLoading={savingGeneral}>
+          <div className="pt-2 flex justify-end border-t border-slate-100">
+            <Button variant="primary" type="submit" isLoading={savingGeneral}>
               Save General Settings
             </Button>
           </div>
@@ -241,12 +241,12 @@ export const AdminProfilePage: React.FC = () => {
       </Card>
 
       {/* SECTION 2: ADMIN CREDENTIALS */}
-      <Card className="p-6 md:p-8 space-y-6 w-full bg-brand-surface border border-brand-border">
-        <div className="border-b border-brand-border pb-3">
-          <h2 className="text-lg font-black text-slate-100 flex items-center gap-2">
-            <User className="w-5 h-5 text-amber-400" /> {adminUser?.role === 'STAFF' ? 'Staff Profile Credentials' : 'Admin Profile Credentials'}
+      <Card className="p-6 md:p-8 space-y-6 w-full bg-white border border-slate-200 shadow-sm">
+        <div className="border-b border-slate-100 pb-3">
+          <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+            <User className="w-5 h-5 text-pink-600" /> {adminUser?.role === 'STAFF' ? 'Staff Profile Credentials' : 'Admin Profile Credentials'}
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500">
             {adminUser?.role === 'STAFF' ? 'Manage your staff display name, login email, and security password.' : 'Manage administrator display name, login email, and security password.'}
           </p>
         </div>
@@ -256,7 +256,7 @@ export const AdminProfilePage: React.FC = () => {
             label="Display Name / Full Name"
             value={credForm.fullName}
             onChange={(e) => setCredForm({ ...credForm, fullName: e.target.value })}
-            leftIcon={<User className="w-4 h-4 text-amber-400" />}
+            leftIcon={<User className="w-4 h-4 text-pink-600" />}
             required
           />
 
@@ -265,7 +265,7 @@ export const AdminProfilePage: React.FC = () => {
             type="email"
             value={credForm.email}
             onChange={(e) => setCredForm({ ...credForm, email: e.target.value })}
-            leftIcon={<Mail className="w-4 h-4 text-amber-400" />}
+            leftIcon={<Mail className="w-4 h-4 text-pink-600" />}
             required
           />
 
@@ -275,10 +275,10 @@ export const AdminProfilePage: React.FC = () => {
             placeholder="Enter new password..."
             value={credForm.password}
             onChange={(e) => setCredForm({ ...credForm, password: e.target.value })}
-            leftIcon={<Lock className="w-4 h-4 text-amber-400" />}
+            leftIcon={<Lock className="w-4 h-4 text-pink-600" />}
           />
 
-          <div className="pt-2 flex justify-end border-t border-brand-border">
+          <div className="pt-2 flex justify-end border-t border-slate-100">
             <Button variant="secondary" type="submit" isLoading={savingCreds}>
               Save Profile Credentials
             </Button>
