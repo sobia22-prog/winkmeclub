@@ -72,7 +72,6 @@ export const StaffLoginPage: React.FC = () => {
           <Input
             label="Staff Username"
             type="text"
-            placeholder="e.g. moon"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             leftIcon={<UserCheck className="w-4 h-4 text-slate-400" />}
