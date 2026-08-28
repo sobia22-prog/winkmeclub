@@ -16,6 +16,7 @@ import {
   LogOut,
   UserCheck,
   Sparkles,
+  Heart,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSystemSettings } from '../contexts/SystemSettingsContext';
@@ -28,14 +29,14 @@ export const AdminSidebar: React.FC = () => {
   const adminNavItems = isStaff
     ? [
         { label: t('dashboard'), path: '/staff/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-        { label: t('girlsProfiles'), path: '/staff/girls', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
+        { label: t('girlsProfiles'), path: '/staff/girls', icon: <Heart className="w-4 h-4" /> },
         { label: t('users'), path: '/staff/users', icon: <Users className="w-4 h-4" /> },
         { label: t('tradeRequests'), path: '/staff/trades', icon: <TrendingUp className="w-4 h-4" /> },
         { label: t('verification'), path: '/staff/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
       ]
     : [
         { label: t('dashboard'), path: '/admin/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
-        { label: t('girlsProfiles'), path: '/admin/girls', icon: <Sparkles className="w-4 h-4 text-amber-400" /> },
+        { label: t('girlsProfiles'), path: '/admin/girls', icon: <Heart className="w-4 h-4" /> },
         { label: t('staffMembers'), path: '/admin/staff', icon: <UserCheck className="w-4 h-4" /> },
         { label: t('users'), path: '/admin/users', icon: <Users className="w-4 h-4" /> },
         { label: t('tradeRequests'), path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },

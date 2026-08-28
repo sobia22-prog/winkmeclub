@@ -208,7 +208,7 @@ export const AdminGirlProfilesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-pink-600" /> Girls Profile Management
+            <Heart className="w-6 h-6 text-pink-600" /> Girls Profile Management
           </h1>
           <p className="text-xs text-slate-500">
             CRUD curated girl profiles shown to members on the Home feed and Match discovery cards.
