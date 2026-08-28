@@ -18,9 +18,11 @@ export const AdminUserDetailPage: React.FC = () => {
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (id) {
+      setError('');
       adminService
         .getUserDetail(id)
         .then((res) => {
@@ -28,13 +30,27 @@ export const AdminUserDetailPage: React.FC = () => {
             setData(res.data.data || res.data);
           }
         })
-        .catch((err) => console.error(err))
+        .catch((err: any) => {
+          console.error(err);
+          setError(err.response?.data?.message || 'Failed to fetch user details.');
+        })
         .finally(() => setLoading(false));
     }
   }, [id]);
 
   if (loading) return <Card className="p-8 text-center text-xs text-slate-500">Loading user details...</Card>;
-  if (!data || !data.user) return <Card className="p-8 text-center text-xs text-slate-500">User not found.</Card>;
+  if (error || !data || !data.user) {
+    return (
+      <div className="space-y-4">
+        <Link to={usersListPath} className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50">
+          <ArrowLeft className="w-4 h-4" /> Back to User Directory
+        </Link>
+        <Card className="p-8 text-center text-xs text-rose-600 bg-rose-50 border border-rose-200">
+          {error || 'User profile not found.'}
+        </Card>
+      </div>
+    );
+  }
 
   const { user, wallet = { availableBalance: 0, frozenBalance: 0, totalBalance: 0 }, transactions = [], recharges = [], withdrawals = [], trades = [] } = data;
 

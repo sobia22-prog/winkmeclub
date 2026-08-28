@@ -30,6 +30,14 @@ const getScopedClientIds = async (req: AuthRequest): Promise<any[] | null> => {
   return null;
 };
 
+const getStaffId = (assignedStaff: any): string | null => {
+  if (!assignedStaff) return null;
+  if (typeof assignedStaff === 'object' && assignedStaff._id) {
+    return String(assignedStaff._id);
+  }
+  return String(assignedStaff);
+};
+
 export class AdminController {
   // 1. Dashboard KPIs & Charts Data
   static async getDashboardStats(req: AuthRequest, res: Response) {
@@ -211,7 +219,7 @@ export class AdminController {
         .populate('assignedStaff', 'fullName email invitationCode');
       if (!user) return res.status(404).json({ message: 'User not found' });
 
-      if (req.user?.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user?.role === 'STAFF' && getStaffId(user.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized. This client is not assigned to your staff account.' });
       }
 
@@ -305,7 +313,7 @@ export class AdminController {
       const user = await User.findById(req.params.id);
       if (!user) return res.status(404).json({ message: 'User not found.' });
 
-      if (req.user?.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user?.role === 'STAFF' && getStaffId(user.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized. This client is not assigned to your staff account.' });
       }
 
@@ -385,7 +393,7 @@ export class AdminController {
       const user = await User.findById(targetUserId);
       if (!user) return res.status(404).json({ message: 'User not found' });
 
-      if (req.user.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user.role === 'STAFF' && getStaffId(user.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized to adjust balance for this client.' });
       }
 
@@ -423,7 +431,7 @@ export class AdminController {
       const user = await User.findById(req.params.id);
       if (!user) return res.status(404).json({ message: 'User not found' });
 
-      if (req.user.role === 'STAFF' && user.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user.role === 'STAFF' && getStaffId(user.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized to toggle status for this client.' });
       }
 
@@ -495,7 +503,7 @@ export class AdminController {
       }
 
       const targetUser = await User.findById(recharge.userId);
-      if (req.user.role === 'STAFF' && targetUser?.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user.role === 'STAFF' && getStaffId(targetUser?.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized to review recharge for this client.' });
       }
 
@@ -555,7 +563,7 @@ export class AdminController {
       }
 
       const targetUser = await User.findById(withdrawal.userId);
-      if (req.user.role === 'STAFF' && targetUser?.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user.role === 'STAFF' && getStaffId(targetUser?.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized to review withdrawal for this client.' });
       }
 
@@ -620,7 +628,7 @@ export class AdminController {
       }
 
       const targetUser = await User.findById(trade.userId);
-      if (req.user.role === 'STAFF' && targetUser?.assignedStaff?.toString() !== req.user._id.toString()) {
+      if (req.user.role === 'STAFF' && getStaffId(targetUser?.assignedStaff) !== String(req.user._id)) {
         return res.status(403).json({ message: 'Unauthorized to settle trade for this client.' });
       }
 
