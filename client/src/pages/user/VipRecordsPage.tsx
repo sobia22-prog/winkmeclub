@@ -5,7 +5,7 @@ import { Trade } from '../../types';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
-import { CreditCard, ArrowLeft, Clock, Award, CheckCircle2 } from 'lucide-react';
+import { Gift, ArrowLeft, Clock, Award, CheckCircle2 } from 'lucide-react';
 
 export const VipRecordsPage: React.FC = () => {
   const { settings } = useSystemSettings();
@@ -36,9 +36,9 @@ export const VipRecordsPage: React.FC = () => {
           </Link>
           <div>
             <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-pink-600" /> VIP Records
+              <Gift className="w-5 h-5 text-pink-600" /> Gift Records
             </h1>
-            <p className="text-[11px] text-slate-500 font-medium font-mono">Airborne round trade activity log</p>
+            <p className="text-[11px] text-slate-500 font-medium font-mono">Airborne round gift & trade activity log</p>
           </div>
         </div>
 
@@ -49,16 +49,16 @@ export const VipRecordsPage: React.FC = () => {
       <Card className="p-5 space-y-4 bg-white border border-slate-200 rounded-3xl shadow-sm min-h-[350px]">
         <div className="flex items-center gap-2 pb-3 border-b border-slate-200">
           <span className="px-3 py-1 bg-pink-50 text-pink-700 rounded-lg text-xs font-extrabold border border-pink-200">
-            VIP
+            Gift Records
           </span>
         </div>
 
         {loading ? (
-          <p className="text-center text-xs text-slate-500 py-10">Loading VIP trade records...</p>
+          <p className="text-center text-xs text-slate-500 py-10">Loading gift records...</p>
         ) : trades.length === 0 ? (
           <div className="text-center text-xs text-slate-500 py-12 space-y-2">
-            <CreditCard className="w-10 h-10 text-slate-400 mx-auto" />
-            <p>No VIP trade records found yet.</p>
+            <Gift className="w-10 h-10 text-slate-400 mx-auto" />
+            <p>No gift records found yet.</p>
           </div>
         ) : (
           <div className="space-y-4">

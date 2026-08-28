@@ -21,6 +21,7 @@ import {
   LogOut,
   FileText,
   CreditCard,
+  Gift,
   History,
 } from 'lucide-react';
 
@@ -154,13 +155,13 @@ export const ProfilePage: React.FC = () => {
             </span>
           </Link>
 
-          {/* Item 3: VIP Records */}
-          <Link to="/profile/vip-records" className="flex flex-col items-center gap-2 group">
+          {/* Item 3: Gift Records */}
+          <Link to="/profile/gift-records" className="flex flex-col items-center gap-2 group">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
-              <CreditCard className="w-6 h-6" />
+              <Gift className="w-6 h-6" />
             </div>
             <span className="text-xs font-bold text-slate-800 group-hover:text-amber-600 transition-colors">
-              VIP Records
+              Gift Records
             </span>
           </Link>
 
