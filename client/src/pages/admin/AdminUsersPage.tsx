@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { adminService } from '../../services/admin.service';
 import { User } from '../../types';
 import { Card } from '../../components/common/Card';
@@ -29,6 +30,9 @@ import {
 
 export const AdminUsersPage: React.FC = () => {
   const { settings } = useSystemSettings();
+  const { user: currentUser } = useAuth();
+  const isStaff = currentUser?.role === 'STAFF';
+  const userDetailBasePath = isStaff ? '/staff/users' : '/admin/users';
   const currencySymbol = settings.currencySymbol || '₹';
 
   const [users, setUsers] = useState<User[]>([]);
@@ -379,7 +383,7 @@ export const AdminUsersPage: React.FC = () => {
                       </button>
 
                       <Link
-                        to={`/admin/users/${u._id || u.id}`}
+                        to={`${userDetailBasePath}/${u._id || u.id}`}
                         className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-pink-300 transition-colors shadow-sm"
                         title="View Full Profile & Detailed History"
                       >

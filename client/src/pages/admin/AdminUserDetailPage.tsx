@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { adminService } from '../../services/admin.service';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
@@ -10,6 +11,9 @@ import { ArrowLeft, User, Wallet, History, ShieldCheck, KeyRound, Lock, Activity
 export const AdminUserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { settings } = useSystemSettings();
+  const { user: currentUser } = useAuth();
+  const isStaff = currentUser?.role === 'STAFF';
+  const usersListPath = isStaff ? '/staff/users' : '/admin/users';
   const currencySymbol = settings.currencySymbol || '₹';
 
   const [data, setData] = useState<any>(null);
@@ -44,7 +48,7 @@ export const AdminUserDetailPage: React.FC = () => {
     <div className="space-y-6 w-full">
       {/* Top Header */}
       <div className="flex items-center gap-3">
-        <Link to="/admin/users" className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:text-slate-900 transition-colors shadow-sm">
+        <Link to={usersListPath} className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:text-slate-900 transition-colors shadow-sm">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
