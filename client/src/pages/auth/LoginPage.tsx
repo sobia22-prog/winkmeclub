@@ -81,7 +81,7 @@ export const LoginPage: React.FC = () => {
           <Input
             label="Username"
             type="text"
-            placeholder="e.g. moon01"
+            placeholder="e.g. john11"
             value={email}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             leftIcon={<User className="w-4 h-4" />}
