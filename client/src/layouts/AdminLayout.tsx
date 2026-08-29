@@ -3,6 +3,7 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Navbar } from './Navbar';
 import { AdminSidebar } from './AdminSidebar';
+import { AdminBottomNav } from '../components/layout/AdminBottomNav';
 import { Skeleton } from '../components/common/Skeleton';
 
 export const AdminLayout: React.FC = () => {
@@ -32,7 +33,7 @@ export const AdminLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-brand-dark flex flex-col">
+    <div className="min-h-screen bg-brand-dark flex flex-col pb-16 md:pb-0">
       <Navbar />
       <div className="flex flex-1 items-start">
         <AdminSidebar />
@@ -40,6 +41,7 @@ export const AdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+      <AdminBottomNav />
     </div>
   );
 };
