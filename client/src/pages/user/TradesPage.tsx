@@ -151,25 +151,29 @@ export const TradesPage: React.FC = () => {
 
   // Gradual scroll reveal state (starts at 4 products)
   const [visibleCount, setVisibleCount] = useState<number>(4);
+  const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Scroll listener to gradually reveal 4 more products when user scrolls down
+  // IntersectionObserver to automatically load 4 more products when user scrolls near bottom
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.innerHeight + window.scrollY;
-      const threshold = document.body.offsetHeight - 250;
-      if (scrollPosition >= threshold) {
-        setVisibleCount((prev) => {
-          if (prev < products.length) {
-            return Math.min(prev + 4, products.length);
-          }
-          return prev;
-        });
-      }
-    };
+    const target = loadMoreRef.current;
+    if (!target) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => {
+            if (prev < products.length) {
+              return Math.min(prev + 4, products.length);
+            }
+            return prev;
+          });
+        }
+      },
+      { threshold: 0.1, rootMargin: '300px' }
+    );
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [products.length]);
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [products.length, visibleCount]);
 
   const displayedProducts = products.slice(0, visibleCount);
   const catalogProducts = products; // Keep all catalog items in 3-dots drawer menu
@@ -260,7 +264,7 @@ export const TradesPage: React.FC = () => {
           <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">Loading catalog items...</Card>
         ) : (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {displayedProducts.map((product) => {
                 const isSelected = selectedProducts.some((p) => p._id === product._id);
                 return (
@@ -279,7 +283,7 @@ export const TradesPage: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="w-full h-44 md:h-52 rounded-2xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
+                    <div className="w-full h-48 sm:h-44 md:h-52 rounded-2xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
                       <img
                         src={product.image}
                         alt={product.name}
@@ -296,16 +300,7 @@ export const TradesPage: React.FC = () => {
             </div>
 
             {visibleCount < products.length && (
-              <div className="text-center pt-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setVisibleCount((prev) => Math.min(prev + 4, products.length))}
-                  className="bg-white border border-slate-200 text-slate-700 hover:border-pink-300 text-xs font-bold shadow-sm"
-                >
-                  Scroll Down or Click to Reveal More Products ({visibleCount} of {products.length})
-                </Button>
-              </div>
+              <div ref={loadMoreRef} className="h-8 w-full flex items-center justify-center py-2" />
             )}
           </div>
         )}
