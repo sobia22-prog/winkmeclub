@@ -222,26 +222,28 @@ export const AdminDashboardPage: React.FC = () => {
         {recentTransactions.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-6">No recent transactions recorded for your clients.</p>
         ) : (
-          <Table headers={['Transaction ID', 'Client Name', 'Type', 'Amount', 'Description', 'Date']}>
-            {recentTransactions.map((tx) => (
-              <tr key={tx._id} className="hover:bg-slate-50 transition-colors">
-                <td className="px-5 py-3 font-mono font-bold text-slate-900">{tx.transactionId}</td>
-                <td className="px-5 py-3 text-slate-800 font-semibold">
-                  {tx.userId && typeof tx.userId === 'object' ? (tx.userId as any).fullName : 'User / Deleted'}
-                </td>
-                <td className="px-5 py-3">
-                  <Badge variant="neutral" size="sm">
-                    {tx.type}
-                  </Badge>
-                </td>
-                <td className="px-5 py-3 font-bold text-pink-600">
-                  {currencySymbol}{Math.abs(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                </td>
-                <td className="px-5 py-3 text-xs text-slate-600 max-w-xs truncate">{tx.description}</td>
-                <td className="px-5 py-3 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </Table>
+          <div className="w-full overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
+            <Table headers={['Transaction ID', 'Client Name', 'Type', 'Amount', 'Description', 'Date']}>
+              {recentTransactions.map((tx) => (
+                <tr key={tx._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-3 font-mono font-bold text-slate-900">{tx.transactionId}</td>
+                  <td className="px-5 py-3 text-slate-800 font-semibold">
+                    {tx.userId && typeof tx.userId === 'object' ? (tx.userId as any).fullName : 'User / Deleted'}
+                  </td>
+                  <td className="px-5 py-3">
+                    <Badge variant="neutral" size="sm">
+                      {tx.type}
+                    </Badge>
+                  </td>
+                  <td className="px-5 py-3 font-bold text-pink-600">
+                    {currencySymbol}{Math.abs(tx.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </td>
+                  <td className="px-5 py-3 text-xs text-slate-600 max-w-xs truncate">{tx.description}</td>
+                  <td className="px-5 py-3 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </Table>
+          </div>
         )}
       </Card>
     </div>

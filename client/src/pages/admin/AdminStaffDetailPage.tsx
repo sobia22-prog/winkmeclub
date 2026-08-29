@@ -128,7 +128,7 @@ export const AdminStaffDetailPage: React.FC = () => {
       </div>
 
       {/* Staff Header Profile Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 md:p-8 space-y-6 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-4 sm:p-6 md:p-8 space-y-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
             {staff.profileImage ? (
@@ -158,7 +158,7 @@ export const AdminStaffDetailPage: React.FC = () => {
         </div>
 
         {/* Overview Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 pt-4 border-t border-slate-100">
           <StatCard
             title="Assigned Clients"
             value={stats.clientCount}
