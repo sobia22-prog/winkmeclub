@@ -149,7 +149,7 @@ export const AdminProductsPage: React.FC = () => {
           <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
             <Package className="w-6 h-6 text-pink-600" /> Marketplace Product Catalog
           </h1>
-          <p className="text-xs text-slate-500">Configure lifestyle products shown on the Main Trades Page vs Additional Catalog Drawer.</p>
+          <p className="text-xs text-slate-500">Manage lifestyle products displayed in the trading catalog.</p>
         </div>
 
         <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAdd}>
@@ -181,7 +181,7 @@ export const AdminProductsPage: React.FC = () => {
         ) : products.length === 0 ? (
           <p className="text-center text-xs text-slate-500 py-10">No products created yet.</p>
         ) : (
-          <Table headers={['Product Image & Name', 'Category', 'Frontend Location', 'Status', 'Actions']}>
+          <Table headers={['Product Image & Name', 'Category', 'Status', 'Actions']}>
             {products.map((p) => (
               <tr key={p._id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-5 py-3">
@@ -198,25 +198,6 @@ export const AdminProductsPage: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-5 py-3 text-xs text-slate-700 font-medium">{p.category}</td>
-                <td className="px-5 py-3">
-                  {p.isMainPage ? (
-                    <button
-                      onClick={() => handleToggleMainPage(p)}
-                      className="px-2.5 py-1 rounded-full text-[10px] font-black bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100 transition-all cursor-pointer shadow-sm"
-                      title="Click to move to Additional Catalog Drawer"
-                    >
-                      ★ MAIN TRADES PAGE
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleToggleMainPage(p)}
-                      className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200 hover:text-slate-900 transition-all cursor-pointer"
-                      title="Click to feature on Main Trades Page"
-                    >
-                      📁 CATALOG DRAWER
-                    </button>
-                  )}
-                </td>
                 <td className="px-5 py-3">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     {p.status}
@@ -271,18 +252,7 @@ export const AdminProductsPage: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-black text-slate-900">{viewingProduct.name}</h3>
-                {viewingProduct.isMainPage ? (
-                  <span className="px-3 py-1 rounded-full text-xs font-black bg-pink-50 text-pink-700 border border-pink-200">
-                    ★ MAIN TRADES PAGE
-                  </span>
-                ) : (
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                    📁 CATALOG DRAWER
-                  </span>
-                )}
-              </div>
+              <h3 className="text-lg font-black text-slate-900">{viewingProduct.name}</h3>
 
               <div className="flex items-center gap-3 text-xs text-slate-500">
                 <span>Category: <strong className="text-slate-800">{viewingProduct.category}</strong></span>
@@ -335,16 +305,6 @@ export const AdminProductsPage: React.FC = () => {
               label="Product Description"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
-
-            <Select
-              label="Frontend Display Location"
-              options={[
-                { label: '★ Show on Main Trades Page (Featured 4 Grid)', value: 'MAIN' },
-                { label: '📁 Show in Additional Catalog Drawer (Hidden List)', value: 'CATALOG' },
-              ]}
-              value={form.isMainPage ? 'MAIN' : 'CATALOG'}
-              onChange={(e) => setForm({ ...form, isMainPage: e.target.value === 'MAIN' })}
             />
 
             <ImageUploadPicker
