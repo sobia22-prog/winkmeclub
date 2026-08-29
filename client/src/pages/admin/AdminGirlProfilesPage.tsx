@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import { girlProfileService, GirlProfileData } from '../../services/girlProfile.service';
 import { Card } from '../../components/common/Card';
 import { Table } from '../../components/common/Table';
@@ -22,6 +24,12 @@ import {
 } from 'lucide-react';
 
 export const AdminGirlProfilesPage: React.FC = () => {
+  const { user } = useAuth();
+
+  if (user?.role === 'STAFF') {
+    return <Navigate to="/staff/dashboard" replace />;
+  }
+
   const [profiles, setProfiles] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

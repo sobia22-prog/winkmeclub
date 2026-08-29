@@ -129,7 +129,6 @@ export const App: React.FC = () => {
                 {/* Staff Portal Routes */}
                 <Route path="/staff" element={<Navigate to="/staff/dashboard" replace />} />
                 <Route path="/staff/dashboard" element={<AdminDashboardPage />} />
-                <Route path="/staff/girls" element={<AdminGirlProfilesPage />} />
                 <Route path="/staff/users" element={<AdminUsersPage />} />
                 <Route path="/staff/users/:id" element={<AdminUserDetailPage />} />
                 <Route path="/staff/trades" element={<AdminTradesPage />} />

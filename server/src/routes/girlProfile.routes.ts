@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { GirlProfileController } from '../controllers/girlProfile.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate, requireSuperAdmin } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -9,11 +9,11 @@ router.get('/public', GirlProfileController.getPublicProfiles);
 router.get('/categories', GirlProfileController.getCategories);
 router.get('/:id', GirlProfileController.getProfileById);
 
-// Admin / Staff protected CRUD routes
-router.get('/admin/all', authenticate, GirlProfileController.getAllProfilesAdmin);
-router.post('/admin/create', authenticate, GirlProfileController.createProfile);
-router.put('/admin/update/:id', authenticate, GirlProfileController.updateProfile);
-router.delete('/admin/delete/:id', authenticate, GirlProfileController.deleteProfile);
-router.post('/admin/categories', authenticate, GirlProfileController.createCategory);
+// Admin-only protected CRUD routes (Staff restricted)
+router.get('/admin/all', authenticate, requireSuperAdmin, GirlProfileController.getAllProfilesAdmin);
+router.post('/admin/create', authenticate, requireSuperAdmin, GirlProfileController.createProfile);
+router.put('/admin/update/:id', authenticate, requireSuperAdmin, GirlProfileController.updateProfile);
+router.delete('/admin/delete/:id', authenticate, requireSuperAdmin, GirlProfileController.deleteProfile);
+router.post('/admin/categories', authenticate, requireSuperAdmin, GirlProfileController.createCategory);
 
 export default router;
