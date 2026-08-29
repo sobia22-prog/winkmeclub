@@ -543,7 +543,11 @@ export class AdminController {
       }
 
       const withdrawals = await WithdrawalRequest.find(query)
-        .populate('userId', 'fullName email')
+        .populate({
+          path: 'userId',
+          select: 'fullName email assignedStaff phone city profileImage',
+          populate: { path: 'assignedStaff', select: 'fullName invitationCode' },
+        })
         .sort({ createdAt: -1 });
 
       return res.status(200).json({ success: true, withdrawals });
