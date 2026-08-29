@@ -149,12 +149,30 @@ export const TradesPage: React.FC = () => {
     }
   };
 
-  const mainFourProducts = (() => {
-    const featured = products.filter((p) => p.isMainPage).slice(0, 4);
-    return featured.length > 0 ? featured : products.slice(0, 4);
-  })();
+  // Gradual scroll reveal state (starts at 4 products)
+  const [visibleCount, setVisibleCount] = useState<number>(4);
 
-  const catalogProducts = products.filter((p) => !mainFourProducts.some((m) => m._id === p._id));
+  // Scroll listener to gradually reveal 4 more products when user scrolls down
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.body.offsetHeight - 250;
+      if (scrollPosition >= threshold) {
+        setVisibleCount((prev) => {
+          if (prev < products.length) {
+            return Math.min(prev + 4, products.length);
+          }
+          return prev;
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [products.length]);
+
+  const displayedProducts = products.slice(0, visibleCount);
+  const catalogProducts = products; // Keep all catalog items in 3-dots drawer menu
 
   const selectedProductNames = selectedProducts.map((p) => p.name).join(', ') || 'None selected';
   const totalItemsCount = selectedProducts.length;
@@ -238,42 +256,57 @@ export const TradesPage: React.FC = () => {
           </button>
         </div>
 
-        {mainFourProducts.length === 0 ? (
-          <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">Loading main catalog items...</Card>
+        {displayedProducts.length === 0 ? (
+          <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">Loading catalog items...</Card>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {mainFourProducts.map((product) => {
-              const isSelected = selectedProducts.some((p) => p._id === product._id);
-              return (
-                <div
-                  key={product._id}
-                  onClick={() => handleToggleSelectProduct(product)}
-                  className={`relative rounded-3xl p-4 bg-white border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-sm group overflow-hidden ${
-                    isSelected
-                      ? 'border-pink-600 bg-pink-50/40 shadow-md scale-[1.02]'
-                      : 'border-slate-200 hover:border-pink-300 hover:bg-slate-50'
-                  }`}
-                >
-                  {isSelected && (
-                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-md z-10">
-                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              {displayedProducts.map((product) => {
+                const isSelected = selectedProducts.some((p) => p._id === product._id);
+                return (
+                  <div
+                    key={product._id}
+                    onClick={() => handleToggleSelectProduct(product)}
+                    className={`relative rounded-3xl p-4 bg-white border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-sm group overflow-hidden ${
+                      isSelected
+                        ? 'border-pink-600 bg-pink-50/40 shadow-md scale-[1.02]'
+                        : 'border-slate-200 hover:border-pink-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-md z-10">
+                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      </div>
+                    )}
+
+                    <div className="w-full h-44 md:h-52 rounded-2xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
-                  )}
 
-                  <div className="w-full h-44 md:h-52 rounded-2xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <h3 className="text-xs font-bold text-slate-900 truncate text-center mt-3 w-full px-1">
+                      {product.name}
+                    </h3>
                   </div>
+                );
+              })}
+            </div>
 
-                  <h3 className="text-xs font-bold text-slate-900 truncate text-center mt-3 w-full px-1">
-                    {product.name}
-                  </h3>
-                </div>
-              );
-            })}
+            {visibleCount < products.length && (
+              <div className="text-center pt-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setVisibleCount((prev) => Math.min(prev + 4, products.length))}
+                  className="bg-white border border-slate-200 text-slate-700 hover:border-pink-300 text-xs font-bold shadow-sm"
+                >
+                  Scroll Down or Click to Reveal More Products ({visibleCount} of {products.length})
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>

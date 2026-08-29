@@ -93,13 +93,6 @@ export const AdminProductsPage: React.FC = () => {
   const handleToggleMainPage = async (product: Product) => {
     setError('');
     const newStatus = !product.isMainPage;
-    if (newStatus) {
-      const currentMainCount = products.filter((p) => p.isMainPage).length;
-      if (currentMainCount >= 4) {
-        setError('Maximum limit reached: Only 4 products can be displayed on the Main Trades Page. Please remove an existing product from the main page first.');
-        return;
-      }
-    }
     try {
       await adminService.updateProduct(product._id, { isMainPage: newStatus });
       setMessage(`"${product.name}" moved to ${newStatus ? 'Main Trades Page' : 'Additional Catalog Drawer'}.`);

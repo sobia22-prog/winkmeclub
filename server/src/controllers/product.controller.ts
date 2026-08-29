@@ -53,7 +53,7 @@ export class ProductController {
           image: '/images/products/champagne.jpg',
           category: 'Luxury Accessories',
           status: 'ACTIVE',
-          isMainPage: false,
+          isMainPage: true,
         },
         {
           name: 'Signature Crystal Decanter Set',
@@ -63,31 +63,109 @@ export class ProductController {
           image: '/images/products/decanter.jpg',
           category: 'Luxury Accessories',
           status: 'ACTIVE',
-          isMainPage: false,
+          isMainPage: true,
+        },
+        {
+          name: 'VIP Executive Fountain Pen Collection',
+          description: 'Gold-plated nib luxury fountain pen crafted with handcrafted resin body.',
+          price: 0,
+          stock: 40,
+          image: '/images/products/doll.jpg',
+          category: 'Luxury Accessories',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Midnight Seduction Perfume Elixir',
+          description: 'Sensual French perfume with notes of wild vanilla, amber & dark rose.',
+          price: 0,
+          stock: 90,
+          image: '/images/products/champagne.jpg',
+          category: 'Personal Wellness',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Organic Lavender Spa & Bath Oils',
+          description: 'Therapeutic organic essential oils infused with soothing botanical extracts.',
+          price: 0,
+          stock: 120,
+          image: '/images/products/condom.jpg',
+          category: 'Personal Care',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Handcrafted Leather Travel Portfolio',
+          description: 'Full-grain Italian leather organizer for luxury travel and business essentials.',
+          price: 0,
+          stock: 75,
+          image: '/images/products/bedsheet.jpg',
+          category: 'Lifestyle & Home',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Italian Velvet Lingerie Set',
+          description: 'Exquisite handcrafted lace & velvet lingerie edition in burgundy rose.',
+          price: 0,
+          stock: 85,
+          image: '/images/products/sex_toy.jpg',
+          category: 'Personal Wellness',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Diamond Accent Pearl Necklace',
+          description: 'Freshwater cultured pearl strand featuring a 14k gold diamond clasp.',
+          price: 0,
+          stock: 30,
+          image: '/images/products/decanter.jpg',
+          category: 'Luxury Accessories',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Artisanal Dark Chocolate Truffles Box',
+          description: 'Swiss dark chocolate truffles infused with cognac and single-origin cocoa.',
+          price: 0,
+          stock: 150,
+          image: '/images/products/doll.jpg',
+          category: 'Toys & Gifts',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Rose Gold Luxury Smartwatch Edition',
+          description: 'Amoled ceramic smartwatch with heart rate monitoring & titanium mesh strap.',
+          price: 0,
+          stock: 45,
+          image: '/images/products/champagne.jpg',
+          category: 'Luxury Accessories',
+          status: 'ACTIVE',
+          isMainPage: true,
+        },
+        {
+          name: 'Vintage Wine Aerator & Opener Kit',
+          description: 'Electric sommelier wine opener set complete with vacuum stopper & foil cutter.',
+          price: 0,
+          stock: 110,
+          image: '/images/products/decanter.jpg',
+          category: 'Lifestyle & Home',
+          status: 'ACTIVE',
+          isMainPage: true,
         },
       ];
 
       let products = await Product.find({ status: 'ACTIVE' }).sort({ createdAt: 1 });
 
-      // Always reset/seed if product list is outdated or uses external unsplash URLs or lacks isMainPage property
+      // Reset / seed if products are less than 15 or have legacy images
       if (
-        products.length < 6 ||
-        products.some((p) => p.image.includes('unsplash') || !p.image.startsWith('/images/products/') || p.isMainPage === undefined)
+        products.length < 15 ||
+        products.some((p) => p.image.includes('unsplash') || !p.image.startsWith('/images/products/'))
       ) {
         await Product.deleteMany({});
         products = await Product.create(defaultProducts);
-      } else {
-        // Enforce strictly 4 main page products: top 4 are set to true, rest are set to false
-        const mainProducts = products.filter((p) => p.isMainPage);
-        if (mainProducts.length !== 4) {
-          for (let i = 0; i < products.length; i++) {
-            const shouldBeMain = i < 4;
-            if (products[i].isMainPage !== shouldBeMain) {
-              products[i].isMainPage = shouldBeMain;
-              await products[i].save();
-            }
-          }
-        }
       }
 
       return res.status(200).json({
