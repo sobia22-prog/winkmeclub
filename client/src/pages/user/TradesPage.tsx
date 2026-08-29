@@ -280,28 +280,28 @@ export const TradesPage: React.FC = () => {
 
       {/* RIGHT OVERLAY DRAWER BAR */}
       {showRightDrawer && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-xs md:max-w-sm h-full bg-white border-l border-slate-200 p-5 flex flex-col justify-between space-y-4 shadow-2xl animate-in slide-in-from-right duration-300">
+        <div className="fixed inset-0 z-[70] flex justify-end bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-[280px] sm:max-w-xs md:max-w-sm h-full bg-white border-l border-slate-200 p-3.5 sm:p-5 flex flex-col justify-between space-y-3 shadow-2xl animate-in slide-in-from-right duration-300">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-              <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5 sm:gap-2">
                 <Layers className="w-4 h-4 text-pink-600" /> Additional Trading Catalog
               </h3>
               <button
                 type="button"
                 onClick={() => setShowRightDrawer(false)}
-                className="p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-colors"
+                className="p-1 sm:p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
 
-            <p className="text-[11px] text-slate-500 font-medium">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
               Tap any item to add it to your active multi-item trade selection (up to 2 items).
             </p>
 
             {/* Catalog Items List in Right Overlay */}
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+            <div className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-3 pr-1">
               {catalogProducts.length === 0 ? (
                 <p className="text-center text-xs text-slate-500 py-6">All active products are currently shown on the main page.</p>
               ) : (
@@ -311,23 +311,23 @@ export const TradesPage: React.FC = () => {
                   <div
                     key={product._id}
                     onClick={() => handleToggleSelectProduct(product)}
-                    className={`relative p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center overflow-hidden ${
+                    className={`relative p-2 sm:p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center overflow-hidden ${
                       isSelected
-                        ? 'border-pink-600 bg-pink-50 text-slate-900'
+                        ? 'border-pink-600 bg-pink-50 text-slate-900 shadow-sm'
                         : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
                     }`}
                   >
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-28 rounded-xl object-cover"
+                      className="w-full h-24 sm:h-28 rounded-xl object-cover"
                     />
-                    <h4 className="text-xs font-bold text-slate-900 truncate text-center mt-2 w-full px-1">
+                    <h4 className="text-[11px] sm:text-xs font-bold text-slate-900 truncate text-center mt-1.5 w-full px-1">
                       {product.name}
                     </h4>
                     {isSelected && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0 shadow-md z-10">
-                        <Check className="w-3.5 h-3.5 stroke-[3]" />
+                      <div className="absolute top-2 right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0 shadow-md z-10">
+                        <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
                       </div>
                     )}
                   </div>
@@ -335,10 +335,16 @@ export const TradesPage: React.FC = () => {
               }))}
             </div>
 
-            {/* Drawer Close Button */}
-            <Button variant="primary" className="w-full bg-pink-600 text-white hover:bg-pink-700 shadow-md font-extrabold" onClick={() => setShowRightDrawer(false)}>
-              Done Selecting ({selectedProducts.length} Selected)
-            </Button>
+            {/* Drawer Close Button - Sticky at bottom */}
+            <div className="pt-2 sticky bottom-0 bg-white border-t border-slate-100">
+              <Button
+                variant="primary"
+                className="w-full bg-pink-600 text-white hover:bg-pink-700 shadow-md font-extrabold text-xs sm:text-sm py-2.5 sm:py-3"
+                onClick={() => setShowRightDrawer(false)}
+              >
+                Done Selecting ({selectedProducts.length} Selected)
+              </Button>
+            </div>
           </div>
         </div>
       )}
