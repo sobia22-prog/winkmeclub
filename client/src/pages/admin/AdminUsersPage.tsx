@@ -244,8 +244,8 @@ export const AdminUsersPage: React.FC = () => {
 
   return (
     <div className="space-y-6 w-full">
-      {/* Header with Top Right Status Filter Tabs */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Primary Header with Title and Create User Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
             <Users className="w-6 h-6 text-pink-600" /> User Directory & Accounts
@@ -253,33 +253,38 @@ export const AdminUsersPage: React.FC = () => {
           <p className="text-xs text-slate-500">Manage registered client members, status, balances, and permissions.</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Top-Right Status Filter Tabs */}
-          <div className="flex items-center gap-1 bg-white p-1.5 border border-slate-200 rounded-2xl shadow-sm">
-            {[
-              { label: 'All', value: 'ALL' },
-              { label: 'Active', value: 'ACTIVE' },
-              { label: 'Blocked', value: 'BLOCKED' },
-              { label: 'Pending', value: 'PENDING' },
-            ].map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                onClick={() => setStatusFilter(tab.value)}
-                className={`px-3.5 py-1.5 text-xs font-extrabold rounded-xl transition-all ${
-                  statusFilter === tab.value
-                    ? 'bg-pink-600 text-white shadow-md'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+        <Button
+          variant="primary"
+          leftIcon={<PlusCircle className="w-4 h-4" />}
+          onClick={handleOpenAddProfile}
+          className="shrink-0 self-start sm:self-auto"
+        >
+          Create User Profile
+        </Button>
+      </div>
 
-          <Button variant="primary" leftIcon={<PlusCircle className="w-4 h-4" />} onClick={handleOpenAddProfile}>
-            Create User
-          </Button>
+      {/* Status Filter Tabs */}
+      <div className="w-full overflow-x-auto">
+        <div className="inline-flex items-center gap-1 bg-white p-1.5 border border-slate-200 rounded-2xl shadow-sm min-w-full sm:min-w-0">
+          {[
+            { label: 'All', value: 'ALL' },
+            { label: 'Active', value: 'ACTIVE' },
+            { label: 'Blocked', value: 'BLOCKED' },
+            { label: 'Pending', value: 'PENDING' },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              onClick={() => setStatusFilter(tab.value)}
+              className={`px-4 py-2 text-xs font-extrabold rounded-xl transition-all whitespace-nowrap flex-1 sm:flex-none text-center ${
+                statusFilter === tab.value
+                  ? 'bg-pink-600 text-white shadow-md'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
