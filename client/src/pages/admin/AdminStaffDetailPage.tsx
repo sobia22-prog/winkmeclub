@@ -117,12 +117,12 @@ export const AdminStaffDetailPage: React.FC = () => {
   return (
     <div className="space-y-6 w-full">
       {/* Top Navigation */}
-      <div className="flex items-center justify-between">
-        <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />} onClick={() => navigate('/admin/staff')}>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />} onClick={() => navigate('/admin/staff')} className="whitespace-nowrap">
           Back to Staff Directory
         </Button>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-pink-50 border border-pink-200 rounded-full font-mono text-xs font-bold text-pink-700 shadow-sm">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-pink-50 border border-pink-200 rounded-full font-mono text-xs font-bold text-pink-700 shadow-sm shrink-0">
           <Key className="w-3.5 h-3.5 text-pink-600" /> Code: {staff.invitationCode || 'N/A'}
         </div>
       </div>
@@ -131,11 +131,19 @@ export const AdminStaffDetailPage: React.FC = () => {
       <div className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-6 md:p-8 space-y-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-pink-50 border-2 border-pink-200 text-pink-600 flex items-center justify-center font-black text-2xl shadow-sm shrink-0">
-              {staff.fullName?.charAt(0).toUpperCase() || 'S'}
-            </div>
+            {staff.profileImage ? (
+              <img
+                src={staff.profileImage}
+                alt={staff.fullName}
+                className="w-16 h-16 rounded-2xl object-cover border-2 border-pink-200 shadow-sm shrink-0"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-pink-50 border-2 border-pink-200 text-pink-600 flex items-center justify-center font-black text-2xl shadow-sm shrink-0">
+                <UserCheck className="w-8 h-8 text-pink-600" />
+              </div>
+            )}
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl font-black text-slate-900">{staff.fullName || 'Staff Member'}</h1>
                 {staff.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE STAFF</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
               </div>
@@ -150,7 +158,7 @@ export const AdminStaffDetailPage: React.FC = () => {
         </div>
 
         {/* Overview Stats Bar */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-100">
           <StatCard
             title="Assigned Clients"
             value={stats.clientCount}
@@ -179,66 +187,68 @@ export const AdminStaffDetailPage: React.FC = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-slate-200 overflow-x-auto pb-2">
-        <button
-          onClick={() => setActiveTab('clients')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'clients'
-              ? 'bg-pink-600 text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <Users className="w-4 h-4" /> Associated Clients ({clients.length})
-        </button>
+      <div className="w-full overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 border-b border-slate-200 min-w-max pb-2">
+          <button
+            onClick={() => setActiveTab('clients')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'clients'
+                ? 'bg-pink-600 text-white shadow-md'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Users className="w-4 h-4" /> Associated Clients ({clients.length})
+          </button>
 
-        <button
-          onClick={() => setActiveTab('trades')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'trades'
-              ? 'bg-pink-600 text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <TrendingUp className="w-4 h-4" /> All Client Trades ({trades.length})
-        </button>
+          <button
+            onClick={() => setActiveTab('trades')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'trades'
+                ? 'bg-pink-600 text-white shadow-md'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4" /> All Client Trades ({trades.length})
+          </button>
 
-        <button
-          onClick={() => setActiveTab('recharges')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'recharges'
-              ? 'bg-pink-600 text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <ArrowDownRight className="w-4 h-4" /> Recharges ({recharges.length})
-        </button>
+          <button
+            onClick={() => setActiveTab('recharges')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'recharges'
+                ? 'bg-pink-600 text-white shadow-md'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <ArrowDownRight className="w-4 h-4" /> Recharges ({recharges.length})
+          </button>
 
-        <button
-          onClick={() => setActiveTab('withdrawals')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'withdrawals'
-              ? 'bg-pink-600 text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <ArrowUpRight className="w-4 h-4" /> Withdrawals ({withdrawals.length})
-        </button>
+          <button
+            onClick={() => setActiveTab('withdrawals')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'withdrawals'
+                ? 'bg-pink-600 text-white shadow-md'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <ArrowUpRight className="w-4 h-4" /> Withdrawals ({withdrawals.length})
+          </button>
 
-        <button
-          onClick={() => setActiveTab('transactions')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'transactions'
-              ? 'bg-pink-600 text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-          }`}
-        >
-          <History className="w-4 h-4" /> Transaction Ledger ({transactions.length})
-        </button>
+          <button
+            onClick={() => setActiveTab('transactions')}
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'transactions'
+                ? 'bg-pink-600 text-white shadow-md'
+                : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <History className="w-4 h-4" /> Transaction Ledger ({transactions.length})
+          </button>
+        </div>
       </div>
 
       {/* Tab 1: Associated Clients with In-Page Quick Summary Modal trigger */}
       {activeTab === 'clients' && (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
           {clients.length === 0 ? (
             <Card className="p-8 text-center text-xs text-slate-500">
               No clients have registered with this staff member's invitation code (`{staff.invitationCode}`) yet.
@@ -279,6 +289,7 @@ export const AdminStaffDetailPage: React.FC = () => {
                       size="sm"
                       leftIcon={<Eye className="w-3.5 h-3.5" />}
                       onClick={() => setSelectedClient(c)}
+                      className="whitespace-nowrap"
                     >
                       Quick Summary
                     </Button>
@@ -292,7 +303,7 @@ export const AdminStaffDetailPage: React.FC = () => {
 
       {/* Tab 2: Trades with Clear WIN/LOSE Bird-Eye Visual Indicators */}
       {activeTab === 'trades' && (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
           {trades.length === 0 ? (
             <Card className="p-8 text-center text-xs text-slate-500">No trades executed by assigned clients yet.</Card>
           ) : (
@@ -365,7 +376,7 @@ export const AdminStaffDetailPage: React.FC = () => {
 
       {/* Tab 3: Recharges */}
       {activeTab === 'recharges' && (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
           {recharges.length === 0 ? (
             <Card className="p-8 text-center text-xs text-slate-500">No deposit recharges submitted by assigned clients yet.</Card>
           ) : (
@@ -400,7 +411,7 @@ export const AdminStaffDetailPage: React.FC = () => {
 
       {/* Tab 4: Withdrawals */}
       {activeTab === 'withdrawals' && (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
           {withdrawals.length === 0 ? (
             <Card className="p-8 text-center text-xs text-slate-500">No withdrawal requests from assigned clients yet.</Card>
           ) : (
@@ -436,7 +447,7 @@ export const AdminStaffDetailPage: React.FC = () => {
 
       {/* Tab 5: Transaction Ledger */}
       {activeTab === 'transactions' && (
-        <div className="w-full overflow-x-auto">
+        <div className="w-full overflow-x-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
           {transactions.length === 0 ? (
             <Card className="p-8 text-center text-xs text-slate-500">No transaction activity recorded for assigned clients.</Card>
           ) : (
