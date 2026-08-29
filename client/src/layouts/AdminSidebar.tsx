@@ -31,6 +31,7 @@ export const AdminSidebar: React.FC = () => {
         { label: t('dashboard'), path: '/staff/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
         { label: t('users'), path: '/staff/users', icon: <Users className="w-4 h-4" /> },
         { label: t('tradeRequests'), path: '/staff/trades', icon: <TrendingUp className="w-4 h-4" /> },
+        { label: t('withdrawals'), path: '/staff/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
         { label: t('verification'), path: '/staff/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
       ]
     : [

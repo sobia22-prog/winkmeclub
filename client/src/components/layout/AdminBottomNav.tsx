@@ -5,6 +5,7 @@ import {
   Heart,
   Users,
   TrendingUp,
+  ArrowUpRight,
   MoreHorizontal,
   UserCheck,
   ShieldCheck,
@@ -29,6 +30,7 @@ export const AdminBottomNav: React.FC = () => {
     { label: 'Dashboard', path: '/staff/dashboard', icon: <LayoutDashboard className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
     { label: 'Users', path: '/staff/users', icon: <Users className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
     { label: 'Trades', path: '/staff/trades', icon: <TrendingUp className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Withdraw', path: '/staff/withdrawals', icon: <ArrowUpRight className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
     { label: 'Verify', path: '/staff/verifications', icon: <ShieldCheck className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
   ];
 
@@ -53,7 +55,7 @@ export const AdminBottomNav: React.FC = () => {
 
   return (
     <>
-      <nav className={`fixed bottom-0 left-0 right-0 z-40 h-[56px] bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-1 py-1 grid ${isStaff ? 'grid-cols-4' : 'grid-cols-5'} items-center justify-items-center shadow-lg`}>
+      <nav className="fixed bottom-0 left-0 right-0 z-40 h-[56px] bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-1 py-1 grid grid-cols-5 items-center justify-items-center shadow-lg">
         {activeItems.map((item) => (
           <NavLink
             key={item.path}
