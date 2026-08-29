@@ -26,17 +26,17 @@ export const AdminBottomNav: React.FC = () => {
   const [showMoreModal, setShowMoreModal] = useState(false);
 
   const staffNavItems = [
-    { label: t('dashboard'), path: '/staff/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { label: t('users'), path: '/staff/users', icon: <Users className="w-5 h-5" /> },
-    { label: t('tradeRequests'), path: '/staff/trades', icon: <TrendingUp className="w-5 h-5" /> },
-    { label: t('verification'), path: '/staff/verifications', icon: <ShieldCheck className="w-5 h-5" /> },
+    { label: 'Dashboard', path: '/staff/dashboard', icon: <LayoutDashboard className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Users', path: '/staff/users', icon: <Users className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Trades', path: '/staff/trades', icon: <TrendingUp className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Verify', path: '/staff/verifications', icon: <ShieldCheck className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
   ];
 
   const adminMainItems = [
-    { label: t('dashboard'), path: '/admin/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
-    { label: t('girlsProfiles'), path: '/admin/girls', icon: <Heart className="w-5 h-5" /> },
-    { label: t('users'), path: '/admin/users', icon: <Users className="w-5 h-5" /> },
-    { label: t('tradeRequests'), path: '/admin/trades', icon: <TrendingUp className="w-5 h-5" /> },
+    { label: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Girls', path: '/admin/girls', icon: <Heart className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Users', path: '/admin/users', icon: <Users className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
+    { label: 'Trades', path: '/admin/trades', icon: <TrendingUp className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> },
   ];
 
   const adminMoreItems = [
@@ -53,13 +53,13 @@ export const AdminBottomNav: React.FC = () => {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-40 h-[56px] bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-2 py-1.5 flex items-center justify-around shadow-lg">
+      <nav className={`fixed bottom-0 left-0 right-0 z-40 h-[56px] bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-1 py-1 grid ${isStaff ? 'grid-cols-4' : 'grid-cols-5'} items-center justify-items-center shadow-lg`}>
         {activeItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 text-[10px] sm:text-[11px] font-semibold transition-all px-2.5 py-1 rounded-xl ${
+              `w-full flex flex-col items-center justify-center gap-0.5 text-[9.5px] sm:text-[11px] font-semibold transition-all px-0.5 py-1 rounded-xl ${
                 isActive
                   ? 'bg-pink-100/80 text-pink-600 font-extrabold shadow-sm border border-pink-200 scale-105'
                   : 'text-slate-500 hover:text-slate-900'
@@ -67,7 +67,7 @@ export const AdminBottomNav: React.FC = () => {
             }
           >
             {item.icon}
-            <span className="truncate max-w-[64px]">{item.label}</span>
+            <span className="truncate w-full text-center">{item.label}</span>
           </NavLink>
         ))}
 
@@ -75,10 +75,10 @@ export const AdminBottomNav: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowMoreModal(true)}
-            className="flex flex-col items-center gap-0.5 text-[10px] sm:text-[11px] font-semibold transition-all px-2.5 py-1 rounded-xl text-slate-500 hover:text-slate-900 cursor-pointer"
+            className="w-full flex flex-col items-center justify-center gap-0.5 text-[9.5px] sm:text-[11px] font-semibold transition-all px-0.5 py-1 rounded-xl text-slate-500 hover:text-slate-900 cursor-pointer"
           >
-            <MoreHorizontal className="w-5 h-5" />
-            <span>More</span>
+            <MoreHorizontal className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+            <span className="truncate w-full text-center">More</span>
           </button>
         )}
       </nav>
