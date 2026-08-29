@@ -159,13 +159,8 @@ export class ProductController {
 
       let products = await Product.find({ status: 'ACTIVE' }).sort({ createdAt: 1 });
 
-      // Reset / seed if products are less than 15 or have legacy/repeat images
-      if (
-        products.length < 15 ||
-        products.some((p) => p.image.includes('/images/products/')) ||
-        new Set(products.map((p) => p.image)).size < 15
-      ) {
-        await Product.deleteMany({});
+      // Seed initial default products ONLY if database collection is completely empty
+      if (products.length === 0) {
         products = await Product.create(defaultProducts);
       }
 
