@@ -31,7 +31,7 @@ export const AdminSidebar: React.FC = () => {
         { label: t('dashboard'), path: '/staff/dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
         { label: t('users'), path: '/staff/users', icon: <Users className="w-4 h-4" /> },
         { label: t('tradeRequests'), path: '/staff/trades', icon: <TrendingUp className="w-4 h-4" /> },
-        { label: t('withdrawals'), path: '/staff/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
+        { label: 'Withdraw Requests', path: '/staff/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
         { label: t('verification'), path: '/staff/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
       ]
     : [
@@ -40,6 +40,7 @@ export const AdminSidebar: React.FC = () => {
         { label: t('staffMembers'), path: '/admin/staff', icon: <UserCheck className="w-4 h-4" /> },
         { label: t('users'), path: '/admin/users', icon: <Users className="w-4 h-4" /> },
         { label: t('tradeRequests'), path: '/admin/trades', icon: <TrendingUp className="w-4 h-4" /> },
+        { label: 'Withdraw Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-4 h-4" /> },
         { label: t('verification'), path: '/admin/verifications', icon: <ShieldCheck className="w-4 h-4" /> },
         { label: 'Products', path: '/admin/products', icon: <Package className="w-4 h-4" /> },
         { label: t('paymentSettings'), path: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
