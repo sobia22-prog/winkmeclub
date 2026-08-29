@@ -12,7 +12,7 @@ export const Table: React.FC<TableProps> = ({ headers, children }) => {
         <thead>
           <tr className="border-b border-slate-200 bg-pink-50/50">
             {headers.map((h, i) => (
-              <th key={i} className="px-5 py-3.5 text-xs font-bold text-slate-600 uppercase tracking-wider">
+              <th key={i} className="px-3 py-2.5 sm:px-5 sm:py-3.5 text-[11px] sm:text-xs font-bold text-slate-600 uppercase tracking-wider whitespace-nowrap">
                 {h}
               </th>
             ))}

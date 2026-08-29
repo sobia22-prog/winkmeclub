@@ -345,30 +345,45 @@ export const TradesPage: React.FC = () => {
 
       {/* TRADE CALCULATION BAR (Floating Bottom Sheet) */}
       {selectedProducts.length > 0 && (
-        <div className="fixed bottom-0 left-0 md:left-64 right-0 z-40 bg-white/98 backdrop-blur-2xl border-t border-slate-200 p-4 md:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300">
-          <div className="max-w-4xl mx-auto space-y-3 text-xs">
-            {/* Top Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pb-2 border-b border-slate-200">
-              <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+        <div className="fixed bottom-[56px] md:bottom-0 left-0 md:left-64 right-0 z-50 bg-white/98 backdrop-blur-2xl border-t border-pink-200 p-3 sm:p-4 md:p-6 shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[80vh] flex flex-col overflow-y-auto">
+          <div className="max-w-4xl mx-auto space-y-3 text-xs w-full">
+            {/* Top Sheet Header & Dismiss Button */}
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
+                <ShoppingBag className="w-4 h-4 text-pink-600" /> Confirm Airborne Trade
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedProducts([])}
+                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 text-[11px] font-semibold"
+                title="Clear Selection"
+              >
+                Clear <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Top Stats Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <div className="flex items-center justify-between bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200">
                 <span className="text-slate-600 font-semibold">Available Balance:</span>
                 <span className="font-mono font-bold text-emerald-600">
                   {currencySymbol}{(wallet?.availableBalance ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </span>
               </div>
 
-              <div className="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div className="flex items-center justify-between bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200 gap-2">
                 <span className="text-slate-600 font-semibold shrink-0">Current Selection:</span>
                 <span className="font-bold text-pink-600 truncate">{selectedProductNames}</span>
               </div>
 
-              <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <div className="flex items-center justify-between bg-slate-50 p-2 sm:p-2.5 rounded-xl border border-slate-200">
                 <span className="text-slate-600 font-semibold">Total Items:</span>
                 <span className="font-mono font-bold text-pink-600">{totalItemsCount} item{totalItemsCount === 1 ? '' : 's'} selected</span>
               </div>
             </div>
 
-            {/* Middle Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+            {/* Middle Row: Quantity & Tickets */}
+            <div className="grid grid-cols-2 gap-3 items-center">
               {/* Quantity Input */}
               <div className="space-y-1">
                 <label className="block text-[11px] font-bold text-slate-700">
@@ -380,7 +395,7 @@ export const TradesPage: React.FC = () => {
                   min="1"
                   value={tradeQuantity}
                   onChange={(e) => setTradeQuantity(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold focus:outline-none focus:border-pink-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold text-xs sm:text-sm focus:outline-none focus:border-pink-500"
                   placeholder="500"
                 />
               </div>
@@ -390,19 +405,19 @@ export const TradesPage: React.FC = () => {
                 <label className="block text-[11px] font-bold text-slate-700">
                   Tickets
                 </label>
-                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-pink-600 font-mono font-bold">
+                <div className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-pink-600 font-mono font-bold text-xs sm:text-sm">
                   {tradeQuantity || 0}
                 </div>
               </div>
             </div>
 
-            {/* Bottom Row */}
-            <div className="pt-1">
+            {/* Bottom Row - Sticky Confirm Action Button */}
+            <div className="pt-2 sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-slate-100 z-10">
               <button
                 type="button"
                 onClick={handleExecuteTrade}
                 disabled={loading || !tradeQuantity || Number(tradeQuantity) <= 0 || Number(tradeQuantity) > (wallet?.availableBalance || 0)}
-                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+                className="w-full py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer border border-white/20"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {loading ? 'Processing Trade...' : 'Confirm Airborne Trade'}

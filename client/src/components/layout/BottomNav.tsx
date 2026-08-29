@@ -11,13 +11,13 @@ export const BottomNav: React.FC = () => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-3 py-2 flex items-center justify-around shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 h-[56px] bg-white/95 backdrop-blur-lg border-t border-slate-200 md:hidden px-2 py-1.5 flex items-center justify-around shadow-lg">
       {navItems.map((item) => (
         <NavLink
           key={item.path}
           to={item.path}
           className={({ isActive }) =>
-            `flex flex-col items-center gap-1 text-[11px] font-semibold transition-all px-3 py-1 rounded-xl ${
+            `flex flex-col items-center gap-0.5 text-[10px] sm:text-[11px] font-semibold transition-all px-2.5 py-1 rounded-xl ${
               isActive ? 'bg-pink-100/80 text-pink-600 font-extrabold shadow-sm border border-pink-200 scale-105' : 'text-slate-500 hover:text-slate-900'
             }`
           }
