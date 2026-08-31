@@ -242,210 +242,204 @@ export const TradesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Lobby Products Section (Limit to 4 Products in 2x2 Grid) */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
-              <Flame className="w-4 h-4 text-pink-600" /> Main Lobby Trade Items
-            </h2>
-            <p className="text-[10px] text-slate-500 font-medium">Select item(s) from main lobby to place active round trade (2 items per row)</p>
-          </div>
-
-          {/* 3-DOTS MENU ICON FOR HIDDEN CATALOG */}
-          <button
-            type="button"
-            onClick={() => setShowRightDrawer(true)}
-            className="p-2 bg-white border border-slate-200 hover:border-pink-500 rounded-2xl text-slate-700 hover:text-pink-600 transition-all shadow-sm cursor-pointer flex items-center gap-1 text-xs font-bold"
-            title="Open Hidden Products Catalog"
-          >
-            <span className="hidden sm:inline text-[11px]">Hidden Products</span>
-            <MoreVertical className="w-5 h-5 text-pink-600" />
-          </button>
-        </div>
-
-        {(() => {
-          const lobbyProducts = products
-            .filter((p) => (p.sectionType ? p.sectionType === 'LOBBY' : p.isMainPage !== false))
-            .slice(0, 4);
-
-          return lobbyProducts.length === 0 ? (
-            <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">Loading lobby trade items...</Card>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5">
-              {lobbyProducts.map((product) => {
-                const isSelected = selectedProducts.some((p) => p._id === product._id);
-                return (
-                  <div
-                    key={product._id}
-                    onClick={() => handleToggleSelectProduct(product)}
-                    className={`relative rounded-2xl p-2.5 sm:p-3 bg-white border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-sm group overflow-hidden ${
-                      isSelected
-                        ? 'border-pink-600 bg-pink-50/40 shadow-md scale-[1.02]'
-                        : 'border-slate-200 hover:border-pink-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-md z-10">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                    )}
-
-                    <div className="w-full h-28 sm:h-36 md:h-40 rounded-xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    <h3 className="text-[11px] sm:text-xs font-extrabold text-slate-900 truncate text-center mt-2 w-full px-1">
-                      {product.name}
-                    </h3>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })()}
-      </div>
-
-      {/* Hidden Products Section (Collapsible & Drawer catalog) */}
+      {/* Product Sections (Main Lobby vs Hidden Products) */}
       {(() => {
+        // 1. Lobby Products: Designated LOBBY products by admin (max 4 cards, 2 per row)
         const lobbyProducts = products
           .filter((p) => (p.sectionType ? p.sectionType === 'LOBBY' : p.isMainPage !== false))
           .slice(0, 4);
 
-        const hiddenProducts = products.filter((p) => {
-          const isSecHidden = p.sectionType ? p.sectionType === 'HIDDEN' : p.isMainPage === false;
-          const isExtraLobby = !isSecHidden && !lobbyProducts.some((lp) => lp._id === p._id);
-          return isSecHidden || isExtraLobby;
-        });
+        const lobbyIds = new Set(lobbyProducts.map((p) => p._id));
 
-        if (hiddenProducts.length === 0) return null;
+        // 2. Hidden Products: All other products strictly EXCLUDING lobbyProducts (zero overlap)
+        const hiddenProducts = products.filter((p) => !lobbyIds.has(p._id));
 
         return (
-          <div className="space-y-3 pt-4 border-t border-slate-200">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-purple-600" /> Hidden Products Section ({hiddenProducts.length})
-              </h2>
-            </div>
+          <>
+            {/* Main Lobby Products Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
+                    <Flame className="w-4 h-4 text-pink-600" /> Main Lobby Trade Items
+                  </h2>
+                  <p className="text-[10px] text-slate-500 font-medium">Select item(s) from main lobby to place active round trade (2 items per row)</p>
+                </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
-              {hiddenProducts.map((product) => {
-                const isSelected = selectedProducts.some((p) => p._id === product._id);
-                return (
-                  <div
-                    key={product._id}
-                    onClick={() => handleToggleSelectProduct(product)}
-                    className={`relative rounded-2xl p-2 bg-white border transition-all cursor-pointer flex flex-col items-center shadow-sm overflow-hidden ${
-                      isSelected
-                        ? 'border-pink-600 bg-pink-50/50 shadow-sm'
-                        : 'border-slate-200 hover:border-pink-300 bg-slate-50'
-                    }`}
-                  >
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-24 sm:h-28 rounded-xl object-cover"
-                    />
-                    <h4 className="text-[11px] font-bold text-slate-900 truncate text-center mt-1.5 w-full px-1">
-                      {product.name}
-                    </h4>
-                    {isSelected && (
-                      <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm z-10">
-                        <Check className="w-3 h-3 stroke-[3]" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
+                {/* 3-DOTS MENU ICON FOR HIDDEN CATALOG */}
+                <button
+                  type="button"
+                  onClick={() => setShowRightDrawer(true)}
+                  className="p-2 bg-white border border-slate-200 hover:border-pink-500 rounded-2xl text-slate-700 hover:text-pink-600 transition-all shadow-sm cursor-pointer flex items-center gap-1 text-xs font-bold"
+                  title="Open Hidden Products Catalog"
+                >
+                  <span className="hidden sm:inline text-[11px]">Hidden Products ({hiddenProducts.length})</span>
+                  <MoreVertical className="w-5 h-5 text-pink-600" />
+                </button>
+              </div>
 
-      {/* RIGHT OVERLAY DRAWER BAR FOR HIDDEN PRODUCTS */}
-      {showRightDrawer && (
-        <div className="fixed inset-0 z-[70] flex justify-end bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-[280px] sm:max-w-xs md:max-w-sm h-full bg-white border-l border-slate-200 p-3.5 sm:p-5 flex flex-col justify-between space-y-3 shadow-2xl animate-in slide-in-from-right duration-300">
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5 sm:gap-2">
-                <Layers className="w-4 h-4 text-pink-600" /> Hidden Products Section
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowRightDrawer(false)}
-                className="p-1 sm:p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-colors"
-              >
-                <X className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-            </div>
-
-            <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
-              Tap any item to add it to your active multi-item trade selection (up to 2 items).
-            </p>
-
-            {/* Catalog Items List in Right Overlay */}
-            <div className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-3 pr-1">
-              {products.length === 0 ? (
-                <p className="text-center text-xs text-slate-500 py-6">No products available in catalog.</p>
+              {lobbyProducts.length === 0 ? (
+                <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">No lobby trade items selected by admin.</Card>
               ) : (
-                products.map((product) => {
-                  const isSelected = selectedProducts.some((p) => p._id === product._id);
-                  const isHiddenSec = product.sectionType === 'HIDDEN' || product.isMainPage === false;
-
-                  return (
-                    <div
-                      key={product._id}
-                      onClick={() => handleToggleSelectProduct(product)}
-                      className={`relative p-2 sm:p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center overflow-hidden ${
-                        isSelected
-                          ? 'border-pink-600 bg-pink-50 text-slate-900 shadow-sm'
-                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-24 sm:h-28 rounded-xl object-cover"
-                      />
-                      <div className="flex items-center justify-between w-full mt-1.5 px-1">
-                        <h4 className="text-[11px] sm:text-xs font-bold text-slate-900 truncate">
-                          {product.name}
-                        </h4>
-                        {isHiddenSec && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-purple-100 text-purple-700 shrink-0">
-                            HIDDEN
-                          </span>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5">
+                  {lobbyProducts.map((product) => {
+                    const isSelected = selectedProducts.some((p) => p._id === product._id);
+                    return (
+                      <div
+                        key={product._id}
+                        onClick={() => handleToggleSelectProduct(product)}
+                        className={`relative rounded-2xl p-2.5 sm:p-3 bg-white border-2 transition-all cursor-pointer flex flex-col justify-between items-center shadow-sm group overflow-hidden ${
+                          isSelected
+                            ? 'border-pink-600 bg-pink-50/40 shadow-md scale-[1.02]'
+                            : 'border-slate-200 hover:border-pink-300 hover:bg-slate-50'
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-md z-10">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </div>
                         )}
-                      </div>
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0 shadow-md z-10">
-                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
+
+                        <div className="w-full h-28 sm:h-36 md:h-40 rounded-xl overflow-hidden bg-slate-100 p-1 border border-slate-200 shadow-inner">
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition-transform duration-300"
+                          />
                         </div>
-                      )}
-                    </div>
-                  );
-                })
+
+                        <h3 className="text-[11px] sm:text-xs font-extrabold text-slate-900 truncate text-center mt-2 w-full px-1">
+                          {product.name}
+                        </h3>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
-            {/* Drawer Close Button - Sticky at bottom */}
-            <div className="pt-2 sticky bottom-0 bg-white border-t border-slate-100">
-              <Button
-                variant="primary"
-                className="w-full bg-pink-600 text-white hover:bg-pink-700 shadow-md font-extrabold text-xs sm:text-sm py-2.5 sm:py-3"
-                onClick={() => setShowRightDrawer(false)}
-              >
-                Done Selecting ({selectedProducts.length} Selected)
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+            {/* Hidden Products Section (On-page grid) */}
+            {hiddenProducts.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-slate-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-purple-600" /> Hidden Products Section ({hiddenProducts.length})
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
+                  {hiddenProducts.map((product) => {
+                    const isSelected = selectedProducts.some((p) => p._id === product._id);
+                    return (
+                      <div
+                        key={product._id}
+                        onClick={() => handleToggleSelectProduct(product)}
+                        className={`relative rounded-2xl p-2 bg-white border transition-all cursor-pointer flex flex-col items-center shadow-sm overflow-hidden ${
+                          isSelected
+                            ? 'border-pink-600 bg-pink-50/50 shadow-sm'
+                            : 'border-slate-200 hover:border-pink-300 bg-slate-50'
+                        }`}
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-24 sm:h-28 rounded-xl object-cover"
+                        />
+                        <h4 className="text-[11px] font-bold text-slate-900 truncate text-center mt-1.5 w-full px-1">
+                          {product.name}
+                        </h4>
+                        {isSelected && (
+                          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm z-10">
+                            <Check className="w-3 h-3 stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* RIGHT OVERLAY DRAWER BAR (Contains ONLY Hidden Products) */}
+            {showRightDrawer && (
+              <div className="fixed inset-0 z-[70] flex justify-end bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="w-full max-w-[280px] sm:max-w-xs md:max-w-sm h-full bg-white border-l border-slate-200 p-3.5 sm:p-5 flex flex-col justify-between space-y-3 shadow-2xl animate-in slide-in-from-right duration-300">
+                  {/* Drawer Header */}
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                    <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5 sm:gap-2">
+                      <Layers className="w-4 h-4 text-pink-600" /> Hidden Products Catalog
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setShowRightDrawer(false)}
+                      className="p-1 sm:p-1.5 bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 rounded-xl transition-colors"
+                    >
+                      <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+                  </div>
+
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium">
+                    Tap any hidden item to add it to your active trade selection (up to 2 items).
+                  </p>
+
+                  {/* Catalog Items List in Right Overlay */}
+                  <div className="flex-1 overflow-y-auto space-y-2.5 sm:space-y-3 pr-1">
+                    {hiddenProducts.length === 0 ? (
+                      <p className="text-center text-xs text-slate-500 py-6">No hidden products available.</p>
+                    ) : (
+                      hiddenProducts.map((product) => {
+                        const isSelected = selectedProducts.some((p) => p._id === product._id);
+
+                        return (
+                          <div
+                            key={product._id}
+                            onClick={() => handleToggleSelectProduct(product)}
+                            className={`relative p-2 sm:p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center overflow-hidden ${
+                              isSelected
+                                ? 'border-pink-600 bg-pink-50 text-slate-900 shadow-sm'
+                                : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700'
+                            }`}
+                          >
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-24 sm:h-28 rounded-xl object-cover"
+                            />
+                            <div className="flex items-center justify-between w-full mt-1.5 px-1">
+                              <h4 className="text-[11px] sm:text-xs font-bold text-slate-900 truncate">
+                                {product.name}
+                              </h4>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-purple-100 text-purple-700 shrink-0">
+                                HIDDEN
+                              </span>
+                            </div>
+                            {isSelected && (
+                              <div className="absolute top-2 right-2 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-pink-600 text-white flex items-center justify-center shrink-0 shadow-md z-10">
+                                <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 stroke-[3]" />
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  {/* Drawer Close Button */}
+                  <div className="pt-2 sticky bottom-0 bg-white border-t border-slate-100">
+                    <Button
+                      variant="primary"
+                      className="w-full bg-pink-600 text-white hover:bg-pink-700 shadow-md font-extrabold text-xs sm:text-sm py-2.5 sm:py-3"
+                      onClick={() => setShowRightDrawer(false)}
+                    >
+                      Done Selecting ({selectedProducts.length} Selected)
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* TRADE CALCULATION BAR (Floating Bottom Sheet) */}
       {selectedProducts.length > 0 && (
