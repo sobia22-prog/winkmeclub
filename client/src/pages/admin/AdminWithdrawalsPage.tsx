@@ -335,11 +335,10 @@ export const AdminWithdrawalsPage: React.FC = () => {
 
             {selectedWithdrawal.status === 'PENDING' && actionType === 'REJECT' && (
               <Input
-                label="Rejection Reason (Requested amount will be refunded to user's Available Balance)"
+                label="Rejection Reason (Optional — Requested amount will be refunded to user's Available Balance)"
                 placeholder="Invalid UPI ID / QR code unreadable / Account mismatch"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                required
               />
             )}
 

@@ -511,7 +511,9 @@ export class AdminController {
         return res.status(403).json({ message: 'Unauthorized to review recharge for this client.' });
       }
 
-      if (action === 'APPROVE') {
+      const upperAction = String(action || '').toUpperCase();
+
+      if (['APPROVE', 'APPROVED', 'ACCEPT', 'ACCEPTED', 'COMPLETE', 'COMPLETED'].includes(upperAction)) {
         const approvedAmount = amount && amount > 0 ? Number(amount) : recharge.amount;
         recharge.status = 'APPROVED';
         recharge.amount = approvedAmount;
@@ -520,12 +522,14 @@ export class AdminController {
         await recharge.save();
 
         await WalletService.creditAvailableBalance(recharge.userId, approvedAmount, 'RECHARGE', 'Manual Deposit Approval', recharge._id.toString());
-      } else {
+      } else if (['REJECT', 'REJECTED'].includes(upperAction)) {
         recharge.status = 'REJECTED';
-        recharge.rejectionReason = rejectionReason || 'Invalid proof of payment';
+        recharge.rejectionReason = rejectionReason || 'Payment receipt / UTR verification unconfirmed';
         recharge.processedBy = req.user._id as any;
         recharge.processedAt = new Date();
         await recharge.save();
+      } else {
+        return res.status(400).json({ message: 'Invalid recharge action specified.' });
       }
 
       return res.status(200).json({ success: true, message: `Recharge ${action} successfully.`, recharge });
@@ -575,21 +579,25 @@ export class AdminController {
         return res.status(403).json({ message: 'Unauthorized to review withdrawal for this client.' });
       }
 
-      if (action === 'COMPLETED') {
+      const upperAction = String(action || '').toUpperCase();
+
+      if (['COMPLETED', 'COMPLETE', 'APPROVE', 'APPROVED', 'ACCEPT', 'ACCEPTED'].includes(upperAction)) {
         withdrawal.status = 'COMPLETED';
         withdrawal.processedBy = req.user._id as any;
         withdrawal.processedAt = new Date();
         await withdrawal.save();
 
         await WalletService.releaseFrozenBalance(withdrawal.userId, withdrawal.amount, false, 'WITHDRAWAL', 'Withdrawal Payout Completed', withdrawal._id.toString());
-      } else if (action === 'REJECTED') {
+      } else if (['REJECTED', 'REJECT'].includes(upperAction)) {
         withdrawal.status = 'REJECTED';
-        withdrawal.rejectionReason = rejectionReason || 'Bank account details error';
+        withdrawal.rejectionReason = rejectionReason || 'Withdrawal request rejected by administrator.';
         withdrawal.processedBy = req.user._id as any;
         withdrawal.processedAt = new Date();
         await withdrawal.save();
 
         await WalletService.releaseFrozenBalance(withdrawal.userId, withdrawal.amount, true, 'WITHDRAWAL', 'Withdrawal Request Rejected', withdrawal._id.toString());
+      } else {
+        return res.status(400).json({ message: 'Invalid withdrawal action specified.' });
       }
 
       return res.status(200).json({ success: true, message: `Withdrawal ${action} successfully.`, withdrawal });
