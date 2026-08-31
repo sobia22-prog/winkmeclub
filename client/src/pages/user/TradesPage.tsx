@@ -35,7 +35,7 @@ export const TradesPage: React.FC = () => {
 
   // Multi-item selection (up to 2 items at a time)
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [tradeQuantity, setTradeQuantity] = useState<number | string>(500);
+  const [tradeQuantity, setTradeQuantity] = useState<number | string>(0);
 
   // Right Drawer Slide-over state (opened via 3-dots menu)
   const [showRightDrawer, setShowRightDrawer] = useState<boolean>(false);
@@ -138,6 +138,7 @@ export const TradesPage: React.FC = () => {
       if (res.data.success) {
         setSuccess(`Trade #${res.data.trade.tradeId} submitted for Round ${roundId}! (${combinedNames} — Qty: ${itemQty})`);
         setSelectedProducts([]);
+        setTradeQuantity(0);
         fetchTradeData();
         refreshSession();
       }
@@ -454,7 +455,7 @@ export const TradesPage: React.FC = () => {
                   value={tradeQuantity}
                   onChange={(e) => setTradeQuantity(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold text-xs sm:text-sm focus:outline-none focus:border-pink-500"
-                  placeholder="500"
+                  placeholder="0"
                 />
               </div>
 
