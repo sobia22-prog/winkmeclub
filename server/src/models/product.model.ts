@@ -21,10 +21,10 @@ const ProductSchema: Schema = new Schema(
     price: { type: Number, default: 0 },
     image: { type: String, required: true },
     category: { type: String, required: true, default: 'General' },
-    sectionType: { type: String, enum: ['LOBBY', 'HIDDEN'], default: 'LOBBY', index: true },
+    sectionType: { type: String, enum: ['LOBBY', 'HIDDEN'], default: 'HIDDEN', index: true },
     status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE', index: true },
     stock: { type: Number, default: 100 },
-    isMainPage: { type: Boolean, default: true, index: true },
+    isMainPage: { type: Boolean, default: false, index: true },
   },
   { timestamps: true }
 );

@@ -246,7 +246,10 @@ export const TradesPage: React.FC = () => {
       {(() => {
         // 1. Lobby Products: Designated LOBBY products by admin (max 4 cards, 2 per row)
         const lobbyProducts = products
-          .filter((p) => (p.sectionType ? p.sectionType === 'LOBBY' : p.isMainPage !== false))
+          .filter((p) => {
+            if (p.sectionType) return p.sectionType === 'LOBBY';
+            return p.isMainPage === true;
+          })
           .slice(0, 4);
 
         const lobbyIds = new Set(lobbyProducts.map((p) => p._id));
