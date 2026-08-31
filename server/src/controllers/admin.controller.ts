@@ -639,8 +639,8 @@ export class AdminController {
       const { outcome, profitPercentage } = req.body;
       const trade = await Trade.findOne({ tradeId: req.params.tradeId });
 
-      if (!trade || trade.status !== 'PENDING') {
-        return res.status(400).json({ message: 'Trade not found or already settled.' });
+      if (!trade) {
+        return res.status(404).json({ message: 'Trade request not found.' });
       }
 
       const targetUser = await User.findById(trade.userId);
