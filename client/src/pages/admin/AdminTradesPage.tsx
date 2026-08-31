@@ -187,7 +187,7 @@ export const AdminTradesPage: React.FC = () => {
                 {t.outcome === 'WIN' && (
                   <Badge variant="success">WIN 🎉 (+{t.profitPercentage || 20}%)</Badge>
                 )}
-                {t.outcome === 'LOSE' && <Badge variant="danger">LOSE (FROZEN)</Badge>}
+                {t.outcome === 'LOSE' && <Badge variant="danger">LOSE (DEDUCTED)</Badge>}
                 {t.outcome === 'NONE' && <Badge variant="warning">NONE</Badge>}
               </td>
               <td className="px-5 py-3">
@@ -410,7 +410,7 @@ export const AdminTradesPage: React.FC = () => {
               onChange={(e: any) => setSettlementOutcome(e.target.value)}
               options={[
                 { label: 'WIN (Credit User Available Balance with Profit %)', value: 'WIN' },
-                { label: 'LOSE (Move Trade Amount to Frozen Balance)', value: 'LOSE' },
+                { label: 'LOSE (Deduct Staked Amount - Lost & Gone Forever)', value: 'LOSE' },
               ]}
             />
 
@@ -480,8 +480,9 @@ export const AdminTradesPage: React.FC = () => {
             )}
 
             {settlementOutcome === 'LOSE' && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700">
-                Trade amount {currencySymbol}{selectedTrade.totalAmount.toFixed(2)} will be moved into the user's Frozen Balance.
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold space-y-1">
+                <div>Trade amount {currencySymbol}{selectedTrade.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} will be permanently deducted and lost forever.</div>
+                <div className="text-[11px] text-rose-500 font-normal">This amount is removed from frozen balance and cannot be recovered by the user.</div>
               </div>
             )}
 
