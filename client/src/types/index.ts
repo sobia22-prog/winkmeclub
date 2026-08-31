@@ -81,6 +81,7 @@ export interface Product {
   stock?: number;
   image: string;
   category: string;
+  sectionType?: 'LOBBY' | 'HIDDEN';
   status: 'ACTIVE' | 'INACTIVE';
   isMainPage?: boolean;
 }

@@ -6,6 +6,7 @@ export interface IProduct extends Document {
   price: number;
   image: string;
   category: string;
+  sectionType: 'LOBBY' | 'HIDDEN';
   status: 'ACTIVE' | 'INACTIVE';
   stock?: number;
   isMainPage?: boolean;
@@ -20,9 +21,10 @@ const ProductSchema: Schema = new Schema(
     price: { type: Number, default: 0 },
     image: { type: String, required: true },
     category: { type: String, required: true, default: 'General' },
+    sectionType: { type: String, enum: ['LOBBY', 'HIDDEN'], default: 'LOBBY', index: true },
     status: { type: String, enum: ['ACTIVE', 'INACTIVE'], default: 'ACTIVE', index: true },
     stock: { type: Number, default: 100 },
-    isMainPage: { type: Boolean, default: false, index: true },
+    isMainPage: { type: Boolean, default: true, index: true },
   },
   { timestamps: true }
 );
