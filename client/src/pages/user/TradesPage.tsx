@@ -470,25 +470,37 @@ export const TradesPage: React.FC = () => {
         {trades.length === 0 ? (
           <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">No active round trades placed yet.</Card>
         ) : (
-          <Table headers={['Trade ID', 'Item(s)', 'Quantity', 'Status', 'Outcome', 'Date']}>
-            {trades.map((t: any) => (
-              <tr key={t._id} className="hover:bg-slate-50 transition-colors text-xs">
-                <td className="px-5 py-3 font-mono font-bold text-slate-900">{t.tradeId}</td>
-                <td className="px-5 py-3 font-semibold text-slate-800">{t.productName}</td>
-                <td className="px-5 py-3 font-bold text-pink-600 font-mono">
-                  {t.quantity || 0}
-                </td>
-                <td className="px-5 py-3">
-                  {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
-                </td>
-                <td className="px-5 py-3">
-                  {t.outcome === 'WIN' && <Badge variant="vip">WIN 🎉</Badge>}
-                  {t.outcome === 'LOSE' && <Badge variant="danger">LOSE</Badge>}
-                  {t.outcome === 'NONE' && <span className="text-[11px] text-slate-500 font-semibold">In Round</span>}
-                </td>
-                <td className="px-5 py-3 text-[11px] text-slate-500">{new Date(t.createdAt).toLocaleDateString()}</td>
-              </tr>
-            ))}
+          <Table headers={['Trade ID', 'Item(s)', 'Quantity / Amount', 'Status', 'Outcome & Profit', 'Payout Credited', 'Date']}>
+            {trades.map((t: any) => {
+              const isWin = t.outcome === 'WIN';
+              const isLose = t.outcome === 'LOSE';
+              const profitPct = t.profitPercentage ?? 20;
+              const payout = t.payoutAmount || (isWin ? t.totalAmount * (1 + profitPct / 100) : 0);
+
+              return (
+                <tr key={t._id} className="hover:bg-slate-50 transition-colors text-xs">
+                  <td className="px-5 py-3 font-mono font-bold text-slate-900">{t.tradeId}</td>
+                  <td className="px-5 py-3 font-semibold text-slate-800">{t.productName}</td>
+                  <td className="px-5 py-3 font-bold text-pink-600 font-mono">
+                    {currencySymbol}{t.quantity || 0}
+                  </td>
+                  <td className="px-5 py-3">
+                    {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
+                  </td>
+                  <td className="px-5 py-3">
+                    {isWin && <Badge variant="vip">WIN 🎉 (+{profitPct}%)</Badge>}
+                    {isLose && <Badge variant="danger">LOSE (-100%)</Badge>}
+                    {!isWin && !isLose && <span className="text-[11px] text-slate-500 font-semibold">In Round</span>}
+                  </td>
+                  <td className="px-5 py-3 font-mono font-black text-xs">
+                    {isWin && <span className="text-emerald-600">+{currencySymbol}{payout.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>}
+                    {isLose && <span className="text-rose-600">-</span>}
+                    {!isWin && !isLose && <span className="text-amber-600">Held in Frozen</span>}
+                  </td>
+                  <td className="px-5 py-3 text-[11px] text-slate-500">{new Date(t.createdAt).toLocaleDateString()}</td>
+                </tr>
+              );
+            })}
           </Table>
         )}
       </div>

@@ -48,6 +48,38 @@ export class WalletService {
     return { wallet, transaction };
   }
 
+  static async deductAvailableBalance(
+    userId: string | mongoose.Types.ObjectId,
+    amount: number,
+    type: TransactionType,
+    description: string,
+    referenceId: string = ''
+  ) {
+    if (amount <= 0) return;
+    const wallet = await this.getOrCreateWallet(userId);
+    const beforeBalance = wallet.availableBalance;
+    const afterBalance = Math.max(0, Number((beforeBalance - amount).toFixed(2)));
+
+    wallet.availableBalance = afterBalance;
+    wallet.totalBalance = Number((wallet.availableBalance + wallet.frozenBalance).toFixed(2));
+    await wallet.save();
+
+    const txId = `TX-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const transaction = await Transaction.create({
+      transactionId: txId,
+      userId,
+      type,
+      amount: -amount,
+      beforeBalance,
+      afterBalance,
+      status: 'COMPLETED',
+      referenceId,
+      description,
+    });
+
+    return { wallet, transaction };
+  }
+
   static async freezeBalance(
     userId: string | mongoose.Types.ObjectId,
     amount: number,

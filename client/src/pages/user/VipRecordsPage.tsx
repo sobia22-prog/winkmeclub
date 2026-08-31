@@ -78,7 +78,7 @@ export const VipRecordsPage: React.FC = () => {
                   </div>
 
                   <div className="text-right">
-                    {t.outcome === 'WIN' && <Badge variant="vip">WIN 🎉 (+{t.profitPercentage || 20}%)</Badge>}
+                    {t.outcome === 'WIN' && <Badge variant="vip">WIN 🎉 (+{t.profitPercentage ?? 20}%)</Badge>}
                     {t.outcome === 'LOSE' && <Badge variant="danger">LOSE</Badge>}
                     {t.outcome === 'NONE' && <Badge variant="pending">IN ROUND</Badge>}
                   </div>
@@ -91,9 +91,11 @@ export const VipRecordsPage: React.FC = () => {
                   </div>
 
                   <div className="text-right">
-                    <span className="text-slate-600 block">Settlement Outcome:</span>
-                    <strong className={t.outcome === 'WIN' ? 'text-emerald-600 font-mono text-xs' : 'text-slate-700 font-mono text-xs'}>
-                      {t.outcome === 'WIN' ? `+${currencySymbol} ${(t.payoutAmount || t.totalAmount * 0.2).toFixed(2)}` : 'Frozen Hold'}
+                    <span className="text-slate-600 block font-semibold">Total Balance Added:</span>
+                    <strong className={t.outcome === 'WIN' ? 'text-emerald-600 font-mono text-xs font-black' : 'text-slate-700 font-mono text-xs'}>
+                      {t.outcome === 'WIN'
+                        ? `${currencySymbol} ${(t.payoutAmount || (t.totalAmount + t.totalAmount * (((t.profitPercentage ?? 20)) / 100))).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
+                        : 'Frozen Hold'}
                     </strong>
                   </div>
                 </div>

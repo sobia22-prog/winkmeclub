@@ -56,13 +56,55 @@ export class TradeSettlementService {
     profitPercentage: number = 20,
     note: string = ''
   ): Promise<ITrade> {
-    const trade = await Trade.findOne({ tradeId, status: 'PENDING' });
+    const trade = await Trade.findOne({ tradeId });
     if (!trade) {
-      throw new Error(`Pending trade with ID ${tradeId} not found or already settled.`);
+      throw new Error(`Pending trade with ID ${tradeId} not found.`);
+    }
+
+    const profitPct = Math.max(0, Number(profitPercentage) || 0);
+
+    // If trade was previously settled, revert prior financial effects before applying new settlement
+    if (trade.status === 'SETTLED') {
+      if (trade.outcome === 'WIN') {
+        const prevProfit = Number((trade.totalAmount * ((trade.profitPercentage || 0) / 100)).toFixed(2));
+        if (prevProfit > 0) {
+          await WalletService.deductAvailableBalance(
+            trade.userId,
+            prevProfit,
+            'ADMIN_ADJUSTMENT',
+            `Reversal of Previous WIN Profit: #${trade.tradeId}`,
+            trade.tradeId
+          );
+        }
+        await WalletService.freezeBalance(
+          trade.userId,
+          trade.totalAmount,
+          'TRADE_HOLD',
+          `Re-freeze for Trade Resettlement: #${trade.tradeId}`,
+          trade.tradeId
+        );
+      } else if (trade.outcome === 'LOSE') {
+        await WalletService.creditAvailableBalance(
+          trade.userId,
+          trade.totalAmount,
+          'ADMIN_ADJUSTMENT',
+          `Reversal of Previous LOSE Deduction: #${trade.tradeId}`,
+          trade.tradeId
+        );
+        await WalletService.freezeBalance(
+          trade.userId,
+          trade.totalAmount,
+          'TRADE_HOLD',
+          `Re-freeze for Trade Resettlement: #${trade.tradeId}`,
+          trade.tradeId
+        );
+      }
     }
 
     if (outcome === 'WIN') {
-      const profitPct = [20, 40, 60, 80, 100].includes(profitPercentage) ? profitPercentage : 20;
+      // Dynamic Percentage Profit Calculation:
+      // profitAmount = totalAmount * (profitPct / 100)
+      // totalPayout = totalAmount + profitAmount
       const profitAmount = Number((trade.totalAmount * (profitPct / 100)).toFixed(2));
       const totalPayout = Number((trade.totalAmount + profitAmount).toFixed(2));
 
@@ -99,7 +141,7 @@ export class TradeSettlementService {
       await NotificationService.createNotification(
         trade.userId,
         'Trade Result: WIN! 🎉',
-        `Congratulations! Your trade #${trade.tradeId} resulted in WIN (+${profitPct}% profit). Total payout: ${totalPayout}`,
+        `Congratulations! Your trade #${trade.tradeId} resulted in WIN (+${profitPct}% profit). Total payout credited to balance: ${totalPayout}`,
         'TRADE',
         '/trades'
       );
@@ -116,6 +158,7 @@ export class TradeSettlementService {
 
       trade.status = 'SETTLED';
       trade.outcome = 'LOSE';
+      trade.profitPercentage = 0;
       trade.payoutAmount = 0;
       trade.processedBy = new mongoose.Types.ObjectId(adminId);
       trade.processedAt = new Date();

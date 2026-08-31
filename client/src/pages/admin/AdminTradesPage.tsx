@@ -415,18 +415,68 @@ export const AdminTradesPage: React.FC = () => {
             />
 
             {settlementOutcome === 'WIN' && (
-              <Select
-                label="Select Win Profit Percentage"
-                value={profitPercentage.toString()}
-                onChange={(e) => setProfitPercentage(Number(e.target.value))}
-                options={[
-                  { label: '20% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.2).toFixed(2) + ')', value: '20' },
-                  { label: '40% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.4).toFixed(2) + ')', value: '40' },
-                  { label: '60% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.6).toFixed(2) + ')', value: '60' },
-                  { label: '80% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 0.8).toFixed(2) + ')', value: '80' },
-                  { label: '100% Profit (+' + currencySymbol + (selectedTrade.totalAmount * 1.0).toFixed(2) + ')', value: '100' },
-                ]}
-              />
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-slate-700">
+                    Win Profit Margin Percentage (%)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      max="1000"
+                      placeholder="e.g. 25"
+                      value={profitPercentage}
+                      onChange={(e) => setProfitPercentage(Math.max(0, Number(e.target.value)))}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 font-mono font-black text-sm focus:outline-none focus:border-pink-500"
+                    />
+                    <span className="text-sm font-black text-pink-600 shrink-0 font-mono">%</span>
+                  </div>
+                </div>
+
+                {/* Preset Profit Percentage Quick Selector */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {[10, 15, 20, 25, 30, 40, 50, 60, 75, 80, 100, 150, 200].map((pct) => (
+                    <button
+                      key={pct}
+                      type="button"
+                      onClick={() => setProfitPercentage(pct)}
+                      className={`px-2.5 py-1 text-[11px] font-extrabold rounded-lg border transition-all ${
+                        profitPercentage === pct
+                          ? 'bg-pink-600 border-pink-600 text-white shadow-sm'
+                          : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {pct}%
+                    </button>
+                  ))}
+                </div>
+
+                {/* Live Payout Breakdown Calculation Box (Matching User Prompt 100%) */}
+                {(() => {
+                  const tradeAmt = selectedTrade.totalAmount;
+                  const profitAmt = Number((tradeAmt * (profitPercentage / 100)).toFixed(2));
+                  const totalPayout = Number((tradeAmt + profitAmt).toFixed(2));
+
+                  return (
+                    <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-2 text-xs">
+                      <div className="flex justify-between items-center text-slate-600 font-medium">
+                        <span>Traded Amount (Returned):</span>
+                        <span className="font-mono font-bold text-slate-900">{currencySymbol}{tradeAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-slate-600 font-medium">
+                        <span>Win Profit Margin ({profitPercentage}%):</span>
+                        <span className="font-mono font-black text-emerald-600">+ {currencySymbol}{profitAmt.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="pt-2 border-t border-emerald-200/80 flex justify-between items-center text-emerald-900 font-extrabold text-sm">
+                        <span>Total Added to Balance:</span>
+                        <span className="font-mono font-black text-base text-emerald-700">{currencySymbol}{totalPayout.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
             )}
 
             {settlementOutcome === 'LOSE' && (
