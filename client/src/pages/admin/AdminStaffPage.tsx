@@ -286,9 +286,9 @@ export const AdminStaffPage: React.FC = () => {
             />
 
             <Input
-              label={editingStaff ? 'New Password (Leave blank to keep unchanged)' : 'Login Password'}
+              label={editingStaff ? 'Reset Password (optional)' : 'Password'}
               type="password"
-              placeholder="••••••••"
+              placeholder={editingStaff ? 'Leave blank to keep unchanged' : 'Enter password'}
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               required={!editingStaff}

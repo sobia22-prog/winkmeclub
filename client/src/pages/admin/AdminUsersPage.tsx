@@ -523,22 +523,33 @@ export const AdminUsersPage: React.FC = () => {
             </div>
 
             <Input
-              label="Reset Username (Full Name)"
+              label="Username (Full Name)"
               value={profileForm.fullName}
               onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
               required
             />
 
-            <div className="space-y-1">
+            {!editProfileUser ? (
               <Input
-                label="Reset Password (optional)"
+                label="Password"
                 type="password"
-                placeholder="Leave blank to keep unchanged"
+                placeholder="Enter password"
                 value={profileForm.password}
                 onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+                required
               />
-              <p className="text-[10px] text-slate-500">Leave blank to keep unchanged</p>
-            </div>
+            ) : (
+              <div className="space-y-1">
+                <Input
+                  label="Reset Password (optional)"
+                  type="password"
+                  placeholder="Leave blank to keep unchanged"
+                  value={profileForm.password}
+                  onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+                />
+                <p className="text-[10px] text-slate-500">Leave blank to keep unchanged</p>
+              </div>
+            )}
 
             <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
               <label className="block text-xs font-semibold text-slate-700">Transaction PIN</label>
