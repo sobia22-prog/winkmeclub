@@ -436,47 +436,23 @@ export const AdminUsersPage: React.FC = () => {
               <h3 className="text-xs font-black uppercase tracking-wider text-pink-700">Account Credentials & Profile</h3>
               
               <Input
-                label="Full Name / Username"
-                placeholder="e.g. John Doe"
+                label="Username / Full Name"
+                placeholder="Enter username / full name"
                 value={profileForm.fullName}
                 onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
                 required
               />
 
-              <Input
-                label="Email Address"
-                type="email"
-                placeholder="e.g. john@example.com"
-                value={profileForm.email}
-                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                required
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Input
-                  label="Phone Number"
-                  placeholder="e.g. +91 9876543210"
-                  value={profileForm.phone}
-                  onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                />
-
-                <Select
-                  label="Gender"
-                  options={[
-                    { label: 'Female', value: 'Female' },
-                    { label: 'Male', value: 'Male' },
-                    { label: 'Other', value: 'Other' },
-                  ]}
-                  value={profileForm.gender}
-                  onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
-                />
-              </div>
-
-              <Input
-                label="City / Location"
-                placeholder="e.g. Mumbai"
-                value={profileForm.city}
-                onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+              <Select
+                label="Gender"
+                options={[
+                  { label: 'Female', value: 'Female' },
+                  { label: 'Male', value: 'Male' },
+                  { label: 'Non-Binary', value: 'Non-Binary' },
+                  { label: 'Other', value: 'Other' },
+                ]}
+                value={profileForm.gender}
+                onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
               />
 
               {!editProfileUser ? (
@@ -608,13 +584,13 @@ export const AdminUsersPage: React.FC = () => {
 
               <div className="space-y-1 pt-1">
                 <Input
-                  label="Set New Transaction PIN (optional)"
+                  label="Transaction PIN (optional)"
                   type="password"
-                  placeholder="4 to 8 digits"
+                  placeholder="4 to 8 digits (optional)"
                   value={profileForm.transactionPin}
                   onChange={(e) => setProfileForm({ ...profileForm, transactionPin: e.target.value })}
                 />
-                <p className="text-[10px] text-slate-500">Enter 4 to 8 digits to set or reset transaction PIN</p>
+                <p className="text-[10px] text-slate-500">4 to 8 digits (optional for create and edit)</p>
               </div>
             </div>
 

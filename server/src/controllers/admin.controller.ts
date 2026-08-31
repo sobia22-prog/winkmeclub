@@ -268,23 +268,35 @@ export class AdminController {
         allowTrade,
         loadAmount,
         totalBalance,
+        transactionPin,
       } = req.body;
 
-      if (!email || !fullName) {
-        return res.status(400).json({ message: 'Full Name and Email address are required.' });
+      if (!fullName || !fullName.trim()) {
+        return res.status(400).json({ message: 'Username / Full Name is required.' });
       }
 
-      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      const cleanUsername = fullName.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const userEmail = email && email.trim()
+        ? email.toLowerCase().trim()
+        : `${cleanUsername || 'user'}${Math.floor(1000 + Math.random() * 9000)}@winkmeclub.com`;
+
+      const existingUser = await User.findOne({ email: userEmail });
       if (existingUser) {
-        return res.status(400).json({ message: 'Email address already registered.' });
+        return res.status(400).json({ message: 'User with this identifier already exists.' });
       }
 
       const passwordHash = await bcrypt.hash(password || 'User@123', 10);
+      let pinHash: string | undefined;
+      if (transactionPin && typeof transactionPin === 'string' && transactionPin.trim().length >= 4) {
+        pinHash = await bcrypt.hash(transactionPin.trim(), 10);
+      }
+
       const user = await User.create({
-        fullName,
-        email: email.toLowerCase(),
+        fullName: fullName.trim(),
+        email: userEmail,
         phone: phone || '0000000000',
         passwordHash,
+        transactionPinHash: pinHash,
         city: city || 'Mumbai',
         gender: gender || 'Female',
         role: 'USER',
