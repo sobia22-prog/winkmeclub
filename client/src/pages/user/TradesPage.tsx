@@ -273,10 +273,9 @@ export const TradesPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowRightDrawer(true)}
-                  className="p-2 bg-white border border-slate-200 hover:border-pink-500 rounded-2xl text-slate-700 hover:text-pink-600 transition-all shadow-sm cursor-pointer flex items-center gap-1 text-xs font-bold"
+                  className="p-2 bg-white border border-slate-200 hover:border-pink-500 rounded-2xl text-slate-700 hover:text-pink-600 transition-all shadow-sm cursor-pointer"
                   title="Open Hidden Products Catalog"
                 >
-                  <span className="hidden sm:inline text-[11px]">Hidden Products ({hiddenProducts.length})</span>
                   <MoreVertical className="w-5 h-5 text-pink-600" />
                 </button>
               </div>
