@@ -350,8 +350,9 @@ const seedData = async () => {
       });
     }
 
-    // 4. Create 15 Premium Marketplace Trade Products
+    // 4. Create Marketplace Trade Products (2 Main Lobby Products & 5 Hidden Products)
     const productsData = [
+      // 2 MAIN LOBBY PRODUCTS
       {
         name: 'Romantic Soft Doll',
         description: 'Plush romantic companion doll crafted with velvet finish.',
@@ -359,6 +360,7 @@ const seedData = async () => {
         stock: 100,
         image: 'https://images.unsplash.com/photo-1558060370-d644479be967?w=800&auto=format&fit=crop&q=80',
         category: 'Toys & Gifts',
+        sectionType: 'LOBBY',
         isMainPage: true,
       },
       {
@@ -368,8 +370,10 @@ const seedData = async () => {
         stock: 50,
         image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=80',
         category: 'Personal Wellness',
+        sectionType: 'LOBBY',
         isMainPage: true,
       },
+      // 5 HIDDEN PRODUCTS
       {
         name: 'Luxury Satin Silk Bedsheet Set',
         description: '100% Mulberry silk handcrafted bedsheets with gold embroidery finish.',
@@ -377,7 +381,8 @@ const seedData = async () => {
         stock: 200,
         image: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&auto=format&fit=crop&q=80',
         category: 'Lifestyle & Home',
-        isMainPage: true,
+        sectionType: 'HIDDEN',
+        isMainPage: false,
       },
       {
         name: 'Premium Ultra-Thin Condom Set',
@@ -386,7 +391,8 @@ const seedData = async () => {
         stock: 150,
         image: 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800&auto=format&fit=crop&q=80',
         category: 'Personal Care',
-        isMainPage: true,
+        sectionType: 'HIDDEN',
+        isMainPage: false,
       },
       {
         name: 'Rose & Fine Champagne Gift Box',
@@ -395,7 +401,8 @@ const seedData = async () => {
         stock: 80,
         image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop&q=80',
         category: 'Luxury Accessories',
-        isMainPage: true,
+        sectionType: 'HIDDEN',
+        isMainPage: false,
       },
       {
         name: 'Signature Crystal Decanter Set',
@@ -404,7 +411,8 @@ const seedData = async () => {
         stock: 60,
         image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&auto=format&fit=crop&q=80',
         category: 'Luxury Accessories',
-        isMainPage: true,
+        sectionType: 'HIDDEN',
+        isMainPage: false,
       },
       {
         name: 'VIP Executive Fountain Pen Collection',
@@ -413,79 +421,8 @@ const seedData = async () => {
         stock: 40,
         image: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=800&auto=format&fit=crop&q=80',
         category: 'Luxury Accessories',
-        isMainPage: true,
-      },
-      {
-        name: 'Midnight Seduction Perfume Elixir',
-        description: 'Sensual French perfume with notes of wild vanilla, amber & dark rose.',
-        price: 0,
-        stock: 90,
-        image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?w=800&auto=format&fit=crop&q=80',
-        category: 'Personal Wellness',
-        isMainPage: true,
-      },
-      {
-        name: 'Organic Lavender Spa & Bath Oils',
-        description: 'Therapeutic organic essential oils infused with soothing botanical extracts.',
-        price: 0,
-        stock: 120,
-        image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=800&auto=format&fit=crop&q=80',
-        category: 'Personal Care',
-        isMainPage: true,
-      },
-      {
-        name: 'Handcrafted Leather Travel Portfolio',
-        description: 'Full-grain Italian leather organizer for luxury travel and business essentials.',
-        price: 0,
-        stock: 75,
-        image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=80',
-        category: 'Lifestyle & Home',
-        isMainPage: true,
-      },
-      {
-        name: 'Italian Velvet Lingerie Set',
-        description: 'Exquisite handcrafted lace & velvet lingerie edition in burgundy rose.',
-        price: 0,
-        stock: 85,
-        image: 'https://images.unsplash.com/photo-1583846783214-7229a91b20ed?w=800&auto=format&fit=crop&q=80',
-        category: 'Personal Wellness',
-        isMainPage: true,
-      },
-      {
-        name: 'Diamond Accent Pearl Necklace',
-        description: 'Freshwater cultured pearl strand featuring a 14k gold diamond clasp.',
-        price: 0,
-        stock: 30,
-        image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&auto=format&fit=crop&q=80',
-        category: 'Luxury Accessories',
-        isMainPage: true,
-      },
-      {
-        name: 'Artisanal Dark Chocolate Truffles Box',
-        description: 'Swiss dark chocolate truffles infused with cognac and single-origin cocoa.',
-        price: 0,
-        stock: 150,
-        image: 'https://images.unsplash.com/photo-1548907040-4baa42d10919?w=800&auto=format&fit=crop&q=80',
-        category: 'Toys & Gifts',
-        isMainPage: true,
-      },
-      {
-        name: 'Rose Gold Luxury Smartwatch Edition',
-        description: 'Amoled ceramic smartwatch with heart rate monitoring & titanium mesh strap.',
-        price: 0,
-        stock: 45,
-        image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80',
-        category: 'Luxury Accessories',
-        isMainPage: true,
-      },
-      {
-        name: 'Vintage Wine Aerator & Opener Kit',
-        description: 'Electric sommelier wine opener set complete with vacuum stopper & foil cutter.',
-        price: 0,
-        stock: 110,
-        image: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=800&auto=format&fit=crop&q=80',
-        category: 'Lifestyle & Home',
-        isMainPage: true,
+        sectionType: 'HIDDEN',
+        isMainPage: false,
       },
     ];
 
