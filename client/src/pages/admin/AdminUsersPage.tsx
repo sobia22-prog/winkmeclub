@@ -431,147 +431,191 @@ export const AdminUsersPage: React.FC = () => {
           maxWidth="md"
         >
           <form onSubmit={handleSaveProfile} className="space-y-4 max-h-[80vh] overflow-y-auto pr-1 text-xs">
-            <Select
-              label="Status"
-              options={[
-                { label: 'Active', value: 'ACTIVE' },
-                { label: 'Blocked', value: 'BLOCKED' },
-                { label: 'Pending', value: 'PENDING' },
-              ]}
-              value={profileForm.status}
-              onChange={(e) => setProfileForm({ ...profileForm, status: e.target.value })}
-            />
-
-            <Select
-              label="VIP Status"
-              options={[
-                { label: 'VIP', value: 'true' },
-                { label: 'None', value: 'false' },
-              ]}
-              value={String(profileForm.isVIP)}
-              onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
-            />
-
-            <Input
-              label="Total Balance"
-              type="number"
-              value={profileForm.totalBalance.toString()}
-              onChange={(e) => setProfileForm({ ...profileForm, totalBalance: Number(e.target.value) })}
-            />
-
-            <Input
-              label="Frozen Balance"
-              type="number"
-              value={profileForm.frozenBalance.toString()}
-              onChange={(e) => setProfileForm({ ...profileForm, frozenBalance: Number(e.target.value) })}
-            />
-
-            <Input
-              label="Credit Score"
-              type="number"
-              value={profileForm.creditScore.toString()}
-              onChange={(e) => setProfileForm({ ...profileForm, creditScore: Number(e.target.value) })}
-            />
-
-            <div className="space-y-1">
-              <Select
-                label="Allow Withdraw"
-                options={[
-                  { label: 'Yes', value: 'true' },
-                  { label: 'No', value: 'false' },
-                ]}
-                value={String(profileForm.allowWithdraw)}
-                onChange={(e) => setProfileForm({ ...profileForm, allowWithdraw: e.target.value === 'true' })}
-              />
-              <p className="text-[10px] text-slate-500">When set to No, this customer cannot submit withdrawal requests.</p>
-            </div>
-
-            <div className="space-y-1">
-              <Select
-                label="Allow Trade"
-                options={[
-                  { label: 'Yes', value: 'true' },
-                  { label: 'No', value: 'false' },
-                ]}
-                value={String(profileForm.allowTrade)}
-                onChange={(e) => setProfileForm({ ...profileForm, allowTrade: e.target.value === 'true' })}
-              />
-              <p className="text-[10px] text-slate-500">When set to No, this customer cannot submit VIP trade (lottery) requests.</p>
-            </div>
-
-            {/* Load Amount (Total Balance) Box */}
-            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            {/* SECTION 1: Personal & Account Credentials */}
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-pink-700">Account Credentials & Profile</h3>
+              
               <Input
-                label={`Load Amount (${currencySymbol})`}
-                type="number"
-                placeholder="Enter amount to add..."
-                value={profileForm.loadAmount}
-                onChange={(e) => setProfileForm({ ...profileForm, loadAmount: e.target.value })}
-              />
-              <div className="flex items-center justify-between text-xs font-bold pt-1">
-                <span className="text-slate-700">New Total Balance:</span>
-                <span className="text-emerald-600 font-mono">{currencySymbol}{newTotalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-              </div>
-            </div>
-
-            {/* Available Balance (auto) - Read Only Non-Editable */}
-            <div className="p-3.5 bg-white border border-slate-200 rounded-2xl flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-700">Available Balance (auto)</span>
-              <span className="text-xs font-bold text-pink-600 font-mono">
-                {currencySymbol}{availableBalanceAuto.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-              </span>
-            </div>
-
-            <Input
-              label="Username (Full Name)"
-              value={profileForm.fullName}
-              onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
-              required
-            />
-
-            {!editProfileUser ? (
-              <Input
-                label="Password"
-                type="password"
-                placeholder="Enter password"
-                value={profileForm.password}
-                onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+                label="Full Name / Username"
+                placeholder="e.g. John Doe"
+                value={profileForm.fullName}
+                onChange={(e) => setProfileForm({ ...profileForm, fullName: e.target.value })}
                 required
               />
-            ) : (
-              <div className="space-y-1">
+
+              <Input
+                label="Email Address"
+                type="email"
+                placeholder="e.g. john@example.com"
+                value={profileForm.email}
+                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                required
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Input
-                  label="Reset Password (optional)"
+                  label="Phone Number"
+                  placeholder="e.g. +91 9876543210"
+                  value={profileForm.phone}
+                  onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                />
+
+                <Select
+                  label="Gender"
+                  options={[
+                    { label: 'Female', value: 'Female' },
+                    { label: 'Male', value: 'Male' },
+                    { label: 'Other', value: 'Other' },
+                  ]}
+                  value={profileForm.gender}
+                  onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })}
+                />
+              </div>
+
+              <Input
+                label="City / Location"
+                placeholder="e.g. Mumbai"
+                value={profileForm.city}
+                onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
+              />
+
+              {!editProfileUser ? (
+                <Input
+                  label="Password"
                   type="password"
-                  placeholder="Leave blank to keep unchanged"
+                  placeholder="Enter password"
                   value={profileForm.password}
                   onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+                  required
                 />
-                <p className="text-[10px] text-slate-500">Leave blank to keep unchanged</p>
-              </div>
-            )}
-
-            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
-              <label className="block text-xs font-semibold text-slate-700">Transaction PIN</label>
-              <div className="flex items-center gap-2">
-                <Badge variant={profileForm.hasTransactionPin ? 'verified' : 'neutral'}>
-                  {profileForm.hasTransactionPin ? 'Set' : 'Not set'}
-                </Badge>
-              </div>
-              <p className="text-[10px] text-slate-500">
-                The PIN is stored securely and cannot be viewed. Enter a new PIN below to reset it for the user.
-              </p>
+              ) : (
+                <div className="space-y-1">
+                  <Input
+                    label="Reset Password (optional)"
+                    type="password"
+                    placeholder="Leave blank to keep unchanged"
+                    value={profileForm.password}
+                    onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+                  />
+                  <p className="text-[10px] text-slate-500">Leave blank to keep unchanged</p>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-1">
+            {/* SECTION 2: Account Status & Permissions */}
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-purple-700">Account Status & Permissions</h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Select
+                  label="Status"
+                  options={[
+                    { label: 'Active', value: 'ACTIVE' },
+                    { label: 'Blocked', value: 'BLOCKED' },
+                    { label: 'Pending', value: 'PENDING' },
+                  ]}
+                  value={profileForm.status}
+                  onChange={(e) => setProfileForm({ ...profileForm, status: e.target.value })}
+                />
+
+                <Select
+                  label="VIP Member Status"
+                  options={[
+                    { label: 'VIP Member', value: 'true' },
+                    { label: 'Regular User', value: 'false' },
+                  ]}
+                  value={String(profileForm.isVIP)}
+                  onChange={(e) => setProfileForm({ ...profileForm, isVIP: e.target.value === 'true' })}
+                />
+              </div>
+
               <Input
-                label="Set New Transaction PIN (optional)"
-                type="password"
-                placeholder="4 to 8 digits"
-                value={profileForm.transactionPin}
-                onChange={(e) => setProfileForm({ ...profileForm, transactionPin: e.target.value })}
+                label="Credit Score"
+                type="number"
+                value={profileForm.creditScore.toString()}
+                onChange={(e) => setProfileForm({ ...profileForm, creditScore: Number(e.target.value) })}
               />
-              <p className="text-[10px] text-slate-500">4 to 8 digits</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Select
+                    label="Allow Withdraw"
+                    options={[
+                      { label: 'Yes', value: 'true' },
+                      { label: 'No', value: 'false' },
+                    ]}
+                    value={String(profileForm.allowWithdraw)}
+                    onChange={(e) => setProfileForm({ ...profileForm, allowWithdraw: e.target.value === 'true' })}
+                  />
+                  <p className="text-[10px] text-slate-500">When set to No, client cannot submit withdrawals.</p>
+                </div>
+
+                <div className="space-y-1">
+                  <Select
+                    label="Allow Trade"
+                    options={[
+                      { label: 'Yes', value: 'true' },
+                      { label: 'No', value: 'false' },
+                    ]}
+                    value={String(profileForm.allowTrade)}
+                    onChange={(e) => setProfileForm({ ...profileForm, allowTrade: e.target.value === 'true' })}
+                  />
+                  <p className="text-[10px] text-slate-500">When set to No, client cannot submit VIP trades.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: Financial & Wallet Balance Controls */}
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-emerald-700">Financial & Wallet Balances</h3>
+
+              <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                <Input
+                  label={`Load Amount (${currencySymbol})`}
+                  type="number"
+                  placeholder="Enter amount to add..."
+                  value={profileForm.loadAmount}
+                  onChange={(e) => setProfileForm({ ...profileForm, loadAmount: e.target.value })}
+                />
+                <div className="flex items-center justify-between text-xs font-bold pt-1 border-t border-slate-100">
+                  <span className="text-slate-700">New Total Balance:</span>
+                  <span className="text-emerald-600 font-mono">{currencySymbol}{newTotalBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Input
+                  label="Total Balance"
+                  type="number"
+                  value={profileForm.totalBalance.toString()}
+                  onChange={(e) => setProfileForm({ ...profileForm, totalBalance: Number(e.target.value) })}
+                />
+
+                <Input
+                  label="Frozen Balance"
+                  type="number"
+                  value={profileForm.frozenBalance.toString()}
+                  onChange={(e) => setProfileForm({ ...profileForm, frozenBalance: Number(e.target.value) })}
+                />
+              </div>
+
+              <div className="p-3 bg-white border border-slate-200 rounded-xl flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-700">Available Balance (auto)</span>
+                <span className="text-xs font-bold text-pink-600 font-mono">
+                  {currencySymbol}{availableBalanceAuto.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="space-y-1 pt-1">
+                <Input
+                  label="Set New Transaction PIN (optional)"
+                  type="password"
+                  placeholder="4 to 8 digits"
+                  value={profileForm.transactionPin}
+                  onChange={(e) => setProfileForm({ ...profileForm, transactionPin: e.target.value })}
+                />
+                <p className="text-[10px] text-slate-500">Enter 4 to 8 digits to set or reset transaction PIN</p>
+              </div>
             </div>
 
             {/* Save Buttons */}

@@ -252,13 +252,34 @@ export class AdminController {
 
   static async createMatchProfile(req: AuthRequest, res: Response) {
     try {
-      const { fullName, email, phone, city, gender, profileImage, bio } = req.body;
+      const {
+        fullName,
+        email,
+        phone,
+        city,
+        gender,
+        profileImage,
+        bio,
+        password,
+        status,
+        isVIP,
+        creditScore,
+        allowWithdraw,
+        allowTrade,
+        loadAmount,
+        totalBalance,
+      } = req.body;
+
+      if (!email || !fullName) {
+        return res.status(400).json({ message: 'Full Name and Email address are required.' });
+      }
+
       const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
         return res.status(400).json({ message: 'Email address already registered.' });
       }
 
-      const passwordHash = await bcrypt.hash('MatchProfile@123', 10);
+      const passwordHash = await bcrypt.hash(password || 'User@123', 10);
       const user = await User.create({
         fullName,
         email: email.toLowerCase(),
@@ -267,24 +288,33 @@ export class AdminController {
         city: city || 'Mumbai',
         gender: gender || 'Female',
         role: 'USER',
-        profileImage,
-        bio,
-        isVIP: true,
+        profileImage: profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+        bio: bio || '',
+        isVIP: isVIP !== undefined ? Boolean(isVIP) : true,
         isVerified: true,
         verificationStatus: 'VERIFIED',
-        status: 'ACTIVE',
+        status: status || 'ACTIVE',
+        creditScore: creditScore !== undefined ? Number(creditScore) : 100,
+        allowWithdraw: allowWithdraw !== undefined ? Boolean(allowWithdraw) : true,
+        allowTrade: allowTrade !== undefined ? Boolean(allowTrade) : true,
         assignedStaff: req.user?.role === 'STAFF' ? req.user._id : undefined,
       });
 
-      await WalletService.getOrCreateWallet(user._id.toString());
+      const wallet = await WalletService.getOrCreateWallet(user._id.toString());
+      const initBal = Number(loadAmount) || Number(totalBalance) || 0;
+      if (initBal > 0) {
+        wallet.availableBalance = initBal;
+        wallet.totalBalance = initBal;
+        await wallet.save();
+      }
 
       return res.status(201).json({
         success: true,
-        message: 'Member Profile Card created successfully!',
+        message: 'User account created successfully!',
         user,
       });
     } catch (error: any) {
-      return res.status(500).json({ message: error.message || 'Failed to create match profile.' });
+      return res.status(500).json({ message: error.message || 'Failed to create user account.' });
     }
   }
 
