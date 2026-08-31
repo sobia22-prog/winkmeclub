@@ -31,6 +31,7 @@ import {
   ChevronLeft,
   Upload,
   ArrowLeft,
+  AlertCircle,
 } from 'lucide-react';
 
 interface WalletPageProps {
@@ -38,7 +39,7 @@ interface WalletPageProps {
 }
 
 export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
-  const { wallet, refreshSession } = useAuth();
+  const { user, wallet, refreshSession } = useAuth();
   const { settings } = useSystemSettings();
   const location = useLocation();
 
@@ -158,6 +159,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
 
   const [rechargeMethod, setRechargeMethod] = useState<'CRYPTO' | 'BANK'>('CRYPTO');
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [copiedSupport, setCopiedSupport] = useState(false);
 
   const effectiveUsdtExchangeRate = (currencySymbol === '$' || currencySymbol === 'USD')
     ? 1
@@ -463,100 +465,162 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
 
       {/* VIEW 2: WITHDRAW WALLET */}
       {currentTab === 'withdraw' && (
-        <form onSubmit={handleWithdrawSubmit} className="space-y-5">
-          <Card className="p-5 space-y-4 bg-white border border-slate-200 rounded-3xl shadow-sm text-xs">
-            <h3 className="text-sm font-bold text-slate-900">Request Payout Withdrawal</h3>
+        user?.allowWithdraw === false ? (
+          <Card className="p-6 md:p-8 space-y-6 bg-white border border-slate-200 rounded-3xl shadow-sm text-center flex flex-col items-center">
+            {/* Restricted Access Banner */}
+            <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 space-y-1.5 w-full text-center">
+              <h3 className="font-extrabold text-sm flex items-center justify-center gap-2 text-rose-800">
+                <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" /> Withdrawal Access Restricted
+              </h3>
+              <p className="text-xs font-medium leading-relaxed">
+                You are currently not allowed to make withdrawal requests. Please contact customer service support for assistance.
+              </p>
+            </div>
 
-            <Select
-              label="Select Payout Method"
-              value={withdrawForm.paymentMethod}
-              onChange={(e) => setWithdrawForm({ ...withdrawForm, paymentMethod: e.target.value })}
-              options={[
-                { label: '1. UPI (ID)', value: 'UPI ID' },
-                { label: '2. QR Code (Upload Photo of QR)', value: 'QR Code' },
-                { label: '3. Bank Account', value: 'Bank Account' },
-              ]}
-            />
-
-            <Input
-              label={`Withdrawal Amount (${currencySymbol})`}
-              type="number"
-              value={withdrawForm.amount}
-              onChange={(e) => setWithdrawForm({ ...withdrawForm, amount: Number(e.target.value) })}
-            />
-
-            {withdrawForm.paymentMethod === 'UPI ID' && (
-              <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <Input
-                  label="UPI ID (e.g. user@upi)"
-                  placeholder="name@okaxis / user@upi"
-                  value={withdrawForm.upiId}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, upiId: e.target.value })}
-                />
-                <Input
-                  label="Account Holder Name"
-                  placeholder="Enter full name on UPI account"
-                  value={withdrawForm.accountHolder}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+            {/* Telegram Customer Support QR Code Container */}
+            <div className="relative p-3 bg-pink-50 border border-pink-200 rounded-2xl shadow-sm flex flex-col items-center max-w-[260px] w-full">
+              <div className="bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
+                <img
+                  src={settings.telegramSupportQrCode || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://t.me/winkmedatingclub_support'}
+                  alt="Telegram Customer Service QR Code"
+                  className="w-48 h-48 object-contain rounded-lg"
                 />
               </div>
-            )}
 
-            {withdrawForm.paymentMethod === 'QR Code' && (
-              <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <Input
-                  label="Account Holder Name"
-                  placeholder="Enter full name of QR holder"
-                  value={withdrawForm.accountHolder}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
-                />
-                <ImageUploadPicker
-                  label="Upload Photo of your Payment QR Code"
-                  value={withdrawForm.qrCodeUrl}
-                  onChange={(url) => setWithdrawForm({ ...withdrawForm, qrCodeUrl: url })}
-                  helperText="Upload clear QR code image for Admin payout processing"
-                />
+              <div className="text-[11px] font-bold text-pink-700 font-mono mt-2 flex items-center justify-center gap-1">
+                <QrCode className="w-3.5 h-3.5 text-pink-700" /> @CUSTOMER_SUPPORT
               </div>
-            )}
+            </div>
 
-            {withdrawForm.paymentMethod === 'Bank Account' && (
-              <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <Input
-                  label="Bank Name"
-                  placeholder="e.g. HDFC Bank, SBI, ICICI"
-                  value={withdrawForm.bankName}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, bankName: e.target.value })}
-                />
-                <Input
-                  label="Account Holder Name"
-                  placeholder="Enter full account holder name"
-                  value={withdrawForm.accountHolder}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
-                />
-                <Input
-                  label="Bank Account Number"
-                  placeholder="Enter account number"
-                  value={withdrawForm.accountNumber}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, accountNumber: e.target.value })}
-                />
-                <Input
-                  label="IFSC Code"
-                  placeholder="e.g. HDFC0001234"
-                  value={withdrawForm.ifscCode}
-                  onChange={(e) => setWithdrawForm({ ...withdrawForm, ifscCode: e.target.value })}
-                />
-              </div>
-            )}
+            {/* Support Action Buttons */}
+            <div className="flex items-center justify-center gap-3 w-full max-w-xs pt-1">
+              <Button
+                variant="secondary"
+                size="md"
+                className="flex-1 bg-white border-slate-200 hover:bg-slate-50 text-slate-700 font-bold"
+                leftIcon={copiedSupport ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                onClick={() => {
+                  navigator.clipboard.writeText(settings.telegramSupportLink || 'https://t.me/winkmedatingclub_support');
+                  setCopiedSupport(true);
+                  setTimeout(() => setCopiedSupport(false), 2500);
+                }}
+              >
+                {copiedSupport ? 'Copied!' : 'Copy Link'}
+              </Button>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-md hover:scale-[1.01] active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
-            >
-              {loading ? 'Submitting...' : 'Submit Withdrawal Request'}
-            </button>
+              <a
+                href={settings.telegramSupportLink || 'https://t.me/winkmedatingclub_support'}
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1"
+              >
+                <Button
+                  variant="primary"
+                  size="md"
+                  className="w-full bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-extrabold border-0 shadow-md"
+                  leftIcon={<Send className="w-4 h-4" />}
+                >
+                  Contact Support
+                </Button>
+              </a>
+            </div>
           </Card>
-        </form>
+        ) : (
+          <form onSubmit={handleWithdrawSubmit} className="space-y-5">
+            <Card className="p-5 space-y-4 bg-white border border-slate-200 rounded-3xl shadow-sm text-xs">
+              <h3 className="text-sm font-bold text-slate-900">Request Payout Withdrawal</h3>
+
+              <Select
+                label="Select Payout Method"
+                value={withdrawForm.paymentMethod}
+                onChange={(e) => setWithdrawForm({ ...withdrawForm, paymentMethod: e.target.value })}
+                options={[
+                  { label: '1. UPI (ID)', value: 'UPI ID' },
+                  { label: '2. QR Code (Upload Photo of QR)', value: 'QR Code' },
+                  { label: '3. Bank Account', value: 'Bank Account' },
+                ]}
+              />
+
+              <Input
+                label={`Withdrawal Amount (${currencySymbol})`}
+                type="number"
+                value={withdrawForm.amount}
+                onChange={(e) => setWithdrawForm({ ...withdrawForm, amount: Number(e.target.value) })}
+              />
+
+              {withdrawForm.paymentMethod === 'UPI ID' && (
+                <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                  <Input
+                    label="UPI ID (e.g. user@upi)"
+                    placeholder="name@okaxis / user@upi"
+                    value={withdrawForm.upiId}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, upiId: e.target.value })}
+                  />
+                  <Input
+                    label="Account Holder Name"
+                    placeholder="Enter full name on UPI account"
+                    value={withdrawForm.accountHolder}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+                  />
+                </div>
+              )}
+
+              {withdrawForm.paymentMethod === 'QR Code' && (
+                <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                  <Input
+                    label="Account Holder Name"
+                    placeholder="Enter full name of QR holder"
+                    value={withdrawForm.accountHolder}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+                  />
+                  <ImageUploadPicker
+                    label="Upload Photo of your Payment QR Code"
+                    value={withdrawForm.qrCodeUrl}
+                    onChange={(url) => setWithdrawForm({ ...withdrawForm, qrCodeUrl: url })}
+                    helperText="Upload clear QR code image for Admin payout processing"
+                  />
+                </div>
+              )}
+
+              {withdrawForm.paymentMethod === 'Bank Account' && (
+                <div className="space-y-3 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                  <Input
+                    label="Bank Name"
+                    placeholder="e.g. HDFC Bank, SBI, ICICI"
+                    value={withdrawForm.bankName}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, bankName: e.target.value })}
+                  />
+                  <Input
+                    label="Account Holder Name"
+                    placeholder="Enter full account holder name"
+                    value={withdrawForm.accountHolder}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, accountHolder: e.target.value })}
+                  />
+                  <Input
+                    label="Bank Account Number"
+                    placeholder="Enter account number"
+                    value={withdrawForm.accountNumber}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, accountNumber: e.target.value })}
+                  />
+                  <Input
+                    label="IFSC Code"
+                    placeholder="e.g. HDFC0001234"
+                    value={withdrawForm.ifscCode}
+                    onChange={(e) => setWithdrawForm({ ...withdrawForm, ifscCode: e.target.value })}
+                  />
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs md:text-sm tracking-wider uppercase shadow-md hover:scale-[1.01] active:scale-95 transition-all cursor-pointer border border-white/20 disabled:opacity-50"
+              >
+                {loading ? 'Submitting...' : 'Submit Withdrawal Request'}
+              </button>
+            </Card>
+          </form>
+        )
       )}
     </div>
   );

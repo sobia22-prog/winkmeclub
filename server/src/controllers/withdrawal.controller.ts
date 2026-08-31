@@ -9,6 +9,13 @@ export class WithdrawalController {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
 
+      if (req.user.allowWithdraw === false) {
+        return res.status(403).json({
+          success: false,
+          message: 'You are not allowed to make withdrawal requests. Please contact customer support.',
+        });
+      }
+
       const {
         amount = 1000,
         paymentMethod = 'UPI ID',

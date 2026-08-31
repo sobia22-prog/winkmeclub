@@ -102,9 +102,6 @@ export class TradeSettlementService {
     }
 
     if (outcome === 'WIN') {
-      // Dynamic Percentage Profit Calculation:
-      // profitAmount = totalAmount * (profitPct / 100)
-      // totalPayout = totalAmount + profitAmount
       const profitAmount = Number((trade.totalAmount * (profitPct / 100)).toFixed(2));
       const totalPayout = Number((trade.totalAmount + profitAmount).toFixed(2));
 
