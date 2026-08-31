@@ -628,8 +628,6 @@ export class AdminController {
         withdrawal.processedBy = req.user._id as any;
         withdrawal.processedAt = new Date();
         await withdrawal.save();
-
-        await WalletService.releaseFrozenBalance(withdrawal.userId, withdrawal.amount, false, 'WITHDRAWAL', 'Withdrawal Payout Completed', withdrawal._id.toString());
       } else if (['REJECTED', 'REJECT'].includes(upperAction)) {
         withdrawal.status = 'REJECTED';
         withdrawal.rejectionReason = rejectionReason || 'Withdrawal request rejected by administrator.';
@@ -637,7 +635,14 @@ export class AdminController {
         withdrawal.processedAt = new Date();
         await withdrawal.save();
 
-        await WalletService.releaseFrozenBalance(withdrawal.userId, withdrawal.amount, true, 'WITHDRAWAL', 'Withdrawal Request Rejected', withdrawal._id.toString());
+        // Refund deducted withdrawal amount back to client's available balance upon rejection
+        await WalletService.creditAvailableBalance(
+          withdrawal.userId,
+          withdrawal.amount,
+          'WITHDRAWAL',
+          'Withdrawal Request Refund (Rejected by Admin)',
+          withdrawal._id.toString()
+        );
       } else {
         return res.status(400).json({ message: 'Invalid withdrawal action specified.' });
       }

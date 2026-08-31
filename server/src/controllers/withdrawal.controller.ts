@@ -51,12 +51,12 @@ export class WithdrawalController {
 
       const requestId = `WTD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
 
-      // Move requested withdrawal amount to frozen balance
-      await WalletService.freezeBalance(
+      // Deduct requested withdrawal amount directly from available balance (does not go to frozen)
+      await WalletService.deductAvailableBalance(
         req.user._id,
         numAmount,
         'WITHDRAWAL',
-        `Withdrawal request hold #${requestId} (${finalPaymentMethod})`,
+        `Withdrawal request deduction #${requestId} (${finalPaymentMethod})`,
         requestId
       );
 
