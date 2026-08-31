@@ -130,6 +130,12 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
+
+    if (user?.allowWithdraw === false) {
+      setError('You are not allowed to make withdrawal requests. Please contact customer support.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -144,12 +150,16 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
         qrCodeUrl: withdrawForm.qrCodeUrl || '',
       };
 
-      await walletService.submitWithdrawal(payload);
-      setSuccessMsg('Withdrawal request submitted! Funds moved to frozen balance.');
-      fetchHistory();
-      refreshSession();
+      const res = await walletService.submitWithdrawal(payload);
+      if (res.data.success) {
+        setSuccessMsg(res.data.message || 'Withdrawal request submitted! Funds moved to frozen balance.');
+        fetchHistory();
+        refreshSession();
+      } else {
+        setError(res.data.message || 'Withdrawal request could not be processed.');
+      }
     } catch (err: any) {
-      setSuccessMsg('Withdrawal request submitted successfully!');
+      setError(err.response?.data?.message || 'Withdrawal request failed. Please contact customer support.');
     } finally {
       setLoading(false);
     }
