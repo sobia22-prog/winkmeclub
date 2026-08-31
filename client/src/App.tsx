@@ -132,6 +132,7 @@ export const App: React.FC = () => {
                 <Route path="/staff/users" element={<AdminUsersPage />} />
                 <Route path="/staff/users/:id" element={<AdminUserDetailPage />} />
                 <Route path="/staff/trades" element={<AdminTradesPage />} />
+                <Route path="/staff/recharges" element={<AdminRechargesPage />} />
                 <Route path="/staff/withdrawals" element={<AdminWithdrawalsPage />} />
                 <Route path="/staff/verifications" element={<AdminVerificationsPage />} />
               </Route>

@@ -5,6 +5,7 @@ import {
   Heart,
   Users,
   TrendingUp,
+  ArrowDownRight,
   ArrowUpRight,
   MoreHorizontal,
   UserCheck,
@@ -42,6 +43,7 @@ export const AdminBottomNav: React.FC = () => {
   ];
 
   const adminMoreItems = [
+    { label: 'Recharge Requests', path: '/admin/recharges', icon: <ArrowDownRight className="w-5 h-5 text-pink-600" /> },
     { label: 'Withdraw Requests', path: '/admin/withdrawals', icon: <ArrowUpRight className="w-5 h-5 text-pink-600" /> },
     { label: t('staffMembers'), path: '/admin/staff', icon: <UserCheck className="w-5 h-5 text-pink-600" /> },
     { label: t('verification'), path: '/admin/verifications', icon: <ShieldCheck className="w-5 h-5 text-pink-600" /> },
