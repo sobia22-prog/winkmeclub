@@ -321,48 +321,6 @@ export const TradesPage: React.FC = () => {
               )}
             </div>
 
-            {/* Hidden Products Section (On-page grid) */}
-            {hiddenProducts.length > 0 && (
-              <div className="space-y-3 pt-4 border-t border-slate-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
-                    <Layers className="w-4 h-4 text-purple-600" /> Hidden Products Section ({hiddenProducts.length})
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
-                  {hiddenProducts.map((product) => {
-                    const isSelected = selectedProducts.some((p) => p._id === product._id);
-                    return (
-                      <div
-                        key={product._id}
-                        onClick={() => handleToggleSelectProduct(product)}
-                        className={`relative rounded-2xl p-2 bg-white border transition-all cursor-pointer flex flex-col items-center shadow-sm overflow-hidden ${
-                          isSelected
-                            ? 'border-pink-600 bg-pink-50/50 shadow-sm'
-                            : 'border-slate-200 hover:border-pink-300 bg-slate-50'
-                        }`}
-                      >
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-24 sm:h-28 rounded-xl object-cover"
-                        />
-                        <h4 className="text-[11px] font-bold text-slate-900 truncate text-center mt-1.5 w-full px-1">
-                          {product.name}
-                        </h4>
-                        {isSelected && (
-                          <div className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-pink-600 text-white flex items-center justify-center shadow-sm z-10">
-                            <Check className="w-3 h-3 stroke-[3]" />
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* RIGHT OVERLAY DRAWER BAR (Contains ONLY Hidden Products) */}
             {showRightDrawer && (
               <div className="fixed inset-0 z-[70] flex justify-end bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
