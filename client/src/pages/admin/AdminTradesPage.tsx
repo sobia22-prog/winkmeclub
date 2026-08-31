@@ -480,9 +480,8 @@ export const AdminTradesPage: React.FC = () => {
             )}
 
             {settlementOutcome === 'LOSE' && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold space-y-1">
-                <div>Trade amount {currencySymbol}{selectedTrade.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} will be permanently deducted and lost forever.</div>
-                <div className="text-[11px] text-rose-500 font-normal">This amount is removed from frozen balance and cannot be recovered by the user.</div>
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold">
+                Trade amount {currencySymbol}{selectedTrade.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} will be permanently deducted and lost forever.
               </div>
             )}
 
