@@ -267,7 +267,6 @@ export const TradesPage: React.FC = () => {
                   <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
                     <Flame className="w-4 h-4 text-pink-600" /> Main Lobby Trade Items
                   </h2>
-                  <p className="text-[10px] text-slate-500 font-medium">Select item(s) from main lobby to place active round trade (2 items per row)</p>
                 </div>
 
                 {/* 3-DOTS MENU ICON FOR HIDDEN CATALOG */}
