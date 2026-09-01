@@ -219,16 +219,35 @@ export const TradesPage: React.FC = () => {
 
       {/* Airborne Activities Round Timer Banner Card */}
       <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 border border-pink-400/30 rounded-3xl p-6 text-white shadow-xl space-y-4">
-        <div className="flex items-center justify-between relative z-10">
-          <div>
-            <span className="text-[11px] font-extrabold text-pink-100 uppercase tracking-widest block">Airborne activities</span>
-            <span className="text-xl md:text-2xl font-black tracking-wider text-white font-mono">{roundId}</span>
+        {/* Top bar inside the card with Back and More Options */}
+        <div className="flex items-center justify-between relative z-10 w-full mb-2">
+          <Link to="/verification" className="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center backdrop-blur-md transition-colors">
+            <ChevronLeft className="w-5 h-5 text-white" />
+          </Link>
+          <span className="text-sm font-extrabold text-white">Airborne activities</span>
+          <button
+            type="button"
+            onClick={() => setShowRightDrawer(true)}
+            className="w-8 h-8 rounded-xl bg-white/20 hover:bg-white/30 flex items-center justify-center backdrop-blur-md transition-colors"
+            title="Open More Products Catalog"
+          >
+            <MoreVertical className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between relative z-10 pt-2 border-t border-white/20">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full border border-white/30 bg-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+               <span className="font-bold text-white text-xs">{wallet?.user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+            </div>
+            <div>
+              <span className="text-xl md:text-2xl font-black tracking-wider text-white font-mono">{roundId}</span>
+            </div>
           </div>
 
           <div className="text-right">
-            <span className="text-[11px] font-bold text-pink-100 uppercase tracking-widest block">Remaining Time</span>
-            <span className="text-xl font-mono font-black text-white flex items-center gap-2 justify-end">
-              <Clock className="w-5 h-5 text-amber-300 animate-pulse" />
+            <span className="text-[9px] font-bold text-pink-100 uppercase tracking-widest block">REMAINING TIME</span>
+            <span className="text-sm font-mono font-black text-white flex items-center justify-end">
               {formatSeconds(timeLeft)}
             </span>
           </div>
@@ -261,24 +280,7 @@ export const TradesPage: React.FC = () => {
         return (
           <>
             {/* Main Lobby Products Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-800 flex items-center gap-1.5">
-                    <Flame className="w-4 h-4 text-pink-600" /> Main Lobby Trade Items
-                  </h2>
-                </div>
-
-                {/* 3-DOTS MENU ICON FOR HIDDEN CATALOG */}
-                <button
-                  type="button"
-                  onClick={() => setShowRightDrawer(true)}
-                  className="p-2 bg-white border border-slate-200 hover:border-pink-500 rounded-2xl text-slate-700 hover:text-pink-600 transition-all shadow-sm cursor-pointer"
-                  title="Open Hidden Products Catalog"
-                >
-                  <MoreVertical className="w-5 h-5 text-pink-600" />
-                </button>
-              </div>
+            <div className="space-y-3 pt-2">
 
               {lobbyProducts.length === 0 ? (
                 <Card className="p-8 text-center text-xs text-slate-500 bg-white border border-slate-200">No lobby trade items selected by admin.</Card>
