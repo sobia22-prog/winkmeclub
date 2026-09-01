@@ -317,8 +317,8 @@ export class AuthController {
         return res.status(401).json({ message: 'Invalid staff member credentials.' });
       }
 
-      if (user.status === 'SUSPENDED') {
-        return res.status(403).json({ message: 'Your staff member account is suspended.' });
+      if (user.status === 'SUSPENDED' || user.status === 'INACTIVE') {
+        return res.status(403).json({ message: 'Your staff member account is suspended or inactive.' });
       }
 
       let isMatch = await bcrypt.compare(password, user.passwordHash);

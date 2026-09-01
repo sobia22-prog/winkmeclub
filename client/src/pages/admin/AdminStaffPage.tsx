@@ -22,6 +22,7 @@ import {
   ShieldAlert,
   UserCheck,
   Eye,
+  Power,
 } from 'lucide-react';
 
 export const AdminStaffPage: React.FC = () => {
@@ -142,6 +143,33 @@ export const AdminStaffPage: React.FC = () => {
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
+  const handleToggleStatus = async (staff: any) => {
+    const newStatus = staff.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await adminService.updateStaffMember(staff._id || staff.id, { status: newStatus });
+      setMessage(`Staff member "${staff.fullName}" is now ${newStatus.toLowerCase()}.`);
+      fetchStaff();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update staff status.');
+    }
+  };
+
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      'bg-rose-800',
+      'bg-indigo-800',
+      'bg-slate-800',
+      'bg-emerald-800',
+      'bg-purple-800',
+      'bg-orange-800'
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
+
   return (
     <div className="space-y-6 w-full">
       {/* Header */}
@@ -227,7 +255,7 @@ export const AdminStaffPage: React.FC = () => {
                   </span>
                 </td>
                 <td className="px-5 py-3">
-                  {s.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE STAFF</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
+                  {s.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE STAFF</Badge> : <Badge variant="danger">INACTIVE</Badge>}
                 </td>
                 <td className="px-5 py-3">
                   <div className="flex items-center gap-2">
@@ -244,6 +272,13 @@ export const AdminStaffPage: React.FC = () => {
                       title="Edit Staff Member"
                     >
                       <Edit className="w-3.5 h-3.5 text-pink-600" />
+                    </button>
+                    <button
+                      onClick={() => handleToggleStatus(s)}
+                      className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-pink-300 transition-colors shadow-sm"
+                      title={s.status === 'ACTIVE' ? 'Deactivate Staff' : 'Activate Staff'}
+                    >
+                      <Power className={`w-3.5 h-3.5 ${s.status === 'ACTIVE' ? 'text-rose-600' : 'text-emerald-600'}`} />
                     </button>
                     <button
                       onClick={() => handleDelete(s._id || s.id, s.fullName)}

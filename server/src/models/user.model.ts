@@ -14,7 +14,7 @@ export interface IUser extends Document {
   vipExpiresAt?: Date;
   isVerified: boolean;
   verificationStatus: 'NONE' | 'PENDING' | 'VERIFIED' | 'REJECTED';
-  status: 'ACTIVE' | 'SUSPENDED' | 'PENDING';
+  status: 'ACTIVE' | 'SUSPENDED' | 'INACTIVE' | 'PENDING';
   creditScore: number;
   allowWithdraw: boolean;
   allowTrade: boolean;
@@ -54,7 +54,7 @@ const UserSchema: Schema = new Schema(
     vipExpiresAt: { type: Date },
     isVerified: { type: Boolean, default: false },
     verificationStatus: { type: String, enum: ['NONE', 'PENDING', 'VERIFIED', 'REJECTED'], default: 'NONE' },
-    status: { type: String, enum: ['ACTIVE', 'SUSPENDED', 'PENDING'], default: 'ACTIVE', index: true },
+    status: { type: String, enum: ['ACTIVE', 'SUSPENDED', 'INACTIVE', 'PENDING'], default: 'ACTIVE', index: true },
     creditScore: { type: Number, default: 100 },
     allowWithdraw: { type: Boolean, default: true },
     allowTrade: { type: Boolean, default: true },

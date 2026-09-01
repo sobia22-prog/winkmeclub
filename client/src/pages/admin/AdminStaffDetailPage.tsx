@@ -33,6 +33,7 @@ import {
   Package,
   Award,
   BarChart3,
+  Power,
 } from 'lucide-react';
 
 export const AdminStaffDetailPage: React.FC = () => {
@@ -114,6 +115,17 @@ export const AdminStaffDetailPage: React.FC = () => {
     return { clientTrades, clientRecharges, clientWithdrawals, clientTransactions };
   };
 
+  const handleToggleStatus = async () => {
+    if (!staff._id && !staff.id) return;
+    const newStatus = staff.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await adminService.updateStaffMember(staff._id || staff.id, { status: newStatus });
+      fetchStaffDetail();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update staff status.');
+    }
+  };
+
   return (
     <div className="space-y-6 w-full">
       {/* Top Navigation */}
@@ -146,6 +158,13 @@ export const AdminStaffDetailPage: React.FC = () => {
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl font-black text-slate-900">{staff.fullName || 'Staff Member'}</h1>
                 {staff.status === 'ACTIVE' ? <Badge variant="verified">ACTIVE STAFF</Badge> : <Badge variant="danger">SUSPENDED</Badge>}
+                <button
+                  onClick={handleToggleStatus}
+                  className="ml-2 p-1.5 rounded-lg border border-slate-200 hover:border-pink-300 bg-white text-slate-700 hover:text-pink-600 transition-colors shadow-sm"
+                  title={staff.status === 'ACTIVE' ? 'Deactivate Staff' : 'Activate Staff'}
+                >
+                  <Power className={`w-4 h-4 ${staff.status === 'ACTIVE' ? 'text-rose-600' : 'text-emerald-600'}`} />
+                </button>
               </div>
               <p className="text-xs text-slate-500 mt-1">
                 {staff.email} {staff.phone ? `• ${staff.phone}` : ''}
