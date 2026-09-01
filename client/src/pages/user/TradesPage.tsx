@@ -184,22 +184,7 @@ export const TradesPage: React.FC = () => {
 
   return (
     <div className="w-full space-y-6 pb-12">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <Link to="/verification" className="p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <h1 className="text-xl md:text-2xl font-black text-slate-900 flex items-center gap-2">
-              <ShoppingBag className="w-6 h-6 text-pink-600" /> Trades & Airborne Activities
-            </h1>
-            <p className="text-[11px] text-slate-500 font-medium">Select item(s), enter trading quantity, and confirm round trade</p>
-          </div>
-        </div>
 
-        <Badge variant="vip" size="sm" />
-      </div>
 
       {error && (
         <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-700 font-semibold flex items-center justify-between shadow-sm">
