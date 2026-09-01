@@ -309,20 +309,7 @@ export const TradesPage: React.FC = () => {
               {/* INLINE CONFIRM AIRBORNE TRADE BOX (Appears below products before trade history) */}
               {selectedProducts.length > 0 && (
                 <div className="mt-4 bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 shadow-sm space-y-4 animate-in fade-in zoom-in-95 duration-200">
-                  {/* Header & Clear Button */}
-                  <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                    <span className="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
-                      <ShoppingBag className="w-4 h-4 text-pink-600" /> Confirm Airborne Trade
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProducts([])}
-                      className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors flex items-center gap-1 text-[11px] font-semibold"
-                      title="Clear Selection"
-                    >
-                      Clear <X className="w-4 h-4" />
-                    </button>
-                  </div>
+
 
                   {/* Top Stats Row */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -373,13 +360,20 @@ export const TradesPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Bottom Row - Confirm Action Button */}
-                  <div className="pt-2">
+                  {/* Bottom Row - Action Buttons */}
+                  <div className="pt-2 flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedProducts([])}
+                      className="flex-1 py-3.5 sm:py-4 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-xs sm:text-sm tracking-wider uppercase active:scale-95 transition-all"
+                    >
+                      Cancel
+                    </button>
                     <button
                       type="button"
                       onClick={handleExecuteTrade}
                       disabled={loading || !tradeQuantity || Number(tradeQuantity) <= 0 || Number(tradeQuantity) > (wallet?.availableBalance || 0)}
-                      className="w-full py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-700 hover:from-pink-600 hover:to-indigo-800 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+                      className="flex-[2] py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-pink-300 to-purple-400 hover:from-pink-400 hover:to-purple-500 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <ShoppingBag className="w-4 h-4" />
                       {loading ? 'Processing Trade...' : 'Confirm Airborne Trade'}
