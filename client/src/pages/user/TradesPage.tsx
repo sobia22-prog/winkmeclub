@@ -375,8 +375,7 @@ export const TradesPage: React.FC = () => {
                       disabled={loading || !tradeQuantity || Number(tradeQuantity) <= 0 || Number(tradeQuantity) > (wallet?.availableBalance || 0)}
                       className="flex-[2] py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-pink-300 to-purple-400 hover:from-pink-400 hover:to-purple-500 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-md active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <ShoppingBag className="w-4 h-4" />
-                      {loading ? 'Processing Trade...' : 'Confirm Airborne Trade'}
+                      {loading ? 'Processing...' : 'Confirm'}
                     </button>
                   </div>
                 </div>
