@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 
 export const TradesPage: React.FC = () => {
-  const { wallet, refreshSession } = useAuth();
+  const { user, wallet, refreshSession } = useAuth();
   const { settings } = useSystemSettings();
   const currencySymbol = settings.currencySymbol || '₹';
   const [products, setProducts] = useState<Product[]>([]);
@@ -238,7 +238,7 @@ export const TradesPage: React.FC = () => {
         <div className="flex items-center justify-between relative z-10 pt-2 border-t border-white/20">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full border border-white/30 bg-white/10 overflow-hidden shrink-0 flex items-center justify-center">
-               <span className="font-bold text-white text-xs">{wallet?.user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+               <span className="font-bold text-white text-xs">{user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
             </div>
             <div>
               <span className="text-xl md:text-2xl font-black tracking-wider text-white font-mono">{roundId}</span>
