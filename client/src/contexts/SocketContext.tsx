@@ -43,7 +43,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (token) {
       updateSocketAuth(token);
     }
-  }, [token, user]);
+  }, [token, user?.id]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

@@ -81,10 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (currentToken) {
         await fetchSession();
       }
-      if (isMounted) {
-        pollTimer = setTimeout(poll, 2500);
-      }
     };
+    // Fetch once on mount, then rely on WebSockets and visibility changes.
     poll();
 
     const onVisible = () => {

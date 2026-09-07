@@ -114,16 +114,7 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
   useEffect(() => {
     fetchHistory();
 
-    let isMounted = true;
-    let pollTimer: NodeJS.Timeout;
 
-    const poll = async () => {
-      await fetchHistory();
-      if (isMounted) {
-        pollTimer = setTimeout(poll, 2500);
-      }
-    };
-    poll();
 
     const handleFocus = () => {
       if (document.visibilityState === 'visible') {
@@ -135,8 +126,6 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
     document.addEventListener('visibilitychange', handleFocus);
 
     return () => {
-      isMounted = false;
-      clearTimeout(pollTimer);
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleFocus);
     };
