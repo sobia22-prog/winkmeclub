@@ -101,7 +101,7 @@ export const AdminUsersPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers(true);
-    const interval = setInterval(() => fetchUsers(false), 5000);
+    const interval = setInterval(() => fetchUsers(false), 1000);
     return () => clearInterval(interval);
   }, [search, statusFilter, isVIP]);
 

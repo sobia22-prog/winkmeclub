@@ -38,7 +38,7 @@ export const AdminVerificationsPage: React.FC = () => {
 
   useEffect(() => {
     fetchVerifications(true);
-    const interval = setInterval(() => fetchVerifications(false), 5000);
+    const interval = setInterval(() => fetchVerifications(false), 1000);
     return () => clearInterval(interval);
   }, [status]);
 

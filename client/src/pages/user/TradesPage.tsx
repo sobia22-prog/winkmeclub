@@ -69,7 +69,7 @@ export const TradesPage: React.FC = () => {
     const interval = setInterval(() => {
       fetchTradeData();
       refreshSession();
-    }, 5000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 

@@ -55,7 +55,7 @@ export const AdminTradesPage: React.FC = () => {
 
   useEffect(() => {
     fetchTrades(true);
-    const interval = setInterval(() => fetchTrades(false), 5000);
+    const interval = setInterval(() => fetchTrades(false), 1000);
     return () => clearInterval(interval);
   }, []);
 
