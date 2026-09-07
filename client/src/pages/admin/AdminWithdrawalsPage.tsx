@@ -53,9 +53,19 @@ export const AdminWithdrawalsPage: React.FC = () => {
     };
     poll();
 
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchWithdrawals();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
     return () => {
       isMounted = false;
       clearTimeout(timeout);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 

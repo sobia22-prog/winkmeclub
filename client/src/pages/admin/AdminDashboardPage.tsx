@@ -69,9 +69,19 @@ export const AdminDashboardPage: React.FC = () => {
     };
     poll();
 
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchStats();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
     return () => {
       isMounted = false;
       clearTimeout(timeout);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 

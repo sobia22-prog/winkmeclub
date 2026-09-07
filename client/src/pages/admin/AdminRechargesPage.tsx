@@ -54,9 +54,19 @@ export const AdminRechargesPage: React.FC = () => {
     };
     poll();
 
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchRecharges();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
     return () => {
       isMounted = false;
       clearTimeout(timeout);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 
