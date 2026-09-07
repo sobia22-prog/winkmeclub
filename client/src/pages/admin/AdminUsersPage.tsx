@@ -83,7 +83,8 @@ export const AdminUsersPage: React.FC = () => {
     onConfirm: () => {},
   });
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     try {
       const res = await adminService.getUsers({
         search,
@@ -94,12 +95,14 @@ export const AdminUsersPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(true);
+    const interval = setInterval(() => fetchUsers(false), 30000);
+    return () => clearInterval(interval);
   }, [search, statusFilter, isVIP]);
 
   const handleOpenAddProfile = () => {
@@ -199,14 +202,14 @@ export const AdminUsersPage: React.FC = () => {
         if (res.data.success) {
           setMessage(`User profile for "${profileForm.fullName}" updated successfully!`);
           setShowProfileModal(false);
-          fetchUsers();
+          fetchUsers(false);
         }
       } else {
         const res = await adminService.createMatchProfile(payload);
         if (res.data.success) {
           setMessage(`User profile for "${profileForm.fullName}" created successfully!`);
           setShowProfileModal(false);
-          fetchUsers();
+          fetchUsers(false);
         }
       }
     } catch (err: any) {
@@ -227,7 +230,7 @@ export const AdminUsersPage: React.FC = () => {
         try {
           await adminService.deleteUserProfile(user.id || user._id!);
           setMessage(`Profile for "${user.fullName}" deleted successfully.`);
-          fetchUsers();
+          fetchUsers(false);
         } catch (err: any) {
           setError(err.response?.data?.message || 'Failed to delete profile.');
         }

@@ -42,18 +42,26 @@ export const AdminDashboardPage: React.FC = () => {
   const isStaff = user?.role === 'STAFF';
   const currencySymbol = settings.currencySymbol || '₹';
 
+  const fetchStats = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
+    try {
+      const res = await adminService.getDashboardStats();
+      if (res.data.success) {
+        setStats(res.data.stats);
+        setMonthlyData(res.data.monthlyData || res.data.revenueGrowth || []);
+        setRecentTransactions(res.data.recentTransactions || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (showLoading) setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    adminService
-      .getDashboardStats()
-      .then((res) => {
-        if (res.data.success) {
-          setStats(res.data.stats);
-          setMonthlyData(res.data.monthlyData || res.data.revenueGrowth || []);
-          setRecentTransactions(res.data.recentTransactions || []);
-        }
-      })
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+    fetchStats(true);
+    const interval = setInterval(() => fetchStats(false), 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const fallbackMonthlyData = [
