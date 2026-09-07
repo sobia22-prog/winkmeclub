@@ -40,7 +40,10 @@ export class TradeController {
     try {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
 
-      const trades = await Trade.find({ userId: req.user._id }).sort({ createdAt: -1 });
+      const trades = await Trade.find({ userId: req.user._id })
+        .select('-productImage')
+        .sort({ createdAt: -1 })
+        .lean();
 
       return res.status(200).json({
         success: true,

@@ -228,8 +228,12 @@ export class AdminController {
       const transactions = await Transaction.find({ userId: user._id }).sort({ createdAt: -1 });
       const recharges = await RechargeRequest.find({ userId: user._id }).sort({ createdAt: -1 });
       const withdrawals = await WithdrawalRequest.find({ userId: user._id }).sort({ createdAt: -1 });
-      const trades = await Trade.find({ userId: user._id }).populate('productId').sort({ createdAt: -1 });
       const verification = await Verification.findOne({ userId: user._id }).sort({ createdAt: -1 });
+      const trades = await Trade.find({ userId: user._id })
+        .select('-productImage')
+        .populate('productId', 'name price category status')
+        .sort({ createdAt: -1 })
+        .lean();
 
       return res.status(200).json({
         success: true,
@@ -695,13 +699,15 @@ export class AdminController {
       }
 
       const trades = await Trade.find(query)
+        .select('-productImage')
         .populate({
           path: 'userId',
-          select: 'fullName email assignedStaff phone city profileImage',
+          select: 'fullName email assignedStaff phone city',
           populate: { path: 'assignedStaff', select: 'fullName invitationCode' },
         })
-        .populate('productId')
-        .sort({ createdAt: -1 });
+        .populate('productId', 'name price category status')
+        .sort({ createdAt: -1 })
+        .lean();
 
       return res.status(200).json({ success: true, trades });
     } catch (error: any) {
@@ -1030,9 +1036,11 @@ export class AdminController {
 
       // Fetch trades, recharges, withdrawals, verifications, and transactions for assigned clients
       const trades = await Trade.find({ userId: { $in: clientIds } })
+        .select('-productImage')
         .populate('userId', 'fullName email')
-        .populate('productId')
-        .sort({ createdAt: -1 });
+        .populate('productId', 'name price category status')
+        .sort({ createdAt: -1 })
+        .lean();
 
       const recharges = await RechargeRequest.find({ userId: { $in: clientIds } })
         .populate('userId', 'fullName email')

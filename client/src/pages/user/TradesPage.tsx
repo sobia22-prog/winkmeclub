@@ -87,7 +87,7 @@ export const TradesPage: React.FC = () => {
       await fetchTradeData();
       refreshSession();
       if (isMounted) {
-        timeout = setTimeout(poll, 1000);
+        timeout = setTimeout(poll, 8000);
       }
     };
     poll();

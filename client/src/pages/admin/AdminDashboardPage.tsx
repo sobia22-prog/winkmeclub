@@ -83,7 +83,7 @@ export const AdminDashboardPage: React.FC = () => {
     const poll = async () => {
       await fetchStats();
       if (isMounted) {
-        timeout = setTimeout(poll, 1000);
+        timeout = setTimeout(poll, 10000);
       }
     };
     poll();

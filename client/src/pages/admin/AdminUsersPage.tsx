@@ -126,7 +126,7 @@ export const AdminUsersPage: React.FC = () => {
     const poll = async () => {
       await fetchUsers();
       if (isMounted) {
-        timeout = setTimeout(poll, 1000);
+        timeout = setTimeout(poll, 10000);
       }
     };
     poll();

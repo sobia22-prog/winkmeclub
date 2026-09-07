@@ -32,7 +32,7 @@ export class TradeSettlementService {
       userId,
       productId,
       productName,
-      productImage,
+      productImage: (productImage && !productImage.startsWith('data:') && productImage.length < 500) ? productImage : '',
       quantity: qty,
       price: itemPrice || 0,
       totalAmount: qty,

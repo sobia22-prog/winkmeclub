@@ -150,9 +150,27 @@ export class SocketService {
   public static notifyTradeCreated(trade: any, assignedStaffId?: string | null) {
     if (!this.io) return;
 
+    // Ultra-lightweight sanitized trade payload (0 base64 images, instant sub-millisecond transmission)
+    const cleanTrade = {
+      _id: trade._id,
+      tradeId: trade.tradeId,
+      userId: trade.userId,
+      productId: trade.productId?._id || trade.productId,
+      productName: trade.productName,
+      quantity: trade.quantity,
+      price: trade.price,
+      totalAmount: trade.totalAmount,
+      status: trade.status,
+      outcome: trade.outcome,
+      profitPercentage: trade.profitPercentage,
+      payoutAmount: trade.payoutAmount,
+      createdAt: trade.createdAt,
+      updatedAt: trade.updatedAt,
+    };
+
     const payload = {
       type: 'TRADE_CREATED',
-      trade,
+      trade: cleanTrade,
       tradeId: trade.tradeId,
       userId: trade.userId?.toString ? trade.userId.toString() : String(trade.userId),
       timestamp: Date.now(),
@@ -184,9 +202,26 @@ export class SocketService {
   public static notifyTradeSettled(trade: any, assignedStaffId?: string | null) {
     if (!this.io) return;
 
+    const cleanTrade = {
+      _id: trade._id,
+      tradeId: trade.tradeId,
+      userId: trade.userId,
+      productId: trade.productId?._id || trade.productId,
+      productName: trade.productName,
+      quantity: trade.quantity,
+      price: trade.price,
+      totalAmount: trade.totalAmount,
+      status: trade.status,
+      outcome: trade.outcome,
+      profitPercentage: trade.profitPercentage,
+      payoutAmount: trade.payoutAmount,
+      createdAt: trade.createdAt,
+      updatedAt: trade.updatedAt,
+    };
+
     const payload = {
       type: 'TRADE_SETTLED',
-      trade,
+      trade: cleanTrade,
       tradeId: trade.tradeId,
       outcome: trade.outcome,
       userId: trade.userId?.toString ? trade.userId.toString() : String(trade.userId),

@@ -79,7 +79,7 @@ export const AdminTradesPage: React.FC = () => {
     const poll = async () => {
       await fetchTrades();
       if (isMounted) {
-        timeout = setTimeout(poll, 1000);
+        timeout = setTimeout(poll, 8000);
       }
     };
     poll();

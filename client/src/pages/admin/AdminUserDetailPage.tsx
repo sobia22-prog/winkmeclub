@@ -65,7 +65,7 @@ export const AdminUserDetailPage: React.FC = () => {
     const poll = async () => {
       await fetchUserDetail();
       if (isMounted) {
-        pollTimer = setTimeout(poll, 2000);
+        pollTimer = setTimeout(poll, 10000);
       }
     };
     poll();
