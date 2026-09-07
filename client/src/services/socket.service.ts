@@ -6,9 +6,17 @@ export const getSocket = (): Socket => {
   if (!socket) {
     const token = localStorage.getItem('wink_token');
     
-    // In production, VITE_API_URL may point to Railway or custom domain, or fallback to current origin
-    const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
-    const socketUrl = apiUrl ? apiUrl.replace(/\/api\/?$/, '') : window.location.origin;
+    // In production on winkmeclub.online or localhost, connect to the local fullstack WebSocket
+    let socketUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname.toLowerCase();
+      if (host.includes('winkmeclub.online') || host === 'localhost' || host === '127.0.0.1') {
+        socketUrl = window.location.origin;
+      } else {
+        const apiUrl = (import.meta as any).env?.VITE_API_URL || '';
+        socketUrl = (apiUrl && apiUrl !== '/api') ? apiUrl.replace(/\/api\/?$/, '') : window.location.origin;
+      }
+    }
 
     socket = io(socketUrl, {
       path: '/socket.io',

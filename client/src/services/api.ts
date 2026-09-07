@@ -1,6 +1,21 @@
 import axios from 'axios';
 
-const baseURL = (import.meta as any).env?.VITE_API_URL || '/api';
+// Determine API baseURL dynamically:
+// If running on winkmeclub.online or localhost or same-origin fullstack Express,
+// always use the local Express backend on the same origin (/api) to avoid cross-origin CORS issues.
+const getBaseUrl = (): string => {
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname.toLowerCase();
+    if (host.includes('winkmeclub.online') || host === 'localhost' || host === '127.0.0.1') {
+      return '/api';
+    }
+  }
+  const envUrl = (import.meta as any).env?.VITE_API_URL;
+  if (!envUrl || envUrl === '/api') return '/api';
+  return envUrl;
+};
+
+const baseURL = getBaseUrl();
 
 const api = axios.create({
   baseURL,
