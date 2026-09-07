@@ -99,11 +99,21 @@ export const AdminUsersPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-    const interval = setInterval(() => {
-      fetchUsers();
-    }, 1000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchUsers();
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, [search, statusFilter, isVIP]);
 
   const handleOpenAddProfile = () => {

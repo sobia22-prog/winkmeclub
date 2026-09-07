@@ -65,12 +65,22 @@ export const TradesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTradeData();
-    const interval = setInterval(() => {
-      fetchTradeData();
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchTradeData();
       refreshSession();
-    }, 1000);
-    return () => clearInterval(interval);
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   // Round Timer Countdown Loop

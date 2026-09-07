@@ -58,11 +58,21 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStats();
-    const interval = setInterval(() => {
-      fetchStats();
-    }, 1000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchStats();
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const fallbackMonthlyData = [

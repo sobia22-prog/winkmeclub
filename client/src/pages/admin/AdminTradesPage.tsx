@@ -53,11 +53,21 @@ export const AdminTradesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTrades();
-    const interval = setInterval(() => {
-      fetchTrades();
-    }, 1000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchTrades();
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleSettleSubmit = async (e: React.FormEvent) => {

@@ -43,11 +43,21 @@ export const AdminRechargesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchRecharges();
-    const interval = setInterval(() => {
-      fetchRecharges();
-    }, 1000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchRecharges();
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleActionSubmit = async (e: React.FormEvent) => {

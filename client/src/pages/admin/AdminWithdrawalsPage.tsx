@@ -42,11 +42,21 @@ export const AdminWithdrawalsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchWithdrawals();
-    const interval = setInterval(() => {
-      fetchWithdrawals();
-    }, 1000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchWithdrawals();
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const handleActionSubmit = async (e: React.FormEvent) => {

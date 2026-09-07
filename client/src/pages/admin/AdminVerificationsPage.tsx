@@ -36,11 +36,21 @@ export const AdminVerificationsPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchVerifications();
-    const interval = setInterval(() => {
-      fetchVerifications();
-    }, 1000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    let timeout: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchVerifications();
+      if (isMounted) {
+        timeout = setTimeout(poll, 1000);
+      }
+    };
+    poll();
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+    };
   }, [status]);
 
   const handleInlineStatusChange = async (verificationId: string, newStatus: 'APPROVE' | 'REJECT' | 'PENDING') => {
