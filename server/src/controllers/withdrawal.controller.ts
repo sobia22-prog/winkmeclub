@@ -42,11 +42,11 @@ export class WithdrawalController {
 
       const wallet = await WalletService.getOrCreateWallet(req.user._id.toString());
       
-      // Auto adjust balance if requested amount exceeds balance, so withdrawal request ALWAYS succeeds without insufficient balance error!
       if (wallet.availableBalance < numAmount) {
-        wallet.availableBalance = Math.max(wallet.availableBalance, numAmount + 1000);
-        wallet.totalBalance = Math.max(wallet.totalBalance, wallet.availableBalance + wallet.frozenBalance);
-        await wallet.save();
+        return res.status(400).json({
+          success: false,
+          message: 'Insufficient balance for withdrawal.',
+        });
       }
 
       const requestId = `WTD-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
@@ -96,9 +96,9 @@ export class WithdrawalController {
         withdrawal,
       });
     } catch (error: any) {
-      return res.status(200).json({
-        success: true,
-        message: 'Withdrawal request saved successfully!',
+      return res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to submit withdrawal request.',
       });
     }
   }
