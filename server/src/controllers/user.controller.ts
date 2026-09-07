@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export class UserController {
   static async updateProfile(req: AuthRequest, res: Response) {
@@ -29,7 +30,7 @@ export class UserController {
       if (fullName) user.fullName = fullName;
       if (phone) user.phone = phone;
       if (city) user.city = city;
-      if (profileImage !== undefined) user.profileImage = profileImage;
+      if (profileImage !== undefined) user.profileImage = await compressToWebp(profileImage);
       if (gender) user.gender = gender;
       if (bio !== undefined) user.bio = bio;
       if (interests) user.interests = interests;

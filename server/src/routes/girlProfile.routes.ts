@@ -14,6 +14,7 @@ router.get('/admin/all', authenticate, requireSuperAdmin, GirlProfileController.
 router.post('/admin/create', authenticate, requireSuperAdmin, GirlProfileController.createProfile);
 router.put('/admin/update/:id', authenticate, requireSuperAdmin, GirlProfileController.updateProfile);
 router.delete('/admin/delete/:id', authenticate, requireSuperAdmin, GirlProfileController.deleteProfile);
+router.post('/admin/optimize-db-images', authenticate, requireSuperAdmin, GirlProfileController.optimizeDbImages);
 router.post('/admin/categories', authenticate, requireSuperAdmin, GirlProfileController.createCategory);
 
 export default router;

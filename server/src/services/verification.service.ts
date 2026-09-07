@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { Verification, IVerification } from '../models/verification.model';
 import { User } from '../models/user.model';
 import { NotificationService } from './notification.service';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export class VerificationService {
   static async submitVerification(params: {
@@ -18,19 +19,27 @@ export class VerificationService {
       throw new Error('You already have a pending verification request under review.');
     }
 
+    const compressedIdDoc = params.idDocumentUrl ? await compressToWebp(params.idDocumentUrl) : '';
+    const compressedSelfie = params.selfieUrl ? await compressToWebp(params.selfieUrl) : '';
+
     let verification: IVerification;
     if (existing) {
       existing.fullName = params.fullName;
       existing.dob = params.dob;
       existing.idType = params.idType;
       existing.idNumber = params.idNumber;
-      existing.idDocumentUrl = params.idDocumentUrl;
-      existing.selfieUrl = params.selfieUrl;
+      existing.idDocumentUrl = compressedIdDoc;
+      existing.selfieUrl = compressedSelfie;
       existing.status = 'PENDING';
       existing.rejectionReason = '';
       verification = await existing.save();
     } else {
-      verification = await Verification.create({ ...params, status: 'PENDING' });
+      verification = await Verification.create({
+        ...params,
+        idDocumentUrl: compressedIdDoc,
+        selfieUrl: compressedSelfie,
+        status: 'PENDING',
+      });
     }
 
     await User.findByIdAndUpdate(params.userId, { verificationStatus: 'PENDING' });

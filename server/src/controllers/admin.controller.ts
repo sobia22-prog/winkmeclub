@@ -11,6 +11,9 @@ import { Announcement } from '../models/announcement.model';
 import { SupportTicket, SupportMessage } from '../models/support.model';
 import { Transaction } from '../models/transaction.model';
 import { GirlProfile } from '../models/girlProfile.model';
+import { SystemSettings } from '../models/systemSettings.model';
+import { compressToWebp, isBase64Image } from '../utils/imageCompressor';
+import { invalidateCache } from '../utils/cache';
 import { WalletService } from '../services/wallet.service';
 import { TradeSettlementService } from '../services/tradeSettlement.service';
 import { VerificationService } from '../services/verification.service';
@@ -296,6 +299,9 @@ export class AdminController {
         pinHash = await bcrypt.hash(transactionPin.trim(), 10);
       }
 
+      const defaultAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80';
+      const finalProfileImage = profileImage ? await compressToWebp(profileImage) : defaultAvatar;
+
       const user = await User.create({
         fullName: fullName.trim(),
         email: userEmail,
@@ -305,7 +311,7 @@ export class AdminController {
         city: city || 'Mumbai',
         gender: gender || 'Female',
         role: 'USER',
-        profileImage: profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80',
+        profileImage: finalProfileImage,
         bio: bio || '',
         isVIP: isVIP !== undefined ? Boolean(isVIP) : true,
         isVerified: true,
@@ -369,7 +375,7 @@ export class AdminController {
       if (phone) user.phone = phone;
       if (city) user.city = city;
       if (gender) user.gender = gender;
-      if (profileImage !== undefined) user.profileImage = profileImage;
+      if (profileImage !== undefined) user.profileImage = await compressToWebp(profileImage);
       if (bio !== undefined) user.bio = bio;
 
       if (status) {
@@ -792,6 +798,9 @@ export class AdminController {
   // 7. Marketplace Product Catalog
   static async createProduct(req: AuthRequest, res: Response) {
     try {
+      if (req.body.image) {
+        req.body.image = await compressToWebp(req.body.image);
+      }
       const product = await Product.create(req.body);
       return res.status(201).json({ success: true, product });
     } catch (error: any) {
@@ -801,6 +810,9 @@ export class AdminController {
 
   static async updateProduct(req: AuthRequest, res: Response) {
     try {
+      if (req.body.image) {
+        req.body.image = await compressToWebp(req.body.image);
+      }
       const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
       return res.status(200).json({ success: true, product });
     } catch (error: any) {
@@ -820,6 +832,9 @@ export class AdminController {
   // 8. Announcements
   static async createAnnouncement(req: AuthRequest, res: Response) {
     try {
+      if (req.body.image) {
+        req.body.image = await compressToWebp(req.body.image);
+      }
       const announcement = await Announcement.create(req.body);
       return res.status(201).json({ success: true, announcement });
     } catch (error: any) {
@@ -1149,6 +1164,184 @@ export class AdminController {
       });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to update admin settings.' });
+    }
+  }
+
+  // 12. Universal Database Image Optimization (Super Admin)
+  static async optimizeAllDbImages(req: AuthRequest, res: Response) {
+    try {
+      let totalUpdated = 0;
+      let totalBytesSaved = 0;
+      const stats = {
+        girlProfilesUpdated: 0,
+        usersUpdated: 0,
+        productsUpdated: 0,
+        announcementsUpdated: 0,
+        rechargesUpdated: 0,
+        verificationsUpdated: 0,
+        systemSettingsUpdated: 0,
+      };
+
+      // 1. Girl Profiles
+      const girlProfiles = await GirlProfile.find();
+      for (const gp of girlProfiles) {
+        let changed = false;
+        if (gp.profileImage && isBase64Image(gp.profileImage)) {
+          const oldLen = gp.profileImage.length;
+          const compressed = await compressToWebp(gp.profileImage);
+          if (compressed !== gp.profileImage) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            gp.profileImage = compressed;
+            changed = true;
+          }
+        }
+        if (Array.isArray(gp.galleryImages) && gp.galleryImages.length > 0) {
+          const newGallery: string[] = [];
+          for (const img of gp.galleryImages) {
+            if (isBase64Image(img)) {
+              const oldLen = img.length;
+              const compressed = await compressToWebp(img);
+              if (compressed !== img) {
+                totalBytesSaved += Math.max(0, oldLen - compressed.length);
+                changed = true;
+              }
+              newGallery.push(compressed);
+            } else {
+              newGallery.push(img);
+            }
+          }
+          if (changed) gp.galleryImages = newGallery;
+        }
+        if (changed) {
+          await gp.save();
+          stats.girlProfilesUpdated++;
+          totalUpdated++;
+        }
+      }
+
+      // 2. Users
+      const users = await User.find({ profileImage: { $exists: true, $ne: '' } });
+      for (const u of users) {
+        if (u.profileImage && isBase64Image(u.profileImage)) {
+          const oldLen = u.profileImage.length;
+          const compressed = await compressToWebp(u.profileImage);
+          if (compressed !== u.profileImage) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            u.profileImage = compressed;
+            await u.save();
+            stats.usersUpdated++;
+            totalUpdated++;
+          }
+        }
+      }
+
+      // 3. Products
+      const products = await Product.find({ image: { $exists: true, $ne: '' } });
+      for (const p of products) {
+        if (p.image && isBase64Image(p.image)) {
+          const oldLen = p.image.length;
+          const compressed = await compressToWebp(p.image);
+          if (compressed !== p.image) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            p.image = compressed;
+            await p.save();
+            stats.productsUpdated++;
+            totalUpdated++;
+          }
+        }
+      }
+
+      // 4. Announcements
+      const announcements = await Announcement.find({ image: { $exists: true, $ne: '' } });
+      for (const a of announcements) {
+        if (a.image && isBase64Image(a.image)) {
+          const oldLen = a.image.length;
+          const compressed = await compressToWebp(a.image);
+          if (compressed !== a.image) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            a.image = compressed;
+            await a.save();
+            stats.announcementsUpdated++;
+            totalUpdated++;
+          }
+        }
+      }
+
+      // 5. Recharges
+      const recharges = await RechargeRequest.find({ receiptUrl: { $exists: true, $ne: '' } });
+      for (const r of recharges) {
+        if (r.receiptUrl && isBase64Image(r.receiptUrl)) {
+          const oldLen = r.receiptUrl.length;
+          const compressed = await compressToWebp(r.receiptUrl);
+          if (compressed !== r.receiptUrl) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            r.receiptUrl = compressed;
+            await r.save();
+            stats.rechargesUpdated++;
+            totalUpdated++;
+          }
+        }
+      }
+
+      // 6. Verifications
+      const verifications = await Verification.find();
+      for (const v of verifications) {
+        let changed = false;
+        if (v.idDocumentUrl && isBase64Image(v.idDocumentUrl)) {
+          const oldLen = v.idDocumentUrl.length;
+          const compressed = await compressToWebp(v.idDocumentUrl);
+          if (compressed !== v.idDocumentUrl) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            v.idDocumentUrl = compressed;
+            changed = true;
+          }
+        }
+        if (v.selfieUrl && isBase64Image(v.selfieUrl)) {
+          const oldLen = v.selfieUrl.length;
+          const compressed = await compressToWebp(v.selfieUrl);
+          if (compressed !== v.selfieUrl) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            v.selfieUrl = compressed;
+            changed = true;
+          }
+        }
+        if (changed) {
+          await v.save();
+          stats.verificationsUpdated++;
+          totalUpdated++;
+        }
+      }
+
+      // 7. SystemSettings
+      const settings = await SystemSettings.findOne();
+      if (settings && settings.projectImage && isBase64Image(settings.projectImage)) {
+        const oldLen = settings.projectImage.length;
+        const compressed = await compressToWebp(settings.projectImage);
+        if (compressed !== settings.projectImage) {
+          totalBytesSaved += Math.max(0, oldLen - compressed.length);
+          settings.projectImage = compressed;
+          await settings.save();
+          stats.systemSettingsUpdated++;
+          totalUpdated++;
+        }
+      }
+
+      invalidateCache('public-profiles');
+      invalidateCache('system-settings');
+
+      const mbSaved = (totalBytesSaved / (1024 * 1024)).toFixed(2);
+      return res.status(200).json({
+        success: true,
+        message: `Database image optimization complete! Processed and converted ${totalUpdated} document(s) to WebP format, saving ~${mbSaved} MB.`,
+        stats: {
+          ...stats,
+          totalUpdated,
+          totalBytesSaved,
+          totalMbSaved: Number(mbSaved),
+        },
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to optimize database images.' });
     }
   }
 }

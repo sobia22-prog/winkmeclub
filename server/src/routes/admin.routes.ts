@@ -59,5 +59,6 @@ router.post('/tickets/:id/reply', AdminController.replyTicket);
 
 // Admin Settings & Total Access Controls
 router.put('/settings', AdminController.updateAdminSettings);
+router.post('/optimize-images', requireSuperAdmin, AdminController.optimizeAllDbImages);
 
 export default router;

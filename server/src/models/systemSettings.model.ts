@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export interface ISystemSettings extends Document {
   appName: string;
@@ -51,5 +52,16 @@ const SystemSettingsSchema: Schema = new Schema(
   },
   { timestamps: true }
 );
+
+SystemSettingsSchema.pre('save', async function (this: any, next) {
+  try {
+    if (this.isModified('projectImage') && this.projectImage) {
+      this.projectImage = await compressToWebp(this.projectImage);
+    }
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+});
 
 export const SystemSettings = mongoose.model<ISystemSettings>('SystemSettings', SystemSettingsSchema);

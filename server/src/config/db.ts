@@ -10,10 +10,10 @@ if (process.platform === 'win32') {
 }
 
 const MONGO_OPTIONS = {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 10000,
-  connectTimeoutMS: 5000,
-  maxPoolSize: 10,
+  serverSelectionTimeoutMS: 30000,
+  socketTimeoutMS: 60000,
+  connectTimeoutMS: 30000,
+  maxPoolSize: 20,
   minPoolSize: 2,
   bufferCommands: false,
 };

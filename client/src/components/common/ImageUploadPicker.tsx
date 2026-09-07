@@ -22,7 +22,7 @@ export const ImageUploadPicker: React.FC<ImageUploadPickerProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const compressImage = (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.75): Promise<string> => {
+  const compressImage = (file: File, maxWidth = 1000, maxHeight = 1000, quality = 0.8): Promise<string> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -50,7 +50,17 @@ export const ImageUploadPicker: React.FC<ImageUploadPickerProps> = ({
           const ctx = canvas.getContext('2d');
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
+            try {
+              const webpDataUrl = canvas.toDataURL('image/webp', quality);
+              // If browser supports WebP canvas export, use it; otherwise fallback to jpeg
+              if (webpDataUrl.startsWith('data:image/webp')) {
+                resolve(webpDataUrl);
+              } else {
+                resolve(canvas.toDataURL('image/jpeg', quality));
+              }
+            } catch {
+              resolve(canvas.toDataURL('image/jpeg', quality));
+            }
           } else {
             resolve(event.target?.result as string);
           }

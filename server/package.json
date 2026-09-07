@@ -8,7 +8,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed": "ts-node src/seed/seed.ts"
+    "seed": "ts-node src/seed/seed.ts",
+    "optimize-images": "ts-node src/scripts/optimizeImages.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

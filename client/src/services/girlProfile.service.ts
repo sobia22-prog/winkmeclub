@@ -29,4 +29,5 @@ export const girlProfileService = {
   updateProfile: (id: string, data: Partial<GirlProfileData>) => api.put(`/girl-profiles/admin/update/${id}`, data),
   deleteProfile: (id: string) => api.delete(`/girl-profiles/admin/delete/${id}`),
   createCategory: (name: string) => api.post('/girl-profiles/admin/categories', { name }),
+  optimizeDbImages: () => api.post('/girl-profiles/admin/optimize-db-images'),
 };

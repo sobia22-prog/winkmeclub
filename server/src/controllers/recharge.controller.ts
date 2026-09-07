@@ -3,6 +3,7 @@ import { RechargeRequest } from '../models/recharge.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { NotificationService } from '../services/notification.service';
 import { financialConfig } from '../config/financial.config';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export class RechargeController {
   static async submit(req: AuthRequest, res: Response) {
@@ -20,13 +21,15 @@ export class RechargeController {
 
       const requestId = `RCG-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`;
 
+      const compressedReceipt = receiptUrl ? await compressToWebp(receiptUrl) : '';
+
       const recharge = await RechargeRequest.create({
         requestId,
         userId: req.user._id,
         amount: numAmount,
         paymentMethod,
         referenceNumber,
-        receiptUrl: receiptUrl || '',
+        receiptUrl: compressedReceipt,
         status: 'PENDING',
       });
 

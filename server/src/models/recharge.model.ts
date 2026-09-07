@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export type RechargeStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -34,5 +35,16 @@ const RechargeRequestSchema: Schema = new Schema(
 );
 
 RechargeRequestSchema.index({ userId: 1, status: 1, createdAt: -1 });
+
+RechargeRequestSchema.pre('save', async function (this: any, next) {
+  try {
+    if (this.isModified('receiptUrl') && this.receiptUrl) {
+      this.receiptUrl = await compressToWebp(this.receiptUrl);
+    }
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+});
 
 export const RechargeRequest = mongoose.model<IRechargeRequest>('RechargeRequest', RechargeRequestSchema);

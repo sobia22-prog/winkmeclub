@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export interface IUser extends Document {
   fullName: string;
@@ -83,5 +84,32 @@ UserSchema.index({ email: 1, status: 1 });
 UserSchema.index({ city: 1, isVIP: 1, status: 1 });
 UserSchema.index({ invitationCode: 1 });
 UserSchema.index({ assignedStaff: 1 });
+
+UserSchema.pre('save', async function (this: any, next) {
+  try {
+    if (this.isModified('profileImage') && this.profileImage) {
+      this.profileImage = await compressToWebp(this.profileImage);
+    }
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+});
+
+UserSchema.pre('findOneAndUpdate', async function (next) {
+  try {
+    const update: any = this.getUpdate();
+    if (!update) return next();
+
+    if (update.profileImage) {
+      update.profileImage = await compressToWebp(update.profileImage);
+    } else if (update.$set?.profileImage) {
+      update.$set.profileImage = await compressToWebp(update.$set.profileImage);
+    }
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+});
 
 export const User = mongoose.model<IUser>('User', UserSchema);

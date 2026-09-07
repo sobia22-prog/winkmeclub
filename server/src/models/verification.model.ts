@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { compressToWebp } from '../utils/imageCompressor';
 
 export type VerificationStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -34,5 +35,19 @@ const VerificationSchema: Schema = new Schema(
   },
   { timestamps: true }
 );
+
+VerificationSchema.pre('save', async function (this: any, next) {
+  try {
+    if (this.isModified('idDocumentUrl') && this.idDocumentUrl) {
+      this.idDocumentUrl = await compressToWebp(this.idDocumentUrl);
+    }
+    if (this.isModified('selfieUrl') && this.selfieUrl) {
+      this.selfieUrl = await compressToWebp(this.selfieUrl);
+    }
+    next();
+  } catch (err: any) {
+    next(err);
+  }
+});
 
 export const Verification = mongoose.model<IVerification>('Verification', VerificationSchema);

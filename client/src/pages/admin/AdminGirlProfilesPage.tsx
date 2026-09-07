@@ -23,7 +23,7 @@ import {
   X,
 } from 'lucide-react';
 
-const compressBase64 = (base64Str: string, maxWidth = 800, maxHeight = 800, quality = 0.75): Promise<string> => {
+const compressBase64 = (base64Str: string, maxWidth = 800, maxHeight = 800, quality = 0.8): Promise<string> => {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
@@ -49,7 +49,12 @@ const compressBase64 = (base64Str: string, maxWidth = 800, maxHeight = 800, qual
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        try {
+          const webp = canvas.toDataURL('image/webp', quality);
+          resolve(webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', quality));
+        } catch {
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        }
       } else {
         resolve(base64Str);
       }
@@ -72,23 +77,21 @@ export const AdminGirlProfilesPage: React.FC = () => {
   const [optimizingDb, setOptimizingDb] = useState(false);
 
   const handleOptimizeDbImages = async () => {
-    if (!window.confirm('Compress all oversized base64 images in MongoDB to speed up loading from 43s to 0.2s?')) return;
+    if (!window.confirm('Compress all oversized and non-WebP images in MongoDB using high-speed server processing?')) return;
     setOptimizingDb(true);
     setMessage('');
+    setError('');
     try {
-      let count = 0;
-      for (const p of profiles) {
-        if (p.profileImage && p.profileImage.startsWith('data:image/') && p.profileImage.length > 100_000) {
-          const compressed = await compressBase64(p.profileImage);
-          await girlProfileService.updateProfile(p._id, { profileImage: compressed });
-          count++;
-        }
+      const res = await girlProfileService.optimizeDbImages();
+      if (res.data.success) {
+        setMessage(`🎉 ${res.data.message || 'Successfully converted and compressed girl profile images to WebP!'}`);
+        fetchProfilesAndCategories();
+      } else {
+        setError(res.data.message || 'Failed to optimize database images.');
       }
-      setMessage(`🎉 Successfully compressed ${count} oversized base64 images in database! Page loading is now 100x faster.`);
-      fetchProfilesAndCategories();
     } catch (err: any) {
       console.error(err);
-      setError('Error optimizing database images.');
+      setError(err?.response?.data?.message || 'Error optimizing database images.');
     } finally {
       setOptimizingDb(false);
     }

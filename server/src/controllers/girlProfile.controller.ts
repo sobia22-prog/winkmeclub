@@ -3,6 +3,7 @@ import { GirlProfile } from '../models/girlProfile.model';
 import { GirlCategory } from '../models/girlCategory.model';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { getCache, setCache, invalidateCache } from '../utils/cache';
+import { compressToWebp, isBase64Image } from '../utils/imageCompressor';
 
 const PUBLIC_LIST_FIELDS =
   'name rating height weight chestCircumference initialLikes categories location bio tags verificationLabel details profileImage isFeatured createdAt';
@@ -45,10 +46,15 @@ export class GirlProfileController {
         ];
       }
 
+      const limit = Math.min(Number(req.query.limit) || 60, 100);
+      const page = Math.max(Number(req.query.page) || 1, 1);
+      const skip = (page - 1) * limit;
+
       const profiles = await GirlProfile.find(query)
         .select(PUBLIC_LIST_FIELDS)
         .sort({ createdAt: -1 })
-        .hint({ isActive: 1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
         .lean()
         .exec();
 
@@ -58,6 +64,7 @@ export class GirlProfileController {
       res.set('Cache-Control', 'public, max-age=300');
       return res.status(200).json({ success: true, ...payload });
     } catch (error: any) {
+      console.error('[GirlProfileController] Error in getPublicProfiles:', error);
       return res.status(500).json({ message: error.message || 'Failed to fetch girl profiles.' });
     }
   }
@@ -121,6 +128,11 @@ export class GirlProfileController {
         return res.status(400).json({ message: 'Name and profile image are required.' });
       }
 
+      const compressedProfileImage = await compressToWebp(profileImage);
+      const compressedGalleryImages = Array.isArray(galleryImages)
+        ? await Promise.all(galleryImages.map((img: string) => compressToWebp(img)))
+        : [];
+
       const profile = await GirlProfile.create({
         name,
         rating: rating !== undefined ? Number(rating) : 5.0,
@@ -134,8 +146,8 @@ export class GirlProfileController {
         tags: Array.isArray(tags) ? tags : typeof tags === 'string' ? tags.split(',').map((t) => t.trim()).filter(Boolean) : [],
         verificationLabel: verificationLabel || "ID Verified",
         details: details || "",
-        profileImage,
-        galleryImages: Array.isArray(galleryImages) ? galleryImages : [],
+        profileImage: compressedProfileImage,
+        galleryImages: compressedGalleryImages,
       });
 
       invalidateCache('public-profiles');
@@ -158,6 +170,16 @@ export class GirlProfileController {
 
       if (updates.tags && typeof updates.tags === 'string') {
         updates.tags = updates.tags.split(',').map((t: string) => t.trim()).filter(Boolean);
+      }
+
+      if (updates.profileImage) {
+        updates.profileImage = await compressToWebp(updates.profileImage);
+      }
+
+      if (Array.isArray(updates.galleryImages)) {
+        updates.galleryImages = await Promise.all(
+          updates.galleryImages.map((img: string) => compressToWebp(img))
+        );
       }
 
       const profile = await GirlProfile.findByIdAndUpdate(id, updates, { new: true });
@@ -234,6 +256,66 @@ export class GirlProfileController {
       });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to create category.' });
+    }
+  }
+
+  // Admin - Compress all existing girl profiles in MongoDB to WebP
+  static async optimizeDbImages(req: AuthRequest, res: Response) {
+    try {
+      const profiles = await GirlProfile.find();
+      let updatedCount = 0;
+      let totalBytesSaved = 0;
+
+      for (const profile of profiles) {
+        let changed = false;
+        if (profile.profileImage && isBase64Image(profile.profileImage)) {
+          const oldLen = profile.profileImage.length;
+          const compressed = await compressToWebp(profile.profileImage);
+          if (compressed !== profile.profileImage) {
+            totalBytesSaved += Math.max(0, oldLen - compressed.length);
+            profile.profileImage = compressed;
+            changed = true;
+          }
+        }
+
+        if (Array.isArray(profile.galleryImages) && profile.galleryImages.length > 0) {
+          const newGallery: string[] = [];
+          for (const img of profile.galleryImages) {
+            if (isBase64Image(img)) {
+              const oldLen = img.length;
+              const compressed = await compressToWebp(img);
+              if (compressed !== img) {
+                totalBytesSaved += Math.max(0, oldLen - compressed.length);
+                changed = true;
+              }
+              newGallery.push(compressed);
+            } else {
+              newGallery.push(img);
+            }
+          }
+          if (changed) {
+            profile.galleryImages = newGallery;
+          }
+        }
+
+        if (changed) {
+          await profile.save();
+          updatedCount++;
+        }
+      }
+
+      invalidateCache('public-profiles');
+
+      const mbSaved = (totalBytesSaved / (1024 * 1024)).toFixed(2);
+      return res.status(200).json({
+        success: true,
+        message: `Successfully optimized ${updatedCount} girl profile(s) to WebP format! Saved approx ${mbSaved} MB in MongoDB.`,
+        updatedCount,
+        bytesSaved: totalBytesSaved,
+        mbSaved: Number(mbSaved),
+      });
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message || 'Failed to optimize database images.' });
     }
   }
 }
