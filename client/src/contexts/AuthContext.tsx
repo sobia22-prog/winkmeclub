@@ -53,14 +53,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     fetchSession();
 
-    // 1. Listen for real-time WebSocket events to update session & wallet immediately
     const socket = getSocket();
 
-    const handleRealtimeUpdate = (data: any) => {
+    const handleRealtimeUpdate = () => {
       const currentToken = localStorage.getItem('wink_token');
       if (!currentToken) return;
-
-      // If event has a target userId, only refresh if it matches current user (or if admin/staff)
       fetchSession();
     };
 
@@ -72,18 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     socket.on('user:updated', handleRealtimeUpdate);
     socket.on('data:invalidate', handleRealtimeUpdate);
 
-    // 2. Fail-safe Polling every 2.5 seconds + focus/visibility listeners
-    let isMounted = true;
-
-    const poll = async () => {
-      const currentToken = localStorage.getItem('wink_token');
-      if (currentToken) {
-        await fetchSession();
-      }
-    };
-    // Fetch once on mount, then rely on WebSockets and visibility changes.
-    poll();
-
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
         fetchSession();
@@ -93,7 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     document.addEventListener('visibilitychange', onVisible);
 
     return () => {
-      isMounted = false;
       socket.off('balance:updated', handleRealtimeUpdate);
       socket.off('trade:settled', handleRealtimeUpdate);
       socket.off('trade:created', handleRealtimeUpdate);
