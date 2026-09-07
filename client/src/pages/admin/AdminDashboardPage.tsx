@@ -59,9 +59,18 @@ export const AdminDashboardPage: React.FC = () => {
   };
 
   // Real-time synchronization for dashboard KPIs and activity
-  useRealtimeEvent('trade:created', () => fetchStats());
-  useRealtimeEvent('trade:settled', () => fetchStats());
-  useRealtimeEvent('balance:updated', () => fetchStats());
+  useRealtimeEvent('trade:created', (d: any) => {
+    console.log('[AdminDashboardPage] Realtime trade:created received:', d);
+    fetchStats();
+  });
+  useRealtimeEvent('trade:settled', () => {
+    console.log('[AdminDashboardPage] Realtime trade:settled received');
+    fetchStats();
+  });
+  useRealtimeEvent('balance:updated', () => {
+    console.log('[AdminDashboardPage] Realtime balance:updated received');
+    fetchStats();
+  });
   useRealtimeEvent('recharge:updated', () => fetchStats());
   useRealtimeEvent('withdrawal:updated', () => fetchStats());
   useRealtimeEvent('user:updated', () => fetchStats());

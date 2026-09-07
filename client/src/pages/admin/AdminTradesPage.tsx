@@ -54,10 +54,22 @@ export const AdminTradesPage: React.FC = () => {
   };
 
   // Instant real-time updates via WebSockets without page reload
-  useRealtimeEvent('trade:created', () => fetchTrades());
-  useRealtimeEvent('trade:settled', () => fetchTrades());
+  useRealtimeEvent('trade:created', (data: any) => {
+    console.log('[AdminTradesPage] Realtime trade:created received:', data);
+    fetchTrades();
+  });
+  useRealtimeEvent('trade:settled', (data: any) => {
+    console.log('[AdminTradesPage] Realtime trade:settled received:', data);
+    fetchTrades();
+  });
+  useRealtimeEvent('balance:updated', () => {
+    fetchTrades();
+  });
   useRealtimeEvent('data:invalidate', (d: any) => {
-    if (d?.entity === 'trades' || !d?.entity) fetchTrades();
+    if (d?.entity === 'trades' || !d?.entity) {
+      console.log('[AdminTradesPage] Realtime data:invalidate received:', d);
+      fetchTrades();
+    }
   });
 
   useEffect(() => {

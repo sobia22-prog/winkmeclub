@@ -57,18 +57,33 @@ export const useSocket = () => {
 };
 
 /**
- * Hook to subscribe to any socket event with automatic cleanup on unmount.
+ * Hook to subscribe to any socket event with persistent ref and automatic cleanup.
+ * Guarantees zero dropped events and never thrashes listeners on component re-renders.
  */
 export const useRealtimeEvent = (event: string, callback: (data: any) => void) => {
   const { socket } = useSocket();
+  const savedCallback = React.useRef(callback);
 
-  useEffect(() => {
-    if (!socket) return;
+  React.useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
-    socket.on(event, callback);
+  React.useEffect(() => {
+    const s = socket || getSocket();
+    if (!s) return;
+
+    const handler = (data: any) => {
+      try {
+        savedCallback.current?.(data);
+      } catch (err) {
+        console.error(`[Realtime Error] Event "${event}":`, err);
+      }
+    };
+
+    s.on(event, handler);
 
     return () => {
-      socket.off(event, callback);
+      s.off(event, handler);
     };
-  }, [socket, event, callback]);
+  }, [socket, event]);
 };

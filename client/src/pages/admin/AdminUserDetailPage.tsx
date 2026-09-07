@@ -39,9 +39,18 @@ export const AdminUserDetailPage: React.FC = () => {
   };
 
   // Real-time WebSocket event triggers for instant zero-lag updates
-  useRealtimeEvent('trade:created', () => fetchUserDetail());
-  useRealtimeEvent('trade:settled', () => fetchUserDetail());
-  useRealtimeEvent('balance:updated', () => fetchUserDetail());
+  useRealtimeEvent('trade:created', (d: any) => {
+    console.log('[AdminUserDetailPage] Realtime trade:created received:', d);
+    fetchUserDetail();
+  });
+  useRealtimeEvent('trade:settled', (d: any) => {
+    console.log('[AdminUserDetailPage] Realtime trade:settled received:', d);
+    fetchUserDetail();
+  });
+  useRealtimeEvent('balance:updated', (d: any) => {
+    console.log('[AdminUserDetailPage] Realtime balance:updated received:', d);
+    fetchUserDetail();
+  });
   useRealtimeEvent('recharge:updated', () => fetchUserDetail());
   useRealtimeEvent('withdrawal:updated', () => fetchUserDetail());
   useRealtimeEvent('user:updated', () => fetchUserDetail());

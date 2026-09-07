@@ -100,11 +100,24 @@ export const AdminUsersPage: React.FC = () => {
   };
 
   // Real-time synchronization for users directory & balances
-  useRealtimeEvent('user:updated', () => fetchUsers());
-  useRealtimeEvent('balance:updated', () => fetchUsers());
-  useRealtimeEvent('trade:created', () => fetchUsers());
-  useRealtimeEvent('trade:settled', () => fetchUsers());
-  useRealtimeEvent('data:invalidate', () => fetchUsers());
+  useRealtimeEvent('user:updated', () => {
+    console.log('[AdminUsersPage] Realtime user:updated received');
+    fetchUsers();
+  });
+  useRealtimeEvent('balance:updated', () => {
+    console.log('[AdminUsersPage] Realtime balance:updated received');
+    fetchUsers();
+  });
+  useRealtimeEvent('trade:created', (d: any) => {
+    console.log('[AdminUsersPage] Realtime trade:created received:', d);
+    fetchUsers();
+  });
+  useRealtimeEvent('trade:settled', () => {
+    fetchUsers();
+  });
+  useRealtimeEvent('data:invalidate', () => {
+    fetchUsers();
+  });
 
   useEffect(() => {
     let isMounted = true;

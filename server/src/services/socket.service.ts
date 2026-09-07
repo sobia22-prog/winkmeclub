@@ -9,7 +9,10 @@ export class SocketService {
   public static init(server: HttpServer): SocketIOServer {
     this.io = new SocketIOServer(server, {
       cors: {
-        origin: '*',
+        origin: (origin, callback) => {
+          // Dynamically allow any origin so that credentials: true works in all browsers
+          callback(null, true);
+        },
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         credentials: true,
       },
@@ -141,10 +144,8 @@ export class SocketService {
 
   /**
    * When a client executes a trade:
-   * 1. Notify the client (updates Trade table and balance)
-   * 2. Notify assigned staff (updates staff Trade table and client detail)
-   * 3. Notify all admins (updates admin Trade table and dashboard)
-   * 4. Broadcast global trade activity
+   * 1. Broadcast to ALL connected sockets (admin, staff, user)
+   * 2. Targeted room emits
    */
   public static notifyTradeCreated(trade: any, assignedStaffId?: string | null) {
     if (!this.io) return;
@@ -157,31 +158,28 @@ export class SocketService {
       timestamp: Date.now(),
     };
 
-    // Notify the user who made the trade
+    // Unconditional global broadcast to ALL connected browsers (Admin, Staff, Client)
+    this.io.emit('trade:created', payload);
+    this.io.emit('balance:updated', { userId: payload.userId, timestamp: Date.now() });
+    this.io.emit('data:invalidate', { entity: 'trades', userId: payload.userId, timestamp: Date.now() });
+
+    // Targeted room emits for specific handlers
     if (trade.userId) {
       this.emitToUser(payload.userId, 'trade:created', payload);
       this.emitToUser(payload.userId, 'balance:updated', { userId: payload.userId, timestamp: Date.now() });
     }
-
-    // Notify assigned staff
     if (assignedStaffId) {
       this.emitToStaff(assignedStaffId, 'trade:created', payload);
       this.emitToStaff(assignedStaffId, 'balance:updated', { userId: payload.userId, timestamp: Date.now() });
     }
     this.emitToAllStaff('trade:created', payload);
-
-    // Notify all admins
     this.emitToAdmin('trade:created', payload);
-    this.emitToAdmin('balance:updated', { userId: payload.userId, timestamp: Date.now() });
-
-    // Global broadcast for any open lists/dashboards
-    this.broadcast('data:invalidate', { entity: 'trades', userId: payload.userId, timestamp: Date.now() });
   }
 
   /**
    * When admin or staff settles a trade (WIN or LOSE):
-   * 1. Notify the client immediately (updates badge, balance credited/deducted)
-   * 2. Notify staff and admins
+   * 1. Broadcast to ALL connected sockets
+   * 2. Targeted room emits
    */
   public static notifyTradeSettled(trade: any, assignedStaffId?: string | null) {
     if (!this.io) return;
@@ -195,20 +193,21 @@ export class SocketService {
       timestamp: Date.now(),
     };
 
+    // Unconditional global broadcast to ALL connected browsers (Admin, Staff, Client)
+    this.io.emit('trade:settled', payload);
+    this.io.emit('balance:updated', { userId: payload.userId, timestamp: Date.now() });
+    this.io.emit('data:invalidate', { entity: 'trades', userId: payload.userId, timestamp: Date.now() });
+
     if (trade.userId) {
       this.emitToUser(payload.userId, 'trade:settled', payload);
       this.emitToUser(payload.userId, 'balance:updated', { userId: payload.userId, timestamp: Date.now() });
     }
-
     if (assignedStaffId) {
       this.emitToStaff(assignedStaffId, 'trade:settled', payload);
       this.emitToStaff(assignedStaffId, 'balance:updated', { userId: payload.userId, timestamp: Date.now() });
     }
     this.emitToAllStaff('trade:settled', payload);
     this.emitToAdmin('trade:settled', payload);
-    this.emitToAdmin('balance:updated', { userId: payload.userId, timestamp: Date.now() });
-
-    this.broadcast('data:invalidate', { entity: 'trades', userId: payload.userId, timestamp: Date.now() });
   }
 
   /**
@@ -221,10 +220,14 @@ export class SocketService {
       wallet: walletData,
       timestamp: Date.now(),
     };
+
+    // Unconditional broadcast
+    this.io.emit('balance:updated', payload);
+    this.io.emit('data:invalidate', { entity: 'wallet', userId: userId.toString(), timestamp: Date.now() });
+
     this.emitToUser(userId, 'balance:updated', payload);
     this.emitToAdmin('balance:updated', payload);
     this.emitToAllStaff('balance:updated', payload);
-    this.broadcast('data:invalidate', { entity: 'wallet', userId: userId.toString(), timestamp: Date.now() });
   }
 
   /**
@@ -235,10 +238,12 @@ export class SocketService {
     const userId = recharge.userId?.toString ? recharge.userId.toString() : String(recharge.userId);
     const payload = { recharge, userId, timestamp: Date.now() };
 
+    this.io.emit('recharge:updated', payload);
+    this.io.emit('data:invalidate', { entity: 'recharges', userId, timestamp: Date.now() });
+
     this.emitToUser(userId, 'recharge:updated', payload);
     this.emitToAdmin('recharge:updated', payload);
     this.emitToAllStaff('recharge:updated', payload);
-    this.broadcast('data:invalidate', { entity: 'recharges', userId, timestamp: Date.now() });
   }
 
   /**
@@ -249,10 +254,12 @@ export class SocketService {
     const userId = withdrawal.userId?.toString ? withdrawal.userId.toString() : String(withdrawal.userId);
     const payload = { withdrawal, userId, timestamp: Date.now() };
 
+    this.io.emit('withdrawal:updated', payload);
+    this.io.emit('data:invalidate', { entity: 'withdrawals', userId, timestamp: Date.now() });
+
     this.emitToUser(userId, 'withdrawal:updated', payload);
     this.emitToAdmin('withdrawal:updated', payload);
     this.emitToAllStaff('withdrawal:updated', payload);
-    this.broadcast('data:invalidate', { entity: 'withdrawals', userId, timestamp: Date.now() });
   }
 
   /**
@@ -262,10 +269,12 @@ export class SocketService {
     if (!this.io) return;
     const payload = { userId: userId.toString(), user: userData, timestamp: Date.now() };
 
+    this.io.emit('user:updated', payload);
+    this.io.emit('data:invalidate', { entity: 'users', userId: userId.toString(), timestamp: Date.now() });
+
     this.emitToUser(userId, 'user:updated', payload);
     this.emitToAdmin('user:updated', payload);
     this.emitToAllStaff('user:updated', payload);
-    this.broadcast('data:invalidate', { entity: 'users', userId: userId.toString(), timestamp: Date.now() });
   }
 
   /**
@@ -276,9 +285,11 @@ export class SocketService {
     const userId = verification.userId?.toString ? verification.userId.toString() : String(verification.userId);
     const payload = { verification, userId, timestamp: Date.now() };
 
+    this.io.emit('verification:updated', payload);
+    this.io.emit('data:invalidate', { entity: 'verifications', userId, timestamp: Date.now() });
+
     this.emitToUser(userId, 'verification:updated', payload);
     this.emitToAdmin('verification:updated', payload);
     this.emitToAllStaff('verification:updated', payload);
-    this.broadcast('data:invalidate', { entity: 'verifications', userId, timestamp: Date.now() });
   }
 }

@@ -16,6 +16,7 @@ export const getSocket = (): Socket => {
         token: token || '',
       },
       transports: ['websocket', 'polling'],
+      withCredentials: true,
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,
@@ -31,12 +32,15 @@ export const getSocket = (): Socket => {
       }
     });
 
+    socket.onAny((event, ...args) => {
+      console.log(`[Socket Realtime] Received: "${event}"`, args[0]);
+    });
+
     socket.on('disconnect', (reason) => {
       console.log('[Socket] Disconnected from real-time server:', reason);
     });
 
     socket.on('connect_error', (err) => {
-      // Quietly reconnect in background without breaking page
       console.warn('[Socket] Connection error:', err.message);
     });
   }
@@ -49,6 +53,10 @@ export const updateSocketAuth = (token: string | null) => {
     socket.auth = { token: token || '' };
     if (token) {
       socket.emit('join', { token });
+      // If already connected, reconnect to ensure the server handshake middleware registers the new role/user
+      if (socket.connected) {
+        socket.disconnect().connect();
+      }
     }
   }
 };
