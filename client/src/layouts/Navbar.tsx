@@ -17,8 +17,13 @@ export const Navbar: React.FC = () => {
   const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  let lastNotifFetchTime = 0;
   const fetchNotifications = () => {
     if (!user) return;
+    const now = Date.now();
+    if (now - lastNotifFetchTime < 10000) return;
+    lastNotifFetchTime = now;
+
     notificationService
       .getNotifications()
       .then((res) => {

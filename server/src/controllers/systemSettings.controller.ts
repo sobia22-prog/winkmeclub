@@ -1,26 +1,32 @@
 import { Request, Response } from 'express';
 import { SystemSettings } from '../models/systemSettings.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { getCache, setCache, invalidateCache } from '../utils/cache';
 
 export class SystemSettingsController {
   static async getSettings(req: Request, res: Response) {
     try {
-      let settings = await SystemSettings.findOne();
-      if (!settings) {
-        settings = await SystemSettings.create({});
+      const cached = getCache<{ settings: unknown }>('system-settings');
+      if (cached) {
+        res.set('Cache-Control', 'public, max-age=120');
+        return res.status(200).json({ success: true, ...cached });
       }
 
-      // Enforce currencySymbol alignment with defaultCurrency
+      const existing = await SystemSettings.findOne().lean();
+      const settingsDoc = existing ?? (await SystemSettings.create({})).toObject();
+
+      const settings = { ...settingsDoc };
       if (settings.defaultCurrency === 'EUR') settings.currencySymbol = '€';
       else if (settings.defaultCurrency === 'USD') settings.currencySymbol = '$';
       else if (settings.defaultCurrency === 'PKR') settings.currencySymbol = 'Rs.';
       else if (settings.defaultCurrency === 'GBP') settings.currencySymbol = '£';
       else if (settings.defaultCurrency === 'INR') settings.currencySymbol = '₹';
 
-      return res.status(200).json({
-        success: true,
-        settings,
-      });
+      const payload = { settings };
+      setCache('system-settings', payload, 120_000);
+
+      res.set('Cache-Control', 'public, max-age=120');
+      return res.status(200).json({ success: true, ...payload });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to fetch settings.' });
     }
@@ -90,6 +96,8 @@ export class SystemSettingsController {
       if (ifscCode !== undefined) settings.ifscCode = ifscCode;
 
       await settings.save();
+
+      invalidateCache('system-settings');
 
       return res.status(200).json({
         success: true,

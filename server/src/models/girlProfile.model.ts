@@ -43,4 +43,8 @@ const GirlProfileSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+GirlProfileSchema.index({ isActive: 1, createdAt: -1 });
+GirlProfileSchema.index({ categories: 1, isActive: 1 });
+GirlProfileSchema.index({ location: 1, isActive: 1 });
+
 export const GirlProfile = mongoose.model<IGirlProfile>('GirlProfile', GirlProfileSchema);

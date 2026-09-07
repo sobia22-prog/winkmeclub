@@ -24,7 +24,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(localStorage.getItem('wink_token'));
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchSession = async () => {
+  let lastFetchTime = 0;
+  const fetchSession = async (force = false) => {
+    const now = Date.now();
+    if (!force && now - lastFetchTime < 10000) {
+      return; // Throttle: do not re-fetch /me more than once every 10 seconds
+    }
+    lastFetchTime = now;
+
     const storedToken = localStorage.getItem('wink_token');
     if (!storedToken) {
       setUser(null);

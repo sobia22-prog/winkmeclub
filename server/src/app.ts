@@ -1,11 +1,16 @@
 import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import routes from './routes';
 import { errorHandler } from './middleware/error.middleware';
+import { isDbReady } from './config/db';
 
 const app = express();
+
+// Enable Gzip/Brotli HTTP Response Compression
+app.use(compression());
 
 // 1. Bulletproof Custom CORS Middleware (Runs FIRST before any other middleware or routes)
 app.use((req, res, next) => {
@@ -51,8 +56,16 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+app.use('/api', (req, res, next) => {
+  if (!isDbReady()) {
+    return res.status(503).json({ message: 'Database temporarily unavailable. Please retry.' });
+  }
+  next();
+});
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -67,8 +80,19 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Wink Me Club API Server is running smoothly.' });
 });
 
+import path from 'path';
+
 // Register API Routes
 app.use('/api', routes);
+
+// Serve static frontend files from 'public' directory
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
+
+// SPA catch-all route for React client-side router
+app.get('*', (req, res) => {
+  res.sendFile(path.join(publicPath, 'index.html'));
+});
 
 // Global Error Handler
 app.use(errorHandler);

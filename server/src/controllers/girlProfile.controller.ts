@@ -2,35 +2,61 @@ import { Request, Response } from 'express';
 import { GirlProfile } from '../models/girlProfile.model';
 import { GirlCategory } from '../models/girlCategory.model';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { getCache, setCache, invalidateCache } from '../utils/cache';
+
+const PUBLIC_LIST_FIELDS =
+  'name rating height weight chestCircumference initialLikes categories location bio tags verificationLabel details profileImage isFeatured createdAt';
+
+function buildPublicProfilesCacheKey(query: Request['query']): string {
+  const category = String(query.category || 'ALL').toLowerCase();
+  const city = String(query.city || 'ALL').toLowerCase();
+  const search = String(query.search || '').toLowerCase().trim();
+  return `public-profiles:${category}:${city}:${search}`;
+}
 
 export class GirlProfileController {
   // Get all active profiles (Public for Home & Matches)
   static async getPublicProfiles(req: Request, res: Response) {
     try {
+      const cacheKey = buildPublicProfilesCacheKey(req.query);
+      const cached = getCache<{ count: number; profiles: unknown[] }>(cacheKey);
+      if (cached) {
+        res.set('Cache-Control', 'public, max-age=60');
+        return res.status(200).json({ success: true, ...cached });
+      }
+
       const { category, city, search } = req.query;
       const query: any = { isActive: true };
 
-      if (category && String(category).toUpperCase() !== 'ALL') {
-        query.categories = { $in: [new RegExp(String(category), 'i')] };
+      if (category && String(category).trim().toUpperCase() !== 'ALL') {
+        const catStr = String(category).trim();
+        query.categories = { $in: [new RegExp(`^${catStr}$`, 'i')] };
       }
-      if (city && String(city).toUpperCase() !== 'ALL') {
-        query.location = new RegExp(String(city), 'i');
+      if (city && String(city).trim().toUpperCase() !== 'ALL') {
+        const cityStr = String(city).trim();
+        query.location = new RegExp(cityStr, 'i');
       }
       if (search) {
+        const searchStr = String(search).trim();
         query.$or = [
-          { name: new RegExp(String(search), 'i') },
-          { bio: new RegExp(String(search), 'i') },
-          { location: new RegExp(String(search), 'i') },
+          { name: new RegExp(searchStr, 'i') },
+          { bio: new RegExp(searchStr, 'i') },
+          { location: new RegExp(searchStr, 'i') },
         ];
       }
 
-      const profiles = await GirlProfile.find(query).sort({ createdAt: -1 });
+      const profiles = await GirlProfile.find(query)
+        .select(PUBLIC_LIST_FIELDS)
+        .sort({ createdAt: -1 })
+        .hint({ isActive: 1, createdAt: -1 })
+        .lean()
+        .exec();
 
-      return res.status(200).json({
-        success: true,
-        count: profiles.length,
-        profiles,
-      });
+      const payload = { count: profiles.length, profiles };
+      setCache(cacheKey, payload, 10 * 60 * 1000); // 10 minutes TTL
+
+      res.set('Cache-Control', 'public, max-age=300');
+      return res.status(200).json({ success: true, ...payload });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to fetch girl profiles.' });
     }
@@ -40,11 +66,22 @@ export class GirlProfileController {
   static async getProfileById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const profile = await GirlProfile.findById(id);
+      const cacheKey = `profile:${id}`;
+      const cached = getCache<{ profile: unknown }>(cacheKey);
+      if (cached) {
+        res.set('Cache-Control', 'public, max-age=120');
+        return res.status(200).json({ success: true, ...cached });
+      }
+
+      const profile = await GirlProfile.findById(id).lean();
       if (!profile) {
         return res.status(404).json({ message: 'Profile not found.' });
       }
-      return res.status(200).json({ success: true, profile });
+
+      const payload = { profile };
+      setCache(cacheKey, payload, 120_000);
+      res.set('Cache-Control', 'public, max-age=120');
+      return res.status(200).json({ success: true, ...payload });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to fetch profile details.' });
     }
@@ -101,6 +138,8 @@ export class GirlProfileController {
         galleryImages: Array.isArray(galleryImages) ? galleryImages : [],
       });
 
+      invalidateCache('public-profiles');
+
       return res.status(201).json({
         success: true,
         message: 'Girl profile created successfully!',
@@ -126,6 +165,9 @@ export class GirlProfileController {
         return res.status(404).json({ message: 'Profile not found.' });
       }
 
+      invalidateCache('public-profiles');
+      invalidateCache(`profile:${id}`);
+
       return res.status(200).json({
         success: true,
         message: 'Girl profile updated successfully!',
@@ -141,6 +183,8 @@ export class GirlProfileController {
     try {
       const { id } = req.params;
       await GirlProfile.findByIdAndDelete(id);
+      invalidateCache('public-profiles');
+      invalidateCache(`profile:${id}`);
       return res.status(200).json({ success: true, message: 'Girl profile deleted.' });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to delete girl profile.' });

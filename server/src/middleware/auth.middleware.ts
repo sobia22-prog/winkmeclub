@@ -17,7 +17,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     const secret = process.env.JWT_SECRET || 'wink_me_club_super_secret_jwt_key_2026';
     const decoded = jwt.verify(token, secret) as { userId: string };
 
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId).select('-passwordHash');
     if (!user) {
       return res.status(401).json({ message: 'Invalid or expired authentication session.' });
     }

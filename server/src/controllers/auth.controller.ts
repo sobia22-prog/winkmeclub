@@ -355,6 +355,7 @@ export class AuthController {
       if (!req.user) return res.status(401).json({ message: 'Not authenticated' });
       const wallet = await WalletService.getOrCreateWallet(req.user._id.toString());
 
+      res.set('Cache-Control', 'no-store');
       return res.status(200).json({
         success: true,
         user: {

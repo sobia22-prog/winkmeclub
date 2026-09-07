@@ -20,7 +20,7 @@ export class NotificationService {
   }
 
   static async getUserNotifications(userId: string) {
-    return await Notification.find({ userId }).sort({ createdAt: -1 }).limit(50);
+    return await Notification.find({ userId }).sort({ createdAt: -1 }).limit(50).lean();
   }
 
   static async markAsRead(notificationId: string, userId: string) {
