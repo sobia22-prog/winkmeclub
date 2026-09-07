@@ -39,8 +39,7 @@ export const AdminTradesPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const fetchTrades = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+  const fetchTrades = async () => {
     try {
       const res = await adminService.getTrades({ status: 'ALL' });
       if (res.data.success) {
@@ -49,13 +48,15 @@ export const AdminTradesPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTrades(true);
-    const interval = setInterval(() => fetchTrades(false), 1000);
+    fetchTrades();
+    const interval = setInterval(() => {
+      fetchTrades();
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -73,7 +74,7 @@ export const AdminTradesPage: React.FC = () => {
       if (res.data.success) {
         setMessage(`Trade #${selectedTrade.tradeId} result updated as ${settlementOutcome}${settlementOutcome === 'WIN' ? ` (+${profitPercentage}% profit)` : ''}!`);
         setSelectedTrade(null);
-        fetchTrades(false);
+        fetchTrades();
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Settlement failed.');

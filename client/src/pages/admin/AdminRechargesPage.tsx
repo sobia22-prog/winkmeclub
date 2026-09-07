@@ -29,8 +29,7 @@ export const AdminRechargesPage: React.FC = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const fetchRecharges = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+  const fetchRecharges = async () => {
     try {
       const res = await adminService.getRecharges({ status: 'ALL' });
       if (res.data.success) {
@@ -39,13 +38,15 @@ export const AdminRechargesPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchRecharges(true);
-    const interval = setInterval(() => fetchRecharges(false), 1000);
+    fetchRecharges();
+    const interval = setInterval(() => {
+      fetchRecharges();
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -66,7 +67,7 @@ export const AdminRechargesPage: React.FC = () => {
         setMessage(`Recharge #${selectedRecharge.requestId} ${actionType === 'APPROVE' ? 'Accepted & Credited' : 'Rejected'} successfully.`);
         setSelectedRecharge(null);
         setReason('');
-        fetchRecharges(false);
+        fetchRecharges();
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Recharge action failed.');

@@ -42,8 +42,7 @@ export const AdminDashboardPage: React.FC = () => {
   const isStaff = user?.role === 'STAFF';
   const currencySymbol = settings.currencySymbol || '₹';
 
-  const fetchStats = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+  const fetchStats = async () => {
     try {
       const res = await adminService.getDashboardStats();
       if (res.data.success) {
@@ -54,13 +53,15 @@ export const AdminDashboardPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStats(true);
-    const interval = setInterval(() => fetchStats(false), 1000);
+    fetchStats();
+    const interval = setInterval(() => {
+      fetchStats();
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 

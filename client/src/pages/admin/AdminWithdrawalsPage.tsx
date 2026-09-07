@@ -28,8 +28,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const fetchWithdrawals = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+  const fetchWithdrawals = async () => {
     try {
       const res = await adminService.getWithdrawals({ status: 'ALL' });
       if (res.data.success) {
@@ -38,13 +37,15 @@ export const AdminWithdrawalsPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchWithdrawals(true);
-    const interval = setInterval(() => fetchWithdrawals(false), 1000);
+    fetchWithdrawals();
+    const interval = setInterval(() => {
+      fetchWithdrawals();
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -64,7 +65,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
         setMessage(`Withdrawal #${selectedWithdrawal.requestId} ${actionType === 'COMPLETE' ? 'Accepted & Completed' : 'Rejected'} successfully.`);
         setSelectedWithdrawal(null);
         setReason('');
-        fetchWithdrawals(false);
+        fetchWithdrawals();
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Withdrawal action failed.');

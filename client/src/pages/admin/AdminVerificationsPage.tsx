@@ -22,8 +22,7 @@ export const AdminVerificationsPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  const fetchVerifications = async (showLoading = true) => {
-    if (showLoading) setLoading(true);
+  const fetchVerifications = async () => {
     try {
       const res = await adminService.getVerifications({ status });
       if (res.data.success) {
@@ -32,13 +31,15 @@ export const AdminVerificationsPage: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      if (showLoading) setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchVerifications(true);
-    const interval = setInterval(() => fetchVerifications(false), 1000);
+    fetchVerifications();
+    const interval = setInterval(() => {
+      fetchVerifications();
+    }, 1000);
     return () => clearInterval(interval);
   }, [status]);
 
@@ -50,7 +51,7 @@ export const AdminVerificationsPage: React.FC = () => {
       });
       if (res.data.success) {
         setMessage(`Verification status updated to ${newStatus}`);
-        fetchVerifications(false);
+        fetchVerifications();
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Verification action failed.');
@@ -72,7 +73,7 @@ export const AdminVerificationsPage: React.FC = () => {
         setMessage(`Verification request updated to ${reviewAction}`);
         setSelectedVerification(null);
         setReason('');
-        fetchVerifications(false);
+        fetchVerifications();
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Review failed.');
