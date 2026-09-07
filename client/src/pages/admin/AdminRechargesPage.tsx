@@ -9,6 +9,7 @@ import { Modal } from '../../components/common/Modal';
 import { Input } from '../../components/common/Input';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import { ArrowDownRight, CheckCircle2, XCircle, Send, Eye } from 'lucide-react';
 
 export const AdminRechargesPage: React.FC = () => {
@@ -41,6 +42,11 @@ export const AdminRechargesPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useRealtimeEvent('recharge:updated', () => fetchRecharges());
+  useRealtimeEvent('data:invalidate', (d: any) => {
+    if (d?.entity === 'recharges' || !d?.entity) fetchRecharges();
+  });
 
   useEffect(() => {
     let isMounted = true;

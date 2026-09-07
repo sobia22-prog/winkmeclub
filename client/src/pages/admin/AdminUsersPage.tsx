@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import { adminService } from '../../services/admin.service';
 import { User } from '../../types';
 import { Card } from '../../components/common/Card';
@@ -97,6 +98,13 @@ export const AdminUsersPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Real-time synchronization for users directory & balances
+  useRealtimeEvent('user:updated', () => fetchUsers());
+  useRealtimeEvent('balance:updated', () => fetchUsers());
+  useRealtimeEvent('trade:created', () => fetchUsers());
+  useRealtimeEvent('trade:settled', () => fetchUsers());
+  useRealtimeEvent('data:invalidate', () => fetchUsers());
 
   useEffect(() => {
     let isMounted = true;

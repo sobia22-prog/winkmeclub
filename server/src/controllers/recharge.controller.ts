@@ -38,6 +38,13 @@ export class RechargeController {
         '/wallet'
       );
 
+      try {
+        const { SocketService } = await import('../services/socket.service');
+        SocketService.notifyRechargeUpdated(recharge);
+      } catch (err) {
+        console.error('[Socket] Failed to notify recharge submit:', err);
+      }
+
       return res.status(201).json({
         success: true,
         message: 'Recharge request submitted successfully!',

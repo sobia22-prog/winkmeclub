@@ -4,6 +4,7 @@ import { tradeService } from '../../services/trade.service';
 import { Product, Trade } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import { Card } from '../../components/common/Card';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
@@ -64,6 +65,20 @@ export const TradesPage: React.FC = () => {
     }
   };
 
+  // Instant real-time update when trade is settled by admin/staff
+  useRealtimeEvent('trade:settled', () => {
+    fetchTradeData();
+    refreshSession();
+  });
+  useRealtimeEvent('balance:updated', () => {
+    refreshSession();
+    fetchTradeData();
+  });
+  useRealtimeEvent('data:invalidate', () => {
+    fetchTradeData();
+    refreshSession();
+  });
+
   useEffect(() => {
     let isMounted = true;
     let timeout: NodeJS.Timeout;
@@ -77,9 +92,20 @@ export const TradesPage: React.FC = () => {
     };
     poll();
 
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchTradeData();
+        refreshSession();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
     return () => {
       isMounted = false;
       clearTimeout(timeout);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
     };
   }, []);
 

@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import { Trade, ITrade, TradeOutcome } from '../models/trade.model';
+import { User } from '../models/user.model';
 import { WalletService } from './wallet.service';
 import { NotificationService } from './notification.service';
+import { SocketService } from './socket.service';
 
 export class TradeSettlementService {
   static async executeTrade(
@@ -45,6 +47,14 @@ export class TradeSettlementService {
       'TRADE',
       '/trades'
     );
+
+    try {
+      const user = await User.findById(userId).select('assignedStaff');
+      const staffId = user?.assignedStaff ? user.assignedStaff.toString() : null;
+      SocketService.notifyTradeCreated(trade, staffId);
+    } catch (err) {
+      console.error('[Socket] Failed to notify trade created:', err);
+    }
 
     return trade;
   }
@@ -169,6 +179,14 @@ export class TradeSettlementService {
         'TRADE',
         '/trades'
       );
+    }
+
+    try {
+      const targetUser = await User.findById(trade.userId).select('assignedStaff');
+      const staffId = targetUser?.assignedStaff ? targetUser.assignedStaff.toString() : null;
+      SocketService.notifyTradeSettled(trade, staffId);
+    } catch (err) {
+      console.error('[Socket] Failed to notify trade settled:', err);
     }
 
     return trade;

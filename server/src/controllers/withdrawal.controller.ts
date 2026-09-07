@@ -82,6 +82,14 @@ export class WithdrawalController {
         '/wallet'
       );
 
+      try {
+        const { SocketService } = await import('../services/socket.service');
+        SocketService.notifyWithdrawalUpdated(withdrawal);
+        SocketService.notifyBalanceUpdated(req.user._id.toString());
+      } catch (err) {
+        console.error('[Socket] Failed to notify withdrawal submit:', err);
+      }
+
       return res.status(201).json({
         success: true,
         message: 'Withdrawal request submitted successfully!',

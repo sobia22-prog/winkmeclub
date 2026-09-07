@@ -8,6 +8,7 @@ import { Button } from '../../components/common/Button';
 import { Modal } from '../../components/common/Modal';
 import { Select } from '../../components/common/Select';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import {
   TrendingUp,
   TrendingDown,
@@ -51,6 +52,13 @@ export const AdminTradesPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Instant real-time updates via WebSockets without page reload
+  useRealtimeEvent('trade:created', () => fetchTrades());
+  useRealtimeEvent('trade:settled', () => fetchTrades());
+  useRealtimeEvent('data:invalidate', (d: any) => {
+    if (d?.entity === 'trades' || !d?.entity) fetchTrades();
+  });
 
   useEffect(() => {
     let isMounted = true;

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { SocketProvider } from './contexts/SocketContext';
 import { SystemSettingsProvider } from './contexts/SystemSettingsContext';
 import { LanguageTranslator } from './components/common/LanguageTranslator';
 
@@ -71,76 +72,78 @@ export const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <SystemSettingsProvider>
-            <LanguageTranslator />
-            <Routes>
-              {/* Public Auth Routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/verify-otp" element={<VerifyOTPPage />} />
-              <Route path="/admin/login" element={<AdminLoginPage />} />
-              <Route path="/staff/login" element={<StaffLoginPage />} />
+          <SocketProvider>
+            <SystemSettingsProvider>
+              <LanguageTranslator />
+              <Routes>
+                {/* Public Auth Routes */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/verify-otp" element={<VerifyOTPPage />} />
+                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route path="/staff/login" element={<StaffLoginPage />} />
 
-              {/* Protected User Routes */}
-              <Route element={<UserLayout />}>
-                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/matches" element={<MatchesPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/profile/essential-information" element={<EssentialInformationPage />} />
-                <Route path="/profile/account" element={<AccountPage />} />
-                <Route path="/profile/withdrawal-details" element={<WithdrawalSecretPage />} />
-                <Route path="/profile/withdrawal-secret" element={<WithdrawalSecretPage />} />
-                <Route path="/profile/login-password" element={<LoginPasswordPage />} />
-                <Route path="/profile/gift-records" element={<VipRecordsPage />} />
-                <Route path="/profile/vip-records" element={<VipRecordsPage />} />
-                <Route path="/profile/points-history" element={<FinanceHistoryPage />} />
-                <Route path="/profile/finance-history" element={<FinanceHistoryPage />} />
-                <Route path="/verification" element={<VerificationPage />} />
-                <Route path="/wallet" element={<WalletPage />} />
-                <Route path="/wallet/recharge" element={<WalletPage initialTab="recharge" />} />
-                <Route path="/wallet/withdraw" element={<WalletPage initialTab="withdraw" />} />
-                <Route path="/trades" element={<TradesPage />} />
-                <Route path="/transactions" element={<Navigate to="/wallet" replace />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/announcements" element={<AnnouncementsPage />} />
-                <Route path="/support" element={<SupportPage />} />
-              </Route>
+                {/* Protected User Routes */}
+                <Route element={<UserLayout />}>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/matches" element={<MatchesPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/profile/essential-information" element={<EssentialInformationPage />} />
+                  <Route path="/profile/account" element={<AccountPage />} />
+                  <Route path="/profile/withdrawal-details" element={<WithdrawalSecretPage />} />
+                  <Route path="/profile/withdrawal-secret" element={<WithdrawalSecretPage />} />
+                  <Route path="/profile/login-password" element={<LoginPasswordPage />} />
+                  <Route path="/profile/gift-records" element={<VipRecordsPage />} />
+                  <Route path="/profile/vip-records" element={<VipRecordsPage />} />
+                  <Route path="/profile/points-history" element={<FinanceHistoryPage />} />
+                  <Route path="/profile/finance-history" element={<FinanceHistoryPage />} />
+                  <Route path="/verification" element={<VerificationPage />} />
+                  <Route path="/wallet" element={<WalletPage />} />
+                  <Route path="/wallet/recharge" element={<WalletPage initialTab="recharge" />} />
+                  <Route path="/wallet/withdraw" element={<WalletPage initialTab="withdraw" />} />
+                  <Route path="/trades" element={<TradesPage />} />
+                  <Route path="/transactions" element={<Navigate to="/wallet" replace />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/announcements" element={<AnnouncementsPage />} />
+                  <Route path="/support" element={<SupportPage />} />
+                </Route>
 
-              {/* Protected Admin & Staff Routes */}
-              <Route element={<AdminLayout />}>
-                <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-                <Route path="/admin/girls" element={<AdminGirlProfilesPage />} />
-                <Route path="/admin/staff" element={<AdminStaffPage />} />
-                <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
-                <Route path="/admin/users" element={<AdminUsersPage />} />
-                <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
-                <Route path="/admin/trades" element={<AdminTradesPage />} />
-                <Route path="/admin/recharges" element={<AdminRechargesPage />} />
-                <Route path="/admin/withdrawals" element={<AdminWithdrawalsPage />} />
-                <Route path="/admin/verifications" element={<AdminVerificationsPage />} />
-                <Route path="/admin/products" element={<AdminProductsPage />} />
-                <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
-                <Route path="/admin/announcements" element={<AdminAnnouncementsPage />} />
-                <Route path="/admin/support" element={<AdminSupportPage />} />
-                <Route path="/admin/settings" element={<AdminPaymentSettingsPage />} />
-                <Route path="/admin/profile" element={<AdminProfilePage />} />
+                {/* Protected Admin & Staff Routes */}
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                  <Route path="/admin/girls" element={<AdminGirlProfilesPage />} />
+                  <Route path="/admin/staff" element={<AdminStaffPage />} />
+                  <Route path="/admin/staff/:id" element={<AdminStaffDetailPage />} />
+                  <Route path="/admin/users" element={<AdminUsersPage />} />
+                  <Route path="/admin/users/:id" element={<AdminUserDetailPage />} />
+                  <Route path="/admin/trades" element={<AdminTradesPage />} />
+                  <Route path="/admin/recharges" element={<AdminRechargesPage />} />
+                  <Route path="/admin/withdrawals" element={<AdminWithdrawalsPage />} />
+                  <Route path="/admin/verifications" element={<AdminVerificationsPage />} />
+                  <Route path="/admin/products" element={<AdminProductsPage />} />
+                  <Route path="/admin/transactions" element={<AdminTransactionsPage />} />
+                  <Route path="/admin/announcements" element={<AdminAnnouncementsPage />} />
+                  <Route path="/admin/support" element={<AdminSupportPage />} />
+                  <Route path="/admin/settings" element={<AdminPaymentSettingsPage />} />
+                  <Route path="/admin/profile" element={<AdminProfilePage />} />
 
-                {/* Staff Portal Routes */}
-                <Route path="/staff" element={<Navigate to="/staff/dashboard" replace />} />
-                <Route path="/staff/dashboard" element={<AdminDashboardPage />} />
-                <Route path="/staff/users" element={<AdminUsersPage />} />
-                <Route path="/staff/users/:id" element={<AdminUserDetailPage />} />
-                <Route path="/staff/trades" element={<AdminTradesPage />} />
-                <Route path="/staff/recharges" element={<AdminRechargesPage />} />
-                <Route path="/staff/withdrawals" element={<AdminWithdrawalsPage />} />
-                <Route path="/staff/verifications" element={<AdminVerificationsPage />} />
-              </Route>
+                  {/* Staff Portal Routes */}
+                  <Route path="/staff" element={<Navigate to="/staff/dashboard" replace />} />
+                  <Route path="/staff/dashboard" element={<AdminDashboardPage />} />
+                  <Route path="/staff/users" element={<AdminUsersPage />} />
+                  <Route path="/staff/users/:id" element={<AdminUserDetailPage />} />
+                  <Route path="/staff/trades" element={<AdminTradesPage />} />
+                  <Route path="/staff/recharges" element={<AdminRechargesPage />} />
+                  <Route path="/staff/withdrawals" element={<AdminWithdrawalsPage />} />
+                  <Route path="/staff/verifications" element={<AdminVerificationsPage />} />
+                </Route>
 
-              {/* Fallback 404 */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </SystemSettingsProvider>
+                {/* Fallback 404 */}
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </SystemSettingsProvider>
+          </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

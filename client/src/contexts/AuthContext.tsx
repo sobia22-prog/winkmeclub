@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, Wallet } from '../types';
 import { authService } from '../services/auth.service';
 
+import { getSocket } from '../services/socket.service';
+
 interface AuthContextType {
   user: User | null;
   wallet: Wallet | null;
@@ -50,6 +52,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     fetchSession();
+
+    // 1. Listen for real-time WebSocket events to update session & wallet immediately
+    const socket = getSocket();
+
+    const handleRealtimeUpdate = (data: any) => {
+      const currentToken = localStorage.getItem('wink_token');
+      if (!currentToken) return;
+
+      // If event has a target userId, only refresh if it matches current user (or if admin/staff)
+      fetchSession();
+    };
+
+    socket.on('balance:updated', handleRealtimeUpdate);
+    socket.on('trade:settled', handleRealtimeUpdate);
+    socket.on('trade:created', handleRealtimeUpdate);
+    socket.on('recharge:updated', handleRealtimeUpdate);
+    socket.on('withdrawal:updated', handleRealtimeUpdate);
+    socket.on('user:updated', handleRealtimeUpdate);
+    socket.on('data:invalidate', handleRealtimeUpdate);
+
+    // 2. Fail-safe Polling every 2.5 seconds + focus/visibility listeners
+    let isMounted = true;
+    let pollTimer: NodeJS.Timeout;
+
+    const poll = async () => {
+      const currentToken = localStorage.getItem('wink_token');
+      if (currentToken) {
+        await fetchSession();
+      }
+      if (isMounted) {
+        pollTimer = setTimeout(poll, 2500);
+      }
+    };
+    poll();
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        fetchSession();
+      }
+    };
+    window.addEventListener('focus', onVisible);
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(pollTimer);
+      socket.off('balance:updated', handleRealtimeUpdate);
+      socket.off('trade:settled', handleRealtimeUpdate);
+      socket.off('trade:created', handleRealtimeUpdate);
+      socket.off('recharge:updated', handleRealtimeUpdate);
+      socket.off('withdrawal:updated', handleRealtimeUpdate);
+      socket.off('user:updated', handleRealtimeUpdate);
+      socket.off('data:invalidate', handleRealtimeUpdate);
+      window.removeEventListener('focus', onVisible);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, []);
 
   const loginSession = (newToken: string, newUser: User) => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import { adminService } from '../../services/admin.service';
 import { Card } from '../../components/common/Card';
 import { StatCard } from '../../components/common/StatCard';
@@ -56,6 +57,15 @@ export const AdminDashboardPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Real-time synchronization for dashboard KPIs and activity
+  useRealtimeEvent('trade:created', () => fetchStats());
+  useRealtimeEvent('trade:settled', () => fetchStats());
+  useRealtimeEvent('balance:updated', () => fetchStats());
+  useRealtimeEvent('recharge:updated', () => fetchStats());
+  useRealtimeEvent('withdrawal:updated', () => fetchStats());
+  useRealtimeEvent('user:updated', () => fetchStats());
+  useRealtimeEvent('data:invalidate', () => fetchStats());
 
   useEffect(() => {
     let isMounted = true;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import { walletService } from '../../services/wallet.service';
 import { RechargeRequest, WithdrawalRequest } from '../../types';
 import { Card } from '../../components/common/Card';
@@ -92,8 +93,53 @@ export const WalletPage: React.FC<WalletPageProps> = ({ initialTab }) => {
     }
   };
 
+  // Real-time synchronization for wallet recharges, withdrawals, and balance
+  useRealtimeEvent('recharge:updated', () => {
+    fetchHistory();
+    refreshSession();
+  });
+  useRealtimeEvent('withdrawal:updated', () => {
+    fetchHistory();
+    refreshSession();
+  });
+  useRealtimeEvent('balance:updated', () => {
+    fetchHistory();
+    refreshSession();
+  });
+  useRealtimeEvent('data:invalidate', () => {
+    fetchHistory();
+    refreshSession();
+  });
+
   useEffect(() => {
     fetchHistory();
+
+    let isMounted = true;
+    let pollTimer: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchHistory();
+      if (isMounted) {
+        pollTimer = setTimeout(poll, 2500);
+      }
+    };
+    poll();
+
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchHistory();
+        refreshSession();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(pollTimer);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
   }, []);
 
   const handleRechargeSubmit = async (e: React.FormEvent) => {

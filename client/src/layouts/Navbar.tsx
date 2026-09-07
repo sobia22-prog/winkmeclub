@@ -6,6 +6,7 @@ import { brandConfig } from '../config/brand.config';
 import { Badge } from '../components/common/Badge';
 import { Bell, Wallet as WalletIcon, LogOut } from 'lucide-react';
 import { notificationService } from '../services/notification.service';
+import { useRealtimeEvent } from '../contexts/SocketContext';
 import { Notification } from '../types';
 
 export const Navbar: React.FC = () => {
@@ -16,18 +17,27 @@ export const Navbar: React.FC = () => {
   const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  const fetchNotifications = () => {
+    if (!user) return;
+    notificationService
+      .getNotifications()
+      .then((res) => {
+        if (res.data.success) {
+          setNotifications(res.data.notifications);
+          setUnreadCount(res.data.unreadCount);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useRealtimeEvent('trade:settled', () => fetchNotifications());
+  useRealtimeEvent('trade:created', () => fetchNotifications());
+  useRealtimeEvent('balance:updated', () => fetchNotifications());
+  useRealtimeEvent('recharge:updated', () => fetchNotifications());
+  useRealtimeEvent('withdrawal:updated', () => fetchNotifications());
+
   useEffect(() => {
-    if (user) {
-      notificationService
-        .getNotifications()
-        .then((res) => {
-          if (res.data.success) {
-            setNotifications(res.data.notifications);
-            setUnreadCount(res.data.unreadCount);
-          }
-        })
-        .catch(() => {});
-    }
+    fetchNotifications();
   }, [user]);
 
   const handleMarkAllRead = async () => {

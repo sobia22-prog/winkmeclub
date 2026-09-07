@@ -9,6 +9,7 @@ import { Modal } from '../../components/common/Modal';
 import { Input } from '../../components/common/Input';
 import { useSystemSettings } from '../../contexts/SystemSettingsContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
 import { ArrowUpRight, CheckCircle2, XCircle, Send, QrCode, Eye, Clock } from 'lucide-react';
 
 export const AdminWithdrawalsPage: React.FC = () => {
@@ -40,6 +41,11 @@ export const AdminWithdrawalsPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useRealtimeEvent('withdrawal:updated', () => fetchWithdrawals());
+  useRealtimeEvent('data:invalidate', (d: any) => {
+    if (d?.entity === 'withdrawals' || !d?.entity) fetchWithdrawals();
+  });
 
   useEffect(() => {
     let isMounted = true;

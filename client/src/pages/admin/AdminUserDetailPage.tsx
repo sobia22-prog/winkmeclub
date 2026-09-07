@@ -6,7 +6,8 @@ import { adminService } from '../../services/admin.service';
 import { Card } from '../../components/common/Card';
 import { Badge } from '../../components/common/Badge';
 import { Table } from '../../components/common/Table';
-import { ArrowLeft, User, Wallet, History, ShieldCheck, KeyRound, Lock, Activity } from 'lucide-react';
+import { useRealtimeEvent } from '../../contexts/SocketContext';
+import { ArrowLeft, User, Wallet, History, ShieldCheck, KeyRound, Lock, Activity, TrendingUp } from 'lucide-react';
 
 export const AdminUserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,22 +21,60 @@ export const AdminUserDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (id) {
-      setError('');
-      adminService
-        .getUserDetail(id)
-        .then((res) => {
-          if (res.data.success) {
-            setData(res.data.data || res.data);
-          }
-        })
-        .catch((err: any) => {
-          console.error(err);
-          setError(err.response?.data?.message || 'Failed to fetch user details.');
-        })
-        .finally(() => setLoading(false));
+  const fetchUserDetail = async () => {
+    if (!id) return;
+    try {
+      const res = await adminService.getUserDetail(id);
+      if (res.data.success) {
+        setData(res.data.data || res.data);
+      }
+    } catch (err: any) {
+      console.error(err);
+      if (!data) {
+        setError(err.response?.data?.message || 'Failed to fetch user details.');
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Real-time WebSocket event triggers for instant zero-lag updates
+  useRealtimeEvent('trade:created', () => fetchUserDetail());
+  useRealtimeEvent('trade:settled', () => fetchUserDetail());
+  useRealtimeEvent('balance:updated', () => fetchUserDetail());
+  useRealtimeEvent('recharge:updated', () => fetchUserDetail());
+  useRealtimeEvent('withdrawal:updated', () => fetchUserDetail());
+  useRealtimeEvent('user:updated', () => fetchUserDetail());
+  useRealtimeEvent('data:invalidate', () => fetchUserDetail());
+
+  useEffect(() => {
+    fetchUserDetail();
+
+    let isMounted = true;
+    let pollTimer: NodeJS.Timeout;
+
+    const poll = async () => {
+      await fetchUserDetail();
+      if (isMounted) {
+        pollTimer = setTimeout(poll, 2000);
+      }
+    };
+    poll();
+
+    const handleFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchUserDetail();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(pollTimer);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
   }, [id]);
 
   if (loading) return <Card className="p-8 text-center text-xs text-slate-500">Loading user details...</Card>;
@@ -187,6 +226,43 @@ export const AdminUserDetailPage: React.FC = () => {
                 <td className="px-4 py-2.5 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}
+          </Table>
+        )}
+      </div>
+
+      {/* Client Trade History Section */}
+      <div className="space-y-3 pt-4 border-t border-slate-200">
+        <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-pink-600" /> Client Airborne Trade History
+        </h3>
+        {trades.length === 0 ? (
+          <Card className="p-6 text-center text-xs text-slate-500 bg-white border border-slate-200 shadow-sm">No trades placed by this client yet.</Card>
+        ) : (
+          <Table headers={['Trade ID', 'Product', 'Qty / Amount', 'Status', 'Outcome & Profit', 'Date']}>
+            {trades.map((t: any) => {
+              const isWin = t.outcome === 'WIN';
+              const isLose = t.outcome === 'LOSE';
+              const profitPct = t.profitPercentage || 20;
+
+              return (
+                <tr key={t._id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-4 py-2.5 font-mono font-bold text-xs text-slate-900">{t.tradeId}</td>
+                  <td className="px-4 py-2.5 text-xs text-slate-800 font-semibold">{t.productName}</td>
+                  <td className="px-4 py-2.5 font-bold text-pink-600 text-xs">
+                    {currencySymbol}{t.totalAmount || t.quantity || 0}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs">
+                    {t.status === 'PENDING' ? <Badge variant="pending">PENDING</Badge> : <Badge variant="verified">SETTLED</Badge>}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs">
+                    {isWin && <Badge variant="vip">WIN (+{profitPct}%)</Badge>}
+                    {isLose && <Badge variant="danger">LOSE (-100%)</Badge>}
+                    {!isWin && !isLose && <span className="text-[11px] text-slate-500 font-semibold">In Round</span>}
+                  </td>
+                  <td className="px-4 py-2.5 text-xs text-slate-500">{new Date(t.createdAt).toLocaleDateString()}</td>
+                </tr>
+              );
+            })}
           </Table>
         )}
       </div>

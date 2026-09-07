@@ -20,6 +20,7 @@ import { AuditService } from '../services/audit.service';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { financialConfig } from '../config/financial.config';
 import { generateStaffInvitationCode } from '../utils/staffCode.util';
+import { SocketService } from '../services/socket.service';
 
 // Helper to scoping client IDs for STAFF members
 const getScopedClientIds = async (req: AuthRequest): Promise<any[] | null> => {
@@ -408,6 +409,13 @@ export class AdminController {
         await wallet.save();
       }
 
+      try {
+        SocketService.notifyUserUpdated(user._id.toString(), user.toObject());
+        SocketService.notifyBalanceUpdated(user._id.toString(), wallet);
+      } catch (err) {
+        console.error('[Socket] Failed to notify user profile update:', err);
+      }
+
       return res.status(200).json({
         success: true,
         message: 'Member profile updated successfully.',
@@ -455,6 +463,13 @@ export class AdminController {
         amount: numAmount,
         reason,
       });
+
+      try {
+        SocketService.notifyBalanceUpdated(targetUserId, result?.wallet);
+        SocketService.notifyUserUpdated(targetUserId);
+      } catch (err) {
+        console.error('[Socket] Failed to notify balance adjustment:', err);
+      }
 
       return res.status(200).json({
         success: true,
@@ -574,6 +589,13 @@ export class AdminController {
         return res.status(400).json({ message: 'Invalid recharge action specified.' });
       }
 
+      try {
+        SocketService.notifyRechargeUpdated(recharge);
+        SocketService.notifyBalanceUpdated(recharge.userId.toString());
+      } catch (err) {
+        console.error('[Socket] Failed to notify recharge review:', err);
+      }
+
       return res.status(200).json({ success: true, message: `Recharge ${action} successfully.`, recharge });
     } catch (error: any) {
       return res.status(500).json({ message: error.message || 'Failed to review recharge.' });
@@ -645,6 +667,13 @@ export class AdminController {
         );
       } else {
         return res.status(400).json({ message: 'Invalid withdrawal action specified.' });
+      }
+
+      try {
+        SocketService.notifyWithdrawalUpdated(withdrawal);
+        SocketService.notifyBalanceUpdated(withdrawal.userId.toString());
+      } catch (err) {
+        console.error('[Socket] Failed to notify withdrawal review:', err);
       }
 
       return res.status(200).json({ success: true, message: `Withdrawal ${action} successfully.`, withdrawal });
@@ -741,6 +770,12 @@ export class AdminController {
         req.user._id.toString(),
         reason
       );
+
+      try {
+        SocketService.notifyVerificationUpdated(result);
+      } catch (err) {
+        console.error('[Socket] Failed to notify verification review:', err);
+      }
 
       return res.status(200).json({ success: true, message: 'Verification reviewed successfully.', result });
     } catch (error: any) {
