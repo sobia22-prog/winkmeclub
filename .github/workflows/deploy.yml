@@ -18,20 +18,20 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Dependencies
+      - name: Install Client Dependencies
         working-directory: ./client
         run: npm install
 
-      - name: Build Project
+      - name: Build React App
         working-directory: ./client
         run: npm run build
 
-      - name: Sync files to Hostinger via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./client/dist/
-          server-dir: ./public_html/
-          dangerous-clean-slate: true
+      - name: Install basic-ftp helper
+        run: npm install basic-ftp
+
+      - name: Deploy to Hostinger via FTP
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: node .github/scripts/deploy.js
