@@ -45,7 +45,7 @@ export const AdminRechargesPage: React.FC = () => {
 
   useEffect(() => {
     fetchRecharges(true);
-    const interval = setInterval(() => fetchRecharges(false), 15000);
+    const interval = setInterval(() => fetchRecharges(false), 5000);
     return () => clearInterval(interval);
   }, []);
 

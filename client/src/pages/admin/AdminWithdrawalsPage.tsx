@@ -44,7 +44,7 @@ export const AdminWithdrawalsPage: React.FC = () => {
 
   useEffect(() => {
     fetchWithdrawals(true);
-    const interval = setInterval(() => fetchWithdrawals(false), 15000);
+    const interval = setInterval(() => fetchWithdrawals(false), 5000);
     return () => clearInterval(interval);
   }, []);
 

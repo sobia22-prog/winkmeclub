@@ -60,7 +60,7 @@ export const AdminDashboardPage: React.FC = () => {
 
   useEffect(() => {
     fetchStats(true);
-    const interval = setInterval(() => fetchStats(false), 15000);
+    const interval = setInterval(() => fetchStats(false), 5000);
     return () => clearInterval(interval);
   }, []);
 
