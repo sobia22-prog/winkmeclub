@@ -74,7 +74,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // 2. Fail-safe Polling every 2.5 seconds + focus/visibility listeners
     let isMounted = true;
-    let pollTimer: NodeJS.Timeout;
 
     const poll = async () => {
       const currentToken = localStorage.getItem('wink_token');
@@ -95,7 +94,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       isMounted = false;
-      clearTimeout(pollTimer);
       socket.off('balance:updated', handleRealtimeUpdate);
       socket.off('trade:settled', handleRealtimeUpdate);
       socket.off('trade:created', handleRealtimeUpdate);
